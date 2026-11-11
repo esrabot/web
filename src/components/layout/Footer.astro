@@ -4,7 +4,8 @@
  *
  * Opens with the closing call to action — one blue band, the only large
  * block of saturated colour on a page — then the link columns on beige,
- * and a last line of legal and build facts.
+ * a last line of legal and build facts, and to close, the ESRA
+ * wordmark set solid across the full width.
  *
  * Channel columns come from the org registry, so an account appears here
  * or does not exist.
@@ -124,6 +125,10 @@ const year = new Date().getFullYear();
             )
           }
         </p>
+      </div>
+
+      <div class="wordmark" aria-hidden="true">
+        <Logo label={null} tight />
       </div>
     </div>
   </div>
@@ -317,6 +322,24 @@ const year = new Date().getFullYear();
 
   .fine a:hover {
     color: var(--blue);
+  }
+
+  /* --- the wordmark ---------------------------------------------- */
+  /* Last thing on the page: the wordmark set solid, edge to edge
+     across the columns. */
+  .wordmark {
+    margin-top: var(--space-7);
+    color: var(--ink-strong);
+    transition: color var(--dur-slow) var(--ease);
+  }
+
+  .wordmark:hover {
+    color: var(--blue);
+  }
+
+  .wordmark :global(svg) {
+    width: 100%;
+    height: auto;
   }
 
   @media (max-width: 1000px) {
