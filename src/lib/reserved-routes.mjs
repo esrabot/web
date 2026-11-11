@@ -7,16 +7,22 @@
  */
 export const RESERVED_ROUTES = new Set([
   // pages
-  'blog',
   'members',
   'projects',
-  'gallery',
   'docs',
+  'events',
+  'search',
+  'contact',
   'colophon',
   '404',
-  // endpoints and generated output
+  // removed sections, redirected home in vercel.json — a redirect wins
+  // over a page, so a member slug here would never be reachable
+  'blog',
+  'gallery',
   'rss.xml',
   'feed-media',
+  // endpoints and generated output
+  'search-index.json',
   'logos',
   'og',
   'api',
@@ -35,10 +41,9 @@ export const RESERVED_ROUTES = new Set([
   // plausible future routes, reserved pre-emptively so a member slug never
   // has to be taken away from someone later
   'about',
-  'contact',
   'join',
   'sponsors',
-  'search',
+  'calendar',
   'tags',
   'feed',
   'rss',

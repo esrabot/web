@@ -4,11 +4,22 @@
  *
  * Everything an author writes in a .md file lands here, so this is where
  * the reading experience is defined — measure, rhythm, code, quotes,
- * tables, footnotes. Blog bodies additionally get the margin-note column
- * from PostLayout; this handles the base flow.
+ * tables, footnotes. Guide and project bodies additionally reserve a margin
+ * column for side notes; this handles the base flow.
+ *
+ * The styles are global and written to a deliberate specificity, because
+ * the markup inside is generated and mixed with components:
+ *
+ *   - element defaults (links, lists, tables…) are `.prose :where(…)`,
+ *     one class strong: enough to beat the site's base element rules,
+ *     never enough to beat a component's own scoped styles. A parts table
+ *     dropped into a post keeps its own table styling.
+ *   - the vertical rhythm is `.prose.prose.prose > …`, three classes
+ *     strong: the space between blocks belongs to the flow, so it wins
+ *     over a component's own `margin: 0`.
  */
 interface Props {
-  /** `wide` for docs pages, `measure` for essays. */
+  /** `measure` for essays, `wide` for reference pages, `full` to fill. */
   width?: 'measure' | 'wide' | 'full';
   class?: string;
 }
@@ -20,173 +31,166 @@ const { width = 'measure', class: className } = Astro.props;
   <slot />
 </div>
 
-<style>
+<style is:global>
   .prose {
     color: var(--ink-body);
-    font-size: var(--t-lg);
-    line-height: var(--lh-grid);
+    font-size: var(--t-md);
+    line-height: 1.75;
   }
 
-  .w-measure {
+  .prose.w-measure {
     max-width: var(--measure);
   }
-  .w-wide {
-    max-width: var(--measure-wide);
+  .prose.w-wide {
+    max-width: 52rem;
   }
-  .w-full {
+  .prose.w-full {
     max-width: none;
   }
 
-  .prose :global(> * + *) {
-    margin-top: var(--u);
+  /* --- Rhythm ---------------------------------------------------- */
+  .prose.prose.prose > * + * {
+    margin-top: 1.4em;
   }
 
-  /* Headings sit in the monospace register, numbered by the document. */
-  .prose :global(h2),
-  .prose :global(h3),
-  .prose :global(h4) {
-    font-family: var(--font-mono);
+  .prose.prose.prose > :where(h2) {
+    margin-top: 2.2em;
+    font-size: var(--t-h3);
+  }
+
+  .prose.prose.prose > :where(h3) {
+    margin-top: 1.9em;
+    font-size: var(--t-xl);
+  }
+
+  .prose.prose.prose > :where(h4) {
+    margin-top: 1.7em;
+    font-family: var(--font-sans);
+    font-size: var(--t-base);
     font-weight: var(--w-semibold);
-    letter-spacing: var(--track-wider);
-    text-transform: uppercase;
-    color: var(--ink-body);
-    line-height: var(--lh-grid);
-    margin-top: var(--u-2);
+    letter-spacing: 0;
+  }
+
+  /* The paragraph after a heading belongs to it. */
+  .prose.prose.prose > :where(h2, h3, h4) + * {
+    margin-top: 0.7em;
+  }
+
+  .prose.prose.prose > :first-child {
+    margin-top: 0;
+  }
+
+  /* --- Element defaults ------------------------------------------ */
+  .prose :where(p, ul, ol, blockquote, pre, table, figure, hr) {
     margin-bottom: 0;
   }
 
-  .prose :global(h2) {
-    font-size: var(--t-sm);
-  }
-  .prose :global(h3) {
-    font-size: var(--t-mono);
-  }
-  .prose :global(h4) {
-    font-size: var(--t-mono);
-    color: var(--ink-muted);
+  .prose :where(h2, h3, h4) {
+    scroll-margin-top: calc(var(--header-h) + var(--space-5));
   }
 
-  .prose :global(p) {
-    margin: 0;
-    hyphens: auto;
+  /* Links an author wrote. A link with a class is a component's. */
+  .prose :where(a:not([class])) {
+    color: var(--blue);
+    text-decoration-color: var(--blue-soft);
+    text-decoration-thickness: 2px;
   }
 
-  .prose :global(strong) {
+  .prose :where(a:not([class])):hover {
+    color: var(--blue-strong);
+    text-decoration-color: currentColor;
+  }
+
+  .prose :where(strong) {
     font-weight: var(--w-semibold);
     color: var(--ink-strong);
   }
 
-  .prose :global(ul),
-  .prose :global(ol) {
-    margin: 0;
-    padding-left: var(--u);
+  .prose :where(ul, ol) {
+    padding-left: 1.4em;
   }
 
-  .prose :global(li + li) {
-    margin-top: var(--u-quarter);
+  .prose :where(li + li, li > ul, li > ol) {
+    margin-top: 0.4em;
   }
 
-  .prose :global(li > ul),
-  .prose :global(li > ol) {
-    margin-top: var(--u-quarter);
+  .prose :where(li)::marker {
+    color: var(--blue);
   }
 
-  .prose :global(blockquote) {
-    margin: 0;
-    padding-left: 20px;
-    border-left: var(--rule-width) solid var(--rule-strong);
+  .prose :where(blockquote) {
+    margin-inline: 0;
+    padding: 0.25em 0 0.25em 1.25em;
+    border-left: 3px solid var(--blue);
+    font-family: var(--font-display);
     font-size: var(--t-xl);
     font-style: italic;
-    color: var(--ink-muted);
+    line-height: 1.5;
+    color: var(--ink-strong);
   }
 
-  .prose :global(hr) {
+  .prose :where(hr) {
+    margin-block: 2.5em;
     border: 0;
-    border-top: var(--rule-width) solid var(--rule);
-    margin: var(--u-2) 0;
+    border-top: 1px solid var(--rule);
   }
 
-  /* Inline code reads as a token, not a box */
-  .prose :global(:not(pre) > code) {
+  /* Inline code reads as a token, not a box. */
+  .prose :where(:not(pre) > code) {
+    padding: 0.15em 0.4em;
+    border-radius: 0.375rem;
+    background: var(--sand);
     font-family: var(--font-mono);
     font-size: 0.875em;
-    padding: 1px 5px;
-    background: rgba(36, 36, 36, 0.07);
+    color: var(--ink-strong);
+  }
+
+  .prose :where(pre) {
+    padding: var(--space-4) var(--space-5);
     border: 1px solid var(--rule-soft);
-  }
-
-  .prose :global(pre) {
+    border-radius: var(--r-md);
     font-family: var(--font-mono);
-    font-size: var(--t-mono);
-    line-height: 20px; /* sub-grid: code blocks set their own rhythm */
-    padding: var(--u-half);
-    border: var(--rule-width) solid var(--rule);
-    background: rgba(255, 255, 255, 0.06);
+    font-size: var(--t-sm);
+    line-height: 1.65;
     overflow-x: auto;
+    box-shadow: var(--shadow-xs);
   }
 
-  .prose :global(img) {
-    border: var(--rule-width) solid var(--rule-strong);
+  .prose :where(img) {
+    border-radius: var(--r-lg);
   }
 
-  /* Tables scroll inside themselves rather than widening the page */
-  .prose :global(table) {
+  /* Tables scroll inside themselves rather than widening the page. */
+  .prose :where(table) {
+    display: block;
     width: 100%;
     border-collapse: collapse;
     font-size: var(--t-base);
-    display: block;
     overflow-x: auto;
   }
 
-  .prose :global(th),
-  .prose :global(td) {
+  .prose :where(th, td) {
+    padding: 0.625rem 0.875rem;
+    border-bottom: 1px solid var(--rule-soft);
     text-align: left;
-    padding: var(--u-quarter) var(--u-half);
-    border-bottom: var(--rule-width) solid var(--rule-soft);
+    vertical-align: top;
   }
 
-  .prose :global(th) {
-    font-family: var(--font-mono);
-    font-size: var(--t-micro);
-    text-transform: uppercase;
-    letter-spacing: var(--track-widest);
-    color: var(--ink-muted);
-    font-weight: var(--w-regular);
+  .prose :where(th) {
     border-bottom-color: var(--rule);
+    font-size: var(--t-xs);
+    font-weight: var(--w-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    white-space: nowrap;
   }
 
-  .prose :global(.footnotes) {
-    margin-top: var(--u-2);
-    padding-top: var(--u);
-    border-top: var(--rule-width) solid var(--rule);
+  .prose :where(.footnotes) {
+    margin-top: 3em;
+    padding-top: 1.5em;
+    border-top: 1px solid var(--rule);
     font-size: var(--t-sm);
     color: var(--ink-muted);
-  }
-
-  /*
-   * Baseline correction for generated markdown.
-   *
-   * Authors write plain .md, so there is no markup to hang the .on-grid
-   * utility off — the same maths is applied by selector instead. Uses a
-   * transform for the same reason .on-grid does (see global.css): it moves
-   * only the text and never perturbs layout.
-   *
-   * `pre` and `table` are deliberately excluded: both set their own
-   * internal rhythm and are already marked sub-grid.
-   */
-  .prose :global(:is(p, h2, h3, h4, ul, ol, blockquote, figure)) {
-    --_baseline: calc(var(--lh-grid) / 2 + var(--bl-k) * 1em);
-    --_shift: calc(round(up, var(--_baseline), var(--u)) - var(--_baseline));
-
-    transform: translateY(var(--_shift));
-  }
-
-  /* Justified setting suits the document metaphor, but only where there
-     is enough measure for it to not open rivers. */
-  @media (min-width: 700px) {
-    .prose.w-measure :global(p),
-    .prose.w-wide :global(p) {
-      text-align: justify;
-    }
   }
 </style>

@@ -1,0 +1,310 @@
+---
+/**
+ * One search box: the field, the results list, and its three other
+ * states (suggestions before a query, "no results", and "unavailable").
+ *
+ * Used twice — inside the header's search dialog and on the /search page —
+ * and driven in both places by src/scripts/search.ts, which finds every
+ * [data-search-root] on the page.
+ *
+ * The default slot is what shows before anything is typed. It stays under
+ * a "no results" message too, as somewhere to go next.
+ *
+ * The form is a real GET to /search, so the field still does something
+ * sensible if the script has not loaded.
+ */
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  variant: 'dialog' | 'page';
+  /** Most results to list. */
+  limit?: number;
+}
+
+const { variant, limit = variant === 'dialog' ? 8 : 40 } = Astro.props;
+const id = `search-${variant}`;
+const isPage = variant === 'page';
+---
+
+<div
+  class:list={['search-panel', `is-${variant}`]}
+  data-search-root
+  data-index-url="/search-index.json"
+  data-limit={limit}
+  data-search-sync={isPage ? 'true' : undefined}
+  data-state="idle"
+>
+  <form class="search-form" role="search" action="/search" method="get" data-search-form>
+    <label class="sr-only" for={`${id}-input`}>Search the site</label>
+    <Icon name="lucide:search" class="search-icon" aria-hidden="true" />
+    <input
+      id={`${id}-input`}
+      class="search-input"
+      type="search"
+      name="q"
+      placeholder="Search projects, events, guides, people…"
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+      enterkeyhint="search"
+      aria-controls={`${id}-results`}
+      aria-describedby={`${id}-status`}
+      data-search-input
+    />
+    {
+      !isPage && (
+        <button type="button" class="search-esc" data-modal-close aria-label="Close search">
+          <kbd aria-hidden="true">Esc</kbd>
+        </button>
+      )
+    }
+  </form>
+
+  <p id={`${id}-status`} class="sr-only" role="status" aria-live="polite" data-search-status></p>
+
+  <div class="search-body">
+    <ul id={`${id}-results`} class="search-results" data-search-results hidden></ul>
+
+    <div class="search-note" data-search-empty hidden>
+      <strong>No results for “<span data-search-term></span>”</strong>
+      <span>Try a shorter or a different word, or jump to a section.</span>
+    </div>
+
+    <div class="search-note" data-search-failed hidden>
+      <strong>Search is unavailable right now</strong>
+      <span>The index could not be loaded. Check your connection and try again.</span>
+    </div>
+
+    <div class="search-idle" data-search-idle>
+      <slot />
+    </div>
+  </div>
+
+  {
+    !isPage && (
+      <div class="search-foot" aria-hidden="true">
+        <span>
+          <kbd>&uarr;</kbd>
+          <kbd>&darr;</kbd> to move
+        </span>
+        <span>
+          <kbd>&crarr;</kbd> to open
+        </span>
+        <span>
+          <kbd>Esc</kbd> to close
+        </span>
+      </div>
+    )
+  }
+</div>
+
+<!-- Global on purpose: the result rows are created by the script, so they
+     carry no component scope. Everything is namespaced under .search-*. -->
+<style is:global>
+  .search-form {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .search-icon {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--ink-muted);
+    transition: color var(--dur) var(--ease);
+  }
+
+  .search-form:focus-within .search-icon {
+    color: var(--blue);
+  }
+
+  .search-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: var(--t-lg);
+    color: var(--ink-strong);
+    outline: none;
+  }
+
+  .search-input::placeholder {
+    color: var(--ink-muted);
+    opacity: 1;
+  }
+
+  /* The field's own "clear" cross, where the browser draws one. */
+  .search-input::-webkit-search-cancel-button {
+    cursor: pointer;
+  }
+
+  .search-esc {
+    flex: none;
+    padding: 0.25rem;
+    border: 0;
+    border-radius: var(--r-sm);
+    background: none;
+    transition: transform var(--dur-fast) var(--ease);
+  }
+
+  .search-esc:active {
+    transform: scale(0.92);
+  }
+
+  .search-esc:hover kbd {
+    border-color: var(--blue);
+    color: var(--blue);
+  }
+
+  /* --- results --------------------------------------------------- */
+  .search-results {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .search-results[hidden] {
+    display: none;
+  }
+
+  .search-result a {
+    display: grid;
+    grid-template-columns: 5.75rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 0.625rem 0.75rem;
+    border-radius: var(--r-md);
+    color: var(--ink-strong);
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease);
+  }
+
+  .search-result.active a,
+  .search-result a:focus-visible {
+    background: var(--blue-wash);
+  }
+
+  .search-result a:active {
+    background: var(--blue-soft);
+  }
+
+  .sr-kind {
+    justify-self: start;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--r-pill);
+    background: var(--sand);
+    font-size: 0.6875rem;
+    font-weight: var(--w-semibold);
+    line-height: 1.4;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--sand-ink);
+    white-space: nowrap;
+  }
+
+  .search-result.active .sr-kind {
+    background: var(--surface);
+  }
+
+  .sr-text {
+    display: grid;
+    min-width: 0;
+  }
+
+  .sr-title {
+    overflow: hidden;
+    font-weight: var(--w-semibold);
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sr-title mark {
+    background: none;
+    color: var(--blue);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--blue-soft);
+  }
+
+  .sr-desc {
+    overflow: hidden;
+    font-size: var(--t-sm);
+    line-height: 1.4;
+    color: var(--ink-muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sr-go {
+    color: var(--blue);
+    opacity: 0;
+    translate: -0.25rem 0;
+    transition:
+      opacity var(--dur) var(--ease),
+      translate var(--dur) var(--ease-out);
+  }
+
+  .search-result.active .sr-go,
+  .search-result a:focus-visible .sr-go {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .search-note {
+    display: grid;
+    gap: 0.125rem;
+    padding: var(--space-4) 0.75rem;
+    font-size: var(--t-sm);
+    color: var(--ink-muted);
+  }
+
+  .search-note[hidden] {
+    display: none;
+  }
+
+  .search-note strong {
+    font-size: var(--t-base);
+    font-weight: var(--w-semibold);
+    color: var(--ink-strong);
+    overflow-wrap: anywhere;
+  }
+
+  .search-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    font-size: var(--t-xs);
+    color: var(--ink-muted);
+  }
+
+  .search-foot span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  @media (max-width: 520px) {
+    .search-result a {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .sr-kind {
+      grid-column: 1 / -1;
+    }
+
+    .sr-desc {
+      white-space: normal;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+    }
+  }
+</style>

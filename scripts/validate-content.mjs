@@ -6,8 +6,8 @@
  * time, but a raw Zod failure is close to unreadable if you have never
  * seen one. This runs first and reports the same problems in plain
  * English, naming the file, the field, and what to do about it — so a
- * contributor who has only ever written markdown can fix their own post
- * from the CI log without asking anyone.
+ * contributor who has only ever written markdown can fix their own
+ * content from the CI log without asking anyone.
  *
  * Run: pnpm validate:content
  */
@@ -27,6 +27,9 @@ function fail(file, message, hint) {
 
 /** Split a markdown file into frontmatter and body. */
 function splitFrontmatter(raw) {
+  // Files saved on Windows end lines in \r\n; a stray \r left after a value
+  // like `links: []` is not valid YAML, though Astro reads the file fine.
+  raw = raw.replace(/\r\n/g, '\n');
   if (!raw.startsWith('---')) return { frontmatter: null, body: raw };
   const end = raw.indexOf('\n---', 3);
   if (end === -1) return { frontmatter: null, body: raw };
@@ -61,17 +64,9 @@ async function listFiles(dir, exts) {
 }
 
 // ---------------------------------------------------------------------
-// Members — needed first, because posts reference them by ID.
+// Members
 // ---------------------------------------------------------------------
 const memberFiles = await listFiles('src/content/members', ['.md', '.mdx']);
-const memberIds = new Set(
-  memberFiles.map((f) =>
-    f
-      .split('/')
-      .pop()
-      .replace(/\.mdx?$/, '')
-  )
-);
 
 /** slug -> file, so a collision can name both sides. */
 const memberSlugs = new Map();
@@ -153,115 +148,15 @@ for (const file of memberFiles) {
 }
 
 // ---------------------------------------------------------------------
-// Blog posts
-// ---------------------------------------------------------------------
-const postFiles = await listFiles('src/content/blog', ['.md', '.mdx']);
-
-for (const file of postFiles) {
-  const raw = await readFile(file, 'utf8');
-  const { frontmatter, body } = splitFrontmatter(raw);
-
-  if (!frontmatter) {
-    fail(
-      file,
-      'has no frontmatter block',
-      'A post must begin with --- , then title/date/authors, then another ---.'
-    );
-    continue;
-  }
-
-  let data;
-  try {
-    data = parseYaml(frontmatter);
-  } catch (err) {
-    fail(file, `frontmatter is not valid YAML — ${err.message}`, yamlHint(err));
-    continue;
-  }
-
-  if (!data?.title) {
-    fail(file, 'is missing `title`', 'Add a line like:  title: My post');
-  }
-
-  if (!data?.date) {
-    fail(file, 'is missing `date`', 'Add a line like:  date: 2026-07-20');
-  } else if (Number.isNaN(new Date(data.date).getTime())) {
-    fail(
-      file,
-      `\`date\` is not a date I can read: ${data.date}`,
-      'Use YYYY-MM-DD, for example:  date: 2026-07-20'
-    );
-  }
-
-  if (!data?.authors || !Array.isArray(data.authors) || data.authors.length === 0) {
-    fail(
-      file,
-      'is missing `authors`',
-      'Add the author id (the members filename without .md), e.g.\n' +
-        '    authors:\n      - will-forte'
-    );
-  } else {
-    for (const id of data.authors) {
-      if (!memberIds.has(id)) {
-        const known = [...memberIds].sort().join(', ');
-        fail(
-          file,
-          `lists an unknown author: "${id}"`,
-          `Author ids are filenames in src/content/members/.\nKnown ids: ${known}`
-        );
-      }
-    }
-  }
-
-  if (data?.cover) {
-    const target = resolve(dirname(file), data.cover);
-    if (!(await exists(target))) {
-      fail(
-        file,
-        `\`cover\` points at a file that does not exist: ${data.cover}`,
-        `Expected to find: ${relative(process.cwd(), target)}\n` +
-          'Put the image in src/assets/blog/ and reference it as ../../assets/blog/<name>'
-      );
-    }
-    if (!data.coverAlt) {
-      notes.push(
-        `${file}: has a cover image but no \`coverAlt\`. ` +
-          'Add one so screen-reader users know what it shows.'
-      );
-    }
-  }
-
-  // Obsidian-style wikilinks silently render as literal text. One shipped
-  // broken on the old site for months, so it is an error here.
-  const wikilink = body.match(/!\[\[([^\]]+)\]\]/);
-  if (wikilink) {
-    fail(
-      file,
-      `contains an Obsidian wikilink that will not render: ![[${wikilink[1]}]]`,
-      `Use standard markdown instead:\n    ![description](../../assets/blog/${wikilink[1]})`
-    );
-  }
-
-  // Body image paths must resolve.
-  for (const [, alt, src] of body.matchAll(/!\[([^\]]*)\]\(([^)]+)\)/g)) {
-    if (/^(https?:)?\/\//.test(src) || src.startsWith('/')) continue;
-    const target = resolve(dirname(file), src);
-    if (!(await exists(target))) {
-      fail(
-        file,
-        `references an image that does not exist: ${src}`,
-        `Expected to find: ${relative(process.cwd(), target)}`
-      );
-    }
-    if (!alt.trim()) {
-      notes.push(`${file}: image "${src}" has no alt text.`);
-    }
-  }
-}
-
-// ---------------------------------------------------------------------
 // YAML data files
 // ---------------------------------------------------------------------
-for (const file of ['src/content/gallery.yaml', 'src/content/partners.yaml']) {
+for (const file of [
+  'src/content/partners.yaml',
+  'src/content/featured.yaml',
+  'src/content/programs.yaml',
+  'src/content/events.yaml',
+  'src/content/pathways.yaml',
+]) {
   if (!(await exists(file))) continue;
   try {
     const rows = parseYaml(await readFile(file, 'utf8'));
@@ -312,7 +207,7 @@ function yamlHint(err) {
     return (
       'This usually means a value contains a colon followed by a space.\n' +
       'Wrap the whole value in quotes, e.g.\n' +
-      '    credits: "Built by CCBR. Photo: Ryan Rudes."'
+      '    summary: "Prototype: leg test stand."'
     );
   }
   return 'Check indentation — YAML uses spaces, never tabs.';
@@ -327,8 +222,7 @@ if (notes.length > 0) {
 }
 
 if (problems.length === 0) {
-  const total = postFiles.length + memberFiles.length;
-  console.log(`\nContent OK — ${postFiles.length} posts, ${memberFiles.length} members checked.\n`);
+  console.log(`\nContent OK — ${memberFiles.length} members checked.\n`);
   process.exit(0);
 }
 

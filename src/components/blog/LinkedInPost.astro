@@ -7,23 +7,22 @@
  * facade rather than a bare iframe:
  *
  *  - LinkedIn's embed sets cookies and pulls a large third-party bundle.
- *    Not loading it until someone opts in keeps the home page static and
+ *    Not loading it until someone opts in keeps the page static and
  *    avoids shipping a tracker to every visitor.
  *  - The raw embed carries LinkedIn's own visual language, which sits
  *    badly against this design. The card matches the site; the embed
  *    appears in place once expanded.
  *
- * Usable in MDX too: <LinkedInPost activityId="7394171470467223552" />
+ * Usable in MDX too: <LinkedInPost activityId="7394171470467223552" title="…" />
  */
 import { Icon } from 'astro-icon/components';
-import MonoLabel from '../ui/MonoLabel.astro';
 
 interface Props {
   /** Digits from urn:li:activity:<id>. */
   activityId: string;
   title: string;
   summary?: string;
-  /** Source label, e.g. "Rutgers Dynamics". */
+  /** Source label, e.g. "ESRA". */
   source?: string;
   /** Canonical post URL, for the "open on LinkedIn" link. */
   url?: string;
@@ -38,17 +37,11 @@ const postUrl = url ?? `https://www.linkedin.com/feed/update/urn:li:activity:${a
 
 <article class="li-card" data-embed={embedSrc}>
   <div class="head">
-    <MonoLabel size="micro" track="wider">
+    <span class="source">
       <Icon name="simple-icons:linkedin" class="li-icon" aria-hidden="true" />
       LinkedIn · {source}
-    </MonoLabel>
-    {
-      date && (
-        <MonoLabel size="micro" track="wide">
-          <time datetime={date.toISOString()}>{date.toISOString().slice(0, 10)}</time>
-        </MonoLabel>
-      )
-    }
+    </span>
+    {date && <time datetime={date.toISOString()}>{date.toISOString().slice(0, 10)}</time>}
   </div>
 
   <div class="body">
@@ -57,7 +50,7 @@ const postUrl = url ?? `https://www.linkedin.com/feed/update/urn:li:activity:${a
   </div>
 
   <div class="actions">
-    <button type="button" class="load">Show post &#9662;</button>
+    <button type="button" class="load" aria-expanded="false">Show post</button>
     <a href={postUrl} rel="noopener" target="_blank">Open on LinkedIn &#8599;</a>
   </div>
 
@@ -73,24 +66,26 @@ const postUrl = url ?? `https://www.linkedin.com/feed/update/urn:li:activity:${a
     const src = card.dataset.embed;
     if (!button || !slot || !src) return;
 
+    const setOpen = (open: boolean) => {
+      slot.hidden = !open;
+      button.textContent = open ? 'Hide post' : 'Show post';
+      button.setAttribute('aria-expanded', String(open));
+    };
+
     button.addEventListener('click', () => {
-      if (slot.childElementCount > 0) {
-        // Second press collapses it again.
-        const open = !slot.hidden;
-        slot.hidden = open;
-        button.innerHTML = open ? 'Show post &#9662;' : 'Hide post &#9652;';
+      // The embed is only created on the first press; after that the
+      // button just shows and hides it.
+      if (slot.childElementCount === 0) {
+        const frame = document.createElement('iframe');
+        frame.src = src;
+        frame.title = 'LinkedIn post';
+        frame.loading = 'lazy';
+        frame.allowFullscreen = true;
+        slot.appendChild(frame);
+        setOpen(true);
         return;
       }
-
-      const frame = document.createElement('iframe');
-      frame.src = src;
-      frame.title = 'LinkedIn post';
-      frame.loading = 'lazy';
-      frame.setAttribute('frameborder', '0');
-      frame.allowFullscreen = true;
-      slot.appendChild(frame);
-      slot.hidden = false;
-      button.innerHTML = 'Hide post &#9652;';
+      setOpen(slot.hidden);
     });
   });
 </script>
@@ -99,82 +94,94 @@ const postUrl = url ?? `https://www.linkedin.com/feed/update/urn:li:activity:${a
   .li-card {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    padding: var(--u);
+    padding: var(--space-5);
+    border: 1px solid var(--rule-soft);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
   }
 
   .head {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
-    gap: var(--u-half);
-    padding-bottom: var(--u-half);
-    border-bottom: var(--rule-width) solid var(--rule-soft);
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--t-xs);
+    font-weight: var(--w-semibold);
+    color: var(--ink-muted);
+  }
+
+  .source {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--blue);
   }
 
   .li-icon {
-    width: 11px;
-    height: 11px;
-    display: inline-block;
-    vertical-align: -1px;
-    margin-right: 4px;
+    width: 0.875rem;
+    height: 0.875rem;
   }
 
   .body {
     flex: 1;
-    padding-top: var(--u-half);
+    padding-top: var(--space-3);
   }
 
   h3 {
-    margin: 0;
-    font-size: var(--t-lg);
-    font-weight: var(--w-semibold);
-    line-height: var(--lh-grid);
-    letter-spacing: var(--track-snug);
+    font-size: var(--t-xl);
   }
 
-  p {
-    margin: var(--u-quarter) 0 0;
+  .body p {
+    margin: var(--space-2) 0 0;
     font-size: var(--t-base);
-    line-height: var(--lh-grid);
     color: var(--ink-body);
   }
 
   .actions {
     display: flex;
     align-items: center;
-    gap: var(--u);
-    margin-top: var(--u);
-    padding-top: var(--u-half);
-    border-top: var(--rule-width) solid var(--rule-soft);
-    font-family: var(--font-mono);
-    font-size: var(--t-mono-sm);
-    letter-spacing: var(--track-wide);
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--rule-soft);
+    font-size: var(--t-sm);
+    font-weight: var(--w-semibold);
   }
 
   .load {
-    background: none;
-    border: 0;
     padding: 0;
-    cursor: pointer;
-    color: var(--accent-ink);
+    border: 0;
+    background: none;
     font: inherit;
-    letter-spacing: inherit;
+    color: var(--blue);
   }
 
   .load:hover {
+    color: var(--blue-strong);
     text-decoration: underline;
   }
 
+  .actions a {
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+
+  .actions a:hover {
+    color: var(--blue);
+  }
+
   .slot {
-    margin-top: var(--u-half);
+    margin-top: var(--space-4);
   }
 
   .slot :global(iframe) {
-    width: 100%;
-    height: 560px;
-    border: var(--rule-width) solid var(--rule);
     display: block;
-    background: var(--sheet);
+    width: 100%;
+    height: 35rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--r-md);
+    background: var(--surface);
   }
 </style>

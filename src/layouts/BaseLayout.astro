@@ -2,67 +2,82 @@
 /**
  * The single HTML shell. Every page renders through this.
  *
- * Owns the document head (meta, Open Graph, structured data), the sheet,
- * and the header/footer chrome — so a new page is just content.
+ * Owns the document head (meta, Open Graph, structured data), the header
+ * and footer, the search dialog, and the few lines of script the whole
+ * site shares — so a new page is just content.
  */
 import '../styles/global.css';
 
-import Sheet from '../components/ui/Sheet.astro';
-import Colophon from '../components/ui/Colophon.astro';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
+import SearchDialog from '../components/search/SearchDialog.astro';
 import { SITE, SITE_URL } from '../data/site';
-import { ESRA, RUTGERS_DYNAMICS } from '../data/orgs';
+import { ESRA } from '../data/orgs';
 
 interface Props {
   title?: string;
   description?: string;
-  /** Repo-relative source path shown in the colophon. */
-  sourcePath?: string;
-  /** OG image URL. Falls back to the generated per-page card. */
+  /** OG image URL. Falls back to the default card. */
   image?: string;
-  /** `article` for blog posts, else `website`. */
+  /** `article` for guides and write-ups, else `website`. */
   type?: 'website' | 'article';
   publishedAt?: Date;
-  /** Suppress the baseline-grid overlay. */
-  grid?: boolean;
-  wide?: boolean;
-  /** Omit the standard header (used by minimal pages). */
-  bare?: boolean;
+  /**
+   * Which nav item to mark as current, when the URL does not say. Member
+   * pages live at the site root (/willcforte) but belong under Members.
+   */
+  nav?: string;
+  /** Drop the footer's call-to-action band. */
+  cta?: boolean;
   noindex?: boolean;
 }
 
 const {
   title,
   description = SITE.description,
-  sourcePath = 'site/index.astro',
   image,
   type = 'website',
   publishedAt,
-  grid = true,
-  wide = false,
-  bare = false,
+  nav,
+  cta = true,
   noindex = false,
 } = Astro.props;
 
 const pageTitle = title ? `${title} — ${SITE.name}` : SITE.title;
 const canonical = new URL(Astro.url.pathname, SITE_URL).href;
 const ogImage = new URL(image ?? '/og-default.png', SITE_URL).href;
-const current = Astro.url.pathname;
+const current = nav ?? Astro.url.pathname;
 
 // Organisation schema, so search and social surfaces resolve the rebrand
-// and the full account graph rather than guessing.
-const structuredData = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: ESRA.fullName,
-  alternateName: [ESRA.name, ESRA.formerly].filter(Boolean),
-  url: SITE_URL,
-  description: ESRA.blurb,
-  sameAs: [...ESRA.links, ...RUTGERS_DYNAMICS.links]
-    .filter((l) => l.platform !== 'email' && !l.url.startsWith(SITE_URL))
-    .map((l) => l.url),
-};
+// and the full account graph rather than guessing; and the site itself,
+// with its search box, so a search engine can offer one too.
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: ESRA.fullName,
+    alternateName: [ESRA.name, ESRA.formerly].filter(Boolean),
+    url: SITE_URL,
+    description: ESRA.blurb,
+    sameAs: ESRA.links
+      .filter((l) => l.platform !== 'email' && !l.url.startsWith(SITE_URL))
+      .map((l) => l.url),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE.name,
+    url: SITE_URL,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${new URL('/search', SITE_URL).href}?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  },
+];
 ---
 
 <!doctype html>
@@ -70,6 +85,7 @@ const structuredData = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#fbf8f2" />
     <link rel="canonical" href={canonical} />
 
     <title>{pageTitle}</title>
@@ -86,42 +102,56 @@ const structuredData = {
     {publishedAt && <meta property="article:published_time" content={publishedAt.toISOString()} />}
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link
-      rel="alternate"
-      type="application/rss+xml"
-      title={`${SITE.name} — all updates`}
-      href="/rss.xml"
-    />
 
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
-    <!-- Arms the scroll-reveal styles. Set before first paint so nothing
-         flashes; without JS, [data-reveal] content is simply visible. -->
+    <!-- Arms everything that depends on script: the scroll arrivals, the
+         folded menu. Set before first paint so nothing flashes; without JS
+         every [data-reveal] block is simply visible. -->
     <script is:inline>
       document.documentElement.classList.add('js');
+
+      // Page-to-page transitions (see global.css) are skipped by the browser
+      // when something interrupts one — a second click, or the search
+      // shortcut pressed while the page is still fading in — and it reports
+      // each skip as an unhandled rejection. A skipped cross-fade is not an
+      // error, so that one rejection, and only that one, is acknowledged.
+      window.addEventListener('unhandledrejection', function (event) {
+        var reason = event.reason;
+        if (
+          reason &&
+          reason.name === 'InvalidStateError' &&
+          /^Transition was (aborted|skipped)/.test(String(reason.message))
+        ) {
+          event.preventDefault();
+        }
+      });
     </script>
   </head>
 
   <body>
     <a href="#main" class="skip-link">Skip to content</a>
 
-    <Sheet grid={grid} wide={wide}>
-      <Colophon path={sourcePath} />
-      {!bare && <Header current={current} />}
+    <Header current={current} />
 
-      <main id="main">
-        <slot />
-      </main>
+    <main id="main">
+      <slot />
+    </main>
 
-      <Footer path={sourcePath} />
-    </Sheet>
+    <Footer cta={cta} />
 
-    <!-- Arrivals (see global.css). Inline and dependency-free; if anything
-         here fails, the catch reveals everything rather than leaving
-         content hidden. -->
+    <SearchDialog />
+
+    <!-- The behaviour every page shares. Inline and dependency-free, so it
+         cannot fail to load: arrivals, the header, and modal dialogs. -->
     <script is:inline>
       (function () {
-        var els = document.querySelectorAll('[data-reveal], [data-draw]');
+        var doc = document;
+
+        /* --- Arrivals (see global.css) ---------------------------------
+           If anything here fails, the catch reveals everything rather
+           than leaving content hidden. */
+        var blocks = doc.querySelectorAll('[data-reveal]');
         var show = function (el) {
           el.classList.add('revealed');
         };
@@ -129,21 +159,104 @@ const structuredData = {
           if (!('IntersectionObserver' in window)) throw 0;
           var io = new IntersectionObserver(
             function (entries) {
-              entries.forEach(function (e) {
-                if (e.isIntersecting) {
-                  show(e.target);
-                  io.unobserve(e.target);
+              entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                  show(entry.target);
+                  io.unobserve(entry.target);
                 }
               });
             },
-            { rootMargin: '0px 0px -6% 0px' }
+            { rootMargin: '0px 0px -8% 0px' }
           );
-          els.forEach(function (el) {
+          blocks.forEach(function (el) {
             io.observe(el);
           });
         } catch (_) {
-          els.forEach(show);
+          blocks.forEach(show);
         }
+
+        /* --- Header: a hairline once the page scrolls under it -------- */
+        var header = doc.querySelector('[data-header]');
+        var toggle = doc.querySelector('[data-menu-toggle]');
+
+        if (header) {
+          var onScroll = function () {
+            header.toggleAttribute('data-scrolled', window.scrollY > 8);
+          };
+          onScroll();
+          window.addEventListener('scroll', onScroll, { passive: true });
+        }
+
+        /* --- Header: the folded menu ---------------------------------- */
+        var setMenu = function (open) {
+          if (!header || !toggle) return;
+          header.toggleAttribute('data-open', open);
+          toggle.setAttribute('aria-expanded', String(open));
+        };
+
+        if (header && toggle) {
+          toggle.addEventListener('click', function () {
+            setMenu(!header.hasAttribute('data-open'));
+          });
+
+          // Following a link, pressing Esc, clicking away or widening the
+          // window all put the menu away.
+          header.addEventListener('click', function (event) {
+            if (event.target.closest('#site-nav a')) setMenu(false);
+          });
+          doc.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && header.hasAttribute('data-open')) {
+              setMenu(false);
+              toggle.focus();
+            }
+          });
+          doc.addEventListener('click', function (event) {
+            if (header.hasAttribute('data-open') && !header.contains(event.target)) {
+              setMenu(false);
+            }
+          });
+          window.matchMedia('(min-width: 1001px)').addEventListener('change', function (mq) {
+            if (mq.matches) setMenu(false);
+          });
+        }
+
+        /* --- Modal dialogs ----------------------------------------------
+           data-modal-open="<dialog id>" opens one; data-modal-close closes
+           the dialog it sits in; a click on the backdrop closes too. Esc
+           and focus handling are the browser's own. */
+        doc.addEventListener('click', function (event) {
+          var target = event.target;
+          if (!(target instanceof Element)) return;
+
+          var opener = target.closest('[data-modal-open]');
+          if (opener) {
+            var dialog = doc.getElementById(opener.getAttribute('data-modal-open'));
+            if (dialog && typeof dialog.showModal === 'function' && !dialog.open) {
+              event.preventDefault();
+              dialog.showModal();
+            }
+            return;
+          }
+
+          var closer = target.closest('[data-modal-close]');
+          if (closer) {
+            var owner = closer.closest('dialog');
+            if (owner) owner.close();
+            return;
+          }
+
+          // The backdrop belongs to the dialog element itself: a click
+          // whose target is the dialog, outside its box, landed on it.
+          if (target instanceof HTMLDialogElement && target.open) {
+            var box = target.getBoundingClientRect();
+            var inside =
+              event.clientX >= box.left &&
+              event.clientX <= box.right &&
+              event.clientY >= box.top &&
+              event.clientY <= box.bottom;
+            if (!inside) target.close();
+          }
+        });
       })();
     </script>
   </body>

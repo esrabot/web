@@ -19,8 +19,7 @@ import { join, extname } from 'node:path';
 
 const TARGETS = [
   { dir: 'src/assets/avatars', max: 800 },
-  { dir: 'src/assets/blog', max: 2400 },
-  { dir: 'src/assets/gallery', max: 2400 },
+  { dir: 'src/assets/uploads', max: 2400 },
   { dir: 'src/assets/logos', max: 1200 },
 ];
 

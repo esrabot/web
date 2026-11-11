@@ -7,7 +7,7 @@ import { ESRA } from './orgs';
 
 /**
  * Canonical origin. Mirrors the value in astro.config.mjs — that one feeds
- * the sitemap and RSS builders, this one is for runtime template use.
+ * the sitemap, this one is for runtime template use.
  */
 export const SITE_URL = import.meta.env.SITE ?? process.env.SITE_URL ?? 'https://esra.bot';
 
@@ -16,7 +16,7 @@ export const SITE = {
   fullName: ESRA.fullName,
   title: 'ESRA — Experimental Student Robotics Association',
   description: ESRA.blurb!,
-  /** Used in the colophon and footer. */
+  /** Used in the footer and on the home page. */
   established: 'ICRA 2025',
   /** Legal status, from the incorporation record. */
   incorporated: 'New Jersey nonprofit, June 2026',
@@ -24,8 +24,6 @@ export const SITE = {
   repo: 'esrabot/web',
   repoUrl: 'https://github.com/esrabot/web',
   orgUrl: 'https://github.com/esrabot',
-  /** GitHub Discussions category backing blog comments. */
-  discussionsCategory: 'blog',
 } as const;
 
 /**
@@ -59,21 +57,55 @@ export const CONTACTS: { address: string; label: string; note: string }[] = [
 ];
 
 /**
- * Primary navigation. `mono` renders the item in the monospace utility
- * style rather than as a normal nav link.
+ * Primary navigation, in the order it reads across the header. Search and
+ * the "Get involved" button sit after it and are not part of this list.
  */
-export const NAV: { label: string; href: string; mono?: boolean }[] = [
+export const NAV: { label: string; href: string }[] = [
   { label: 'Projects', href: '/projects' },
-  { label: 'Blog', href: '/blog' },
-  { label: 'Gallery', href: '/gallery' },
+  { label: 'Events', href: '/events' },
   { label: 'Guides', href: '/docs' },
   { label: 'Members', href: '/members' },
-  { label: 'RSS', href: '/rss.xml', mono: true },
 ];
 
+/** Where every "Get involved" button points: the ways-in section on Home. */
+export const JOIN_HREF = '/#join';
+
 /**
- * Build provenance shown in the colophon. Vercel injects these; locally
- * they fall back to a dev marker rather than a fabricated hash.
+ * The public ESRA events calendar (Google Calendar).
+ *
+ * Only the calendar's id is written down. The embed, the "add to Google
+ * Calendar" link and the iCal feed are all derived from it, so pointing
+ * the site at a different calendar is a one-line change.
+ */
+const CALENDAR_ID =
+  'c_6e3047bccf9f44154b27291d78a6d02381dac28351773c495e63fe5dfdc763c0@group.calendar.google.com';
+const CALENDAR_TZ = 'America/New_York';
+
+const calendarId = encodeURIComponent(CALENDAR_ID);
+const calendarTz = encodeURIComponent(CALENDAR_TZ);
+const icalPath = `calendar.google.com/calendar/ical/${calendarId}/public/basic.ics`;
+
+export const CALENDAR = {
+  timezone: CALENDAR_TZ,
+  timezoneLabel: 'Eastern Time',
+  /** The calendar's own public page. */
+  publicUrl: `https://calendar.google.com/calendar/embed?src=${calendarId}&ctz=${calendarTz}`,
+  /** The iframe source: a month grid on wide screens, an agenda on narrow ones. */
+  embedUrl: (mode: 'MONTH' | 'AGENDA' = 'MONTH') =>
+    `https://calendar.google.com/calendar/embed?src=${calendarId}&ctz=${calendarTz}` +
+    `&mode=${mode}&showTitle=0&showPrint=0&showCalendars=0`,
+  /** Adds the calendar to the visitor's own Google Calendar. */
+  googleUrl: `https://calendar.google.com/calendar/render?cid=${calendarId}`,
+  /** The iCal feed, for pasting into any calendar app. */
+  icalUrl: `https://${icalPath}`,
+  /** The same feed as a subscription link (Apple Calendar, Outlook). */
+  webcalUrl: `webcal://${icalPath}`,
+} as const;
+
+/**
+ * Build provenance shown in the footer and the colophon. Vercel injects
+ * these; locally they fall back to a dev marker rather than a fabricated
+ * hash.
  */
 export function buildInfo() {
   const sha = process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.GITHUB_SHA ?? null;

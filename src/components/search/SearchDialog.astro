@@ -1,0 +1,189 @@
+---
+/**
+ * The search dialog, mounted once on every page by BaseLayout.
+ *
+ * Opened by the header's search control, by Ctrl/⌘ K, or by "/". It is a
+ * native modal <dialog> (see "Modal dialogs" in global.css), set near the
+ * top of the screen the way a command palette is. Before anything is
+ * typed it offers the site's sections as a place to start.
+ */
+import { Icon } from 'astro-icon/components';
+
+import SearchPanel from './SearchPanel.astro';
+import { JOIN_HREF } from '../../data/site';
+
+const jumps = [
+  { label: 'Projects', href: '/projects', icon: 'lucide:layers', hint: 'Roadmap and repositories' },
+  {
+    label: 'Events',
+    href: '/events',
+    icon: 'lucide:calendar-days',
+    hint: 'Featured events, calendar',
+  },
+  { label: 'Guides', href: '/docs', icon: 'lucide:book-open', hint: 'Build notes and procedures' },
+  { label: 'Members', href: '/members', icon: 'lucide:users', hint: 'People and partners' },
+  { label: 'Get involved', href: JOIN_HREF, icon: 'lucide:handshake', hint: 'Three ways in' },
+  { label: 'Contact', href: '/contact', icon: 'lucide:mail', hint: 'Email and channels' },
+];
+---
+
+<dialog class="modal search-dialog" data-search-dialog aria-label="Search the site">
+  <SearchPanel variant="dialog">
+    <p class="search-jump-head">Jump to</p>
+    <ul class="search-jump">
+      {
+        jumps.map((j) => (
+          <li>
+            <a href={j.href}>
+              <span class="sj-icon">
+                <Icon name={j.icon} aria-hidden="true" />
+              </span>
+              <span class="sj-text">
+                <strong>{j.label}</strong>
+                <span>{j.hint}</span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </SearchPanel>
+</dialog>
+
+<script>
+  import '../../scripts/search';
+</script>
+
+<style>
+  /* Set toward the top, like a command palette, not dead centre. */
+  .search-dialog {
+    width: min(40rem, calc(100vw - 2rem));
+    margin-top: min(12vh, 7rem);
+  }
+
+  .search-dialog :global(.search-panel) {
+    display: flex;
+    flex-direction: column;
+    max-height: min(calc(100dvh - min(12vh, 7rem) - 1rem), 38rem);
+  }
+
+  .search-dialog :global(.search-form) {
+    flex: none;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  .search-dialog :global(.search-body) {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--space-2);
+  }
+
+  .search-dialog :global(.search-foot) {
+    flex: none;
+    padding: var(--space-3) var(--space-5);
+    border-top: 1px solid var(--rule-soft);
+    background: var(--bg);
+  }
+
+  .search-jump-head {
+    margin: 0;
+    padding: var(--space-3) 0.75rem var(--space-2);
+    font-family: var(--font-label);
+    font-size: var(--t-xs);
+    font-weight: var(--w-semibold);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .search-jump {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .search-jump a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--r-md);
+    color: var(--ink-strong);
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease);
+  }
+
+  .search-jump a:hover,
+  .search-jump a:focus-visible {
+    background: var(--blue-wash);
+  }
+
+  .sj-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--r-sm);
+    background: var(--sand);
+    color: var(--sand-ink);
+    transition:
+      background-color var(--dur) var(--ease),
+      color var(--dur) var(--ease);
+  }
+
+  .search-jump a:hover .sj-icon,
+  .search-jump a:focus-visible .sj-icon {
+    background: var(--blue);
+    color: var(--ink-inverse);
+  }
+
+  .sj-icon :global(svg) {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .sj-text {
+    display: grid;
+    min-width: 0;
+    line-height: 1.35;
+  }
+
+  .sj-text strong {
+    font-weight: var(--w-semibold);
+  }
+
+  .sj-text span {
+    overflow: hidden;
+    font-size: var(--t-xs);
+    color: var(--ink-muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 520px) {
+    .search-dialog {
+      margin-top: 1rem;
+    }
+
+    .search-dialog :global(.search-panel) {
+      max-height: calc(100dvh - 2rem);
+    }
+
+    .search-jump {
+      grid-template-columns: 1fr;
+    }
+
+    /* No keyboard to hint at on a phone. */
+    .search-dialog :global(.search-foot) {
+      display: none;
+    }
+  }
+</style>

@@ -11,7 +11,7 @@
  *   <Eq n="1">τ_out = N · k_t · i_q − τ_f</Eq>
  */
 interface Props {
-  /** Equation number shown in the right margin. */
+  /** Equation number shown at the right-hand edge. */
   n?: string | number;
 }
 
@@ -32,12 +32,14 @@ const { n } = Astro.props;
 <style>
   .eq {
     position: relative;
-    text-align: center;
-    margin: var(--u) 0;
-    font-family: var(--font-serif);
-    font-size: 20px;
-    line-height: var(--lh-grid);
+    padding: var(--space-4) var(--space-7);
+    border-radius: var(--r-md);
+    background: var(--sand);
+    font-family: var(--font-display);
+    font-size: var(--t-xl);
+    line-height: 1.5;
     color: var(--ink-strong);
+    text-align: center;
   }
 
   .body {
@@ -46,11 +48,12 @@ const { n } = Astro.props;
 
   .num {
     position: absolute;
-    right: 0;
-    top: 0;
+    right: var(--space-4);
+    top: 50%;
+    translate: 0 -50%;
     font-family: var(--font-mono);
-    font-size: var(--t-mono);
+    font-size: var(--t-xs);
     font-style: normal;
-    color: var(--ink-muted);
+    color: var(--sand-ink);
   }
 </style>

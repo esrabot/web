@@ -6,26 +6,25 @@
  * construction the same way the hardware repos document theirs.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/ui/PageHero.astro';
 import Section from '../components/ui/Section.astro';
-import SectionHead from '../components/ui/SectionHead.astro';
-import MonoLabel from '../components/ui/MonoLabel.astro';
 import Prose from '../components/ui/Prose.astro';
 import { SITE, buildInfo } from '../data/site';
 
 const build = buildInfo();
 ---
 
-<BaseLayout
-  title="Colophon"
-  description="How this site is built, and what it is built from."
-  sourcePath="site/colophon.astro"
->
-  <Section pad="hero">
-    <MonoLabel as="div" size="sm" track="label">About this document</MonoLabel>
-    <h1 class="on-grid">Colophon</h1>
-  </Section>
+<BaseLayout title="Colophon" description="How this site is built, and what it is built from.">
+  <PageHero
+    eyebrow="Colophon"
+    title="How this site is made."
+    lede="The site documents its own construction the same way the hardware repositories document theirs."
+    narrow
+  >
+    <Fragment slot="title">How this site is <em>made.</em></Fragment>
+  </PageHero>
 
-  <Section pad="normal" last>
+  <Section pad="flush-top" width="narrow">
     <Prose>
       <h2>Construction</h2>
       <p>
@@ -40,41 +39,51 @@ const build = buildInfo();
         unavailable, the affected section renders without it; no figure on this site is a
         placeholder.
       </p>
+      <p>
+        Search runs entirely in your browser, against a small index generated with the rest of the
+        site; there is no search service behind it. The events calendar is the one exception to the
+        build-time rule: it is embedded live from Google Calendar, so a new date shows up without a
+        deploy.
+      </p>
 
       <h2>Typography</h2>
       <p>
-        Set in <a href="https://www.ibm.com/plex/" rel="noopener">IBM Plex</a>, an open licence
-        family: Plex Sans for headlines, Plex Mono for text, data and labels. The design was drawn
-        against Berkeley Mono and Houston Mono; those are commercial licences, so the site ships an
-        open substitute from the same lineage of documentation faces.
+        Headlines are set in{' '}
+        <a href="https://fonts.google.com/specimen/Fraunces" rel="noopener">Fraunces</a>, a soft
+        old-style serif with an optical-size axis that keeps large settings delicate. Running text
+        and the interface are in <a href="https://rsms.me/inter/" rel="noopener">Inter</a>; code and
+        figures in tables are in <a href="https://www.ibm.com/plex/" rel="noopener">IBM Plex Mono</a
+        >. All three are open-licence families, and all are served from this site rather than a font
+        service.
       </p>
 
       <h2>Colour</h2>
       <p>
-        A blue-black sheet under a faint drafting grid, warm-white line work, and beige for the
-        things you act on. Partner logos are redrawn in that same ink at build time, so none of them
-        clash with the page or each other. Text contrast is enforced in CI: every text-and-surface
-        pair is composited and measured against WCAG&nbsp;AA, and the build fails below it.
+        A warm-white page with beige bands, deep navy ink, and a single blue for everything you can
+        act on. Partner logos are redrawn in that same ink at build time, so none of them clash with
+        the page or each other. Text contrast is enforced in CI: every text-and-surface pair is
+        measured against WCAG&nbsp;AA, and the build fails below it.
       </p>
 
-      <h2>Influences</h2>
+      <h2>Motion</h2>
       <p>
-        The technical-drawing idiom, monospace labelling, and baseline grid owe to U.S. Graphics
-        Company, NASA documentation, Dieter Rams, and the terminal interfaces of Bell Labs-era
-        computing.
+        Blocks rise into place the first time they scroll into view, cards lift toward the pointer,
+        and buttons sink when pressed. All of it stands down for anyone whose system asks for
+        reduced motion, and none of it is needed to read or use the site.
       </p>
 
       <h2>This build</h2>
     </Prose>
 
-    <div class="build-facts">
-      <MonoLabel as="div" size="micro" track="wide" upper={false}>
-        <span>branch</span><span>{build.ref}</span>
-      </MonoLabel>
-      <MonoLabel as="div" size="micro" track="wide" upper={false}>
-        <span>commit</span>
-        <span
-          >{
+    <dl class="build-facts">
+      <div>
+        <dt>Branch</dt>
+        <dd>{build.ref}</dd>
+      </div>
+      <div>
+        <dt>Commit</dt>
+        <dd>
+          {
             build.sha ? (
               <a href={build.commitUrl} rel="noopener">
                 {build.sha}
@@ -82,41 +91,57 @@ const build = buildInfo();
             ) : (
               'local'
             )
-          }</span
-        >
-      </MonoLabel>
-      <MonoLabel as="div" size="micro" track="wide" upper={false}>
-        <span>built</span><span>{build.date}</span>
-      </MonoLabel>
-      <MonoLabel as="div" size="micro" track="wide" upper={false}>
-        <span>licence</span><span>{SITE.license}</span>
-      </MonoLabel>
-    </div>
+          }
+        </dd>
+      </div>
+      <div>
+        <dt>Built</dt>
+        <dd>{build.date}</dd>
+      </div>
+      <div>
+        <dt>Licence</dt>
+        <dd>{SITE.license}</dd>
+      </div>
+    </dl>
   </Section>
 </BaseLayout>
 
 <style>
-  h1 {
-    margin: var(--u) 0 0;
-    font-family: var(--font-display);
-    font-size: var(--t-display);
-    font-weight: var(--w-bold);
-    --lh: var(--lh-h1);
-    line-height: var(--lh);
-    letter-spacing: var(--track-snug);
-    text-transform: uppercase;
-  }
-
   .build-facts {
-    margin-top: var(--u);
     max-width: var(--measure);
-    border-top: var(--rule-width) solid var(--rule);
+    margin: var(--space-4) 0 0;
+    padding: var(--space-2) var(--space-5);
+    border: 1px solid var(--rule-soft);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    box-shadow: var(--shadow-xs);
   }
 
-  .build-facts :global(div) {
+  .build-facts div {
     display: flex;
     justify-content: space-between;
-    padding: var(--u-quarter) 0;
+    gap: var(--space-5);
+    padding: var(--space-3) 0;
     border-bottom: 1px solid var(--rule-soft);
+  }
+
+  .build-facts div:last-child {
+    border-bottom: 0;
+  }
+
+  dt {
+    font-size: var(--t-sm);
+    color: var(--ink-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--t-sm);
+    color: var(--ink-strong);
+  }
+
+  dd a {
+    color: var(--blue);
   }
 </style>

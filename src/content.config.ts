@@ -1,5 +1,6 @@
 import { defineCollection, reference, z } from 'astro:content';
 import { glob, file } from 'astro/loaders';
+import type { ZodType } from 'astro/zod';
 
 /**
  * Content collections.
@@ -12,65 +13,6 @@ import { glob, file } from 'astro/loaders';
  *
  * Ported from the old Nuxt site's schema/*.ts, with the fixes noted below.
  */
-
-/** Media reference used by figures, gallery items, and RSS enclosures. */
-const media = z.object({
-  type: z.enum(['image', 'video', 'audio', 'embed']).default('image'),
-  src: z.string(),
-  alt: z.string().optional(),
-  /** Poster frame for video. */
-  poster: z.string().optional(),
-  /** Attribution — a real editorial convention carried over from the old site. */
-  credits: z.string().optional(),
-  caption: z.string().optional(),
-});
-
-const blog = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
-  schema: ({ image }) =>
-    z.object({
-      title: z.string(),
-      description: z.string().optional(),
-      /** Coerced, so `2025-09-04` and `Sept 4 2025` both work. */
-      date: z.coerce.date(),
-      updated: z.coerce.date().optional(),
-
-      /**
-       * Authors are member IDs, validated against the members collection.
-       * The old site matched authors by exact display string, so a post
-       * saying "Will Forte" instead of "Will C. Forte" silently lost its
-       * byline. A bad ID now fails the build instead.
-       */
-      authors: z.array(reference('members')).min(1),
-
-      category: z.string().optional(),
-      tags: z.array(z.string()).default([]),
-
-      /** Feeds the card, the OG image, and the RSS enclosure. */
-      cover: image().optional(),
-      coverAlt: z.string().optional(),
-
-      /**
-       * Extra media surfaced in the feed (a video walkthrough, an audio
-       * note). The RSS builder picks the right enclosure type per item.
-       */
-      media: z.array(media).default([]),
-
-      /** Which org this post belongs to; drives per-org sub-feeds. */
-      org: z.enum(['esra', 'rutgers-dynamics']).default('esra'),
-
-      draft: z.boolean().default(false),
-      /** Pins to the top of the index. */
-      featured: z.boolean().default(false),
-
-      seo: z
-        .object({
-          title: z.string().optional(),
-          description: z.string().optional(),
-        })
-        .optional(),
-    }),
-});
 
 const members = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/members' }),
@@ -174,28 +116,10 @@ const projects = defineCollection({
 });
 
 /**
- * Gallery and partners are flat YAML lists rather than a file per entry:
- * they are short records that read better as one editable table, and the
- * `file()` loader parses a top-level array natively as long as each row
- * carries an `id`.
+ * Partners are a flat YAML list rather than a file per entry: short
+ * records that read better as one editable table. The `file()` loader
+ * parses a top-level array natively as long as each row carries an `id`.
  */
-const gallery = defineCollection({
-  loader: file('./src/content/gallery.yaml'),
-  schema: z.object({
-    type: z.enum(['image', 'video']).default('image'),
-    title: z.string(),
-    date: z.coerce.date(),
-    src: z.string(),
-    poster: z.string().optional(),
-    description: z.string().optional(),
-    /** Preserved verbatim from the old site — attribution matters here. */
-    credits: z.string().optional(),
-    category: z.string().optional(),
-    tags: z.array(z.string()).default([]),
-    alt: z.string().optional(),
-  }),
-});
-
 const partners = defineCollection({
   loader: file('./src/content/partners.yaml'),
   schema: z.object({
@@ -264,8 +188,6 @@ const featured = defineCollection({
     title: z.string(),
     /** Short line under the title. */
     summary: z.string().optional(),
-    /** Which org posted it; shown as the source label. */
-    org: z.enum(['esra', 'rutgers-dynamics']).default('esra'),
     date: z.coerce.date().optional(),
 
     /**
@@ -286,6 +208,128 @@ const featured = defineCollection({
   }),
 });
 
+/**
+ * An optional field that also treats a blank value as absent. The content
+ * editor at /admin can save a field it left empty as '' (or an empty
+ * object), and an empty date would otherwise fail the build.
+ */
+const isBlank = (v: unknown): boolean =>
+  v === '' ||
+  v === null ||
+  (typeof v === 'object' &&
+    !(v instanceof Date) &&
+    Object.values(v as object).every((x) => x === '' || x === null || x === undefined));
+
+const blank = <T extends ZodType>(schema: T) =>
+  z.preprocess((v) => (isBlank(v) ? undefined : v), schema.optional());
+
+/**
+ * The roadmap: the robots ESRA is building or has committed to build.
+ *
+ * Shown on the home page and at the top of /projects. A programme's
+ * `milestones` also feed the schedule on the home page and the "on the
+ * horizon" list on /events, so a date is only ever written down once.
+ */
+const programs = defineCollection({
+  loader: file('./src/content/programs.yaml'),
+  schema: z.object({
+    title: z.string(),
+    /** Short designation set large on its card, e.g. "H1". */
+    designation: blank(z.string()),
+    /** Humanoid, Quadruped, Manipulator. */
+    kind: z.string(),
+    status: z.enum(['active', 'planned', 'complete']).default('planned'),
+    /** Who it suits or where it sits: "Flagship", "Beginner", "Advanced". */
+    level: blank(z.string()),
+    /** The flagship gets the wide card and the full specification. */
+    flagship: z.boolean().default(false),
+    summary: z.string(),
+    description: blank(z.string()),
+    /** Human-readable span, e.g. "Nov 2026 – Jun 2027". */
+    timeframe: blank(z.string()),
+    /** Subsystems or focus areas. */
+    focus: z.array(z.string()).default([]),
+    /** What the programme publishes. */
+    outputs: z.array(z.string()).default([]),
+    milestones: z
+      .array(
+        z.object({
+          /**
+           * Only places the "now" marker; the label a reader sees is
+           * `when`, the season the roadmap actually commits to.
+           */
+          starts: z.coerce.date(),
+          when: z.string(),
+          title: z.string(),
+          body: z.string(),
+        })
+      )
+      .default([]),
+    order: z.number().default(100),
+  }),
+});
+
+/**
+ * Events worth a card of their own on /events. Day-to-day scheduling
+ * lives in the public Google Calendar embedded on the same page; this
+ * list is for the few big ones that deserve a write-up.
+ */
+const events = defineCollection({
+  loader: file('./src/content/events.yaml'),
+  schema: z.object({
+    title: z.string(),
+    /** Small line above the title, e.g. the programme it belongs to. */
+    kicker: blank(z.string()),
+    summary: z.string(),
+    /** Sorts the event and decides whether it is upcoming, on now, or past. */
+    start: z.coerce.date(),
+    end: blank(z.coerce.date()),
+    /** What a reader sees: "November 2026", "Jan 16–18, 2027". */
+    when: z.string(),
+    location: blank(z.string()),
+    /** Workshop, Build milestone, Conference, Meetup… */
+    format: blank(z.string()),
+    /** Featured events get the large card. */
+    featured: z.boolean().default(false),
+    /** Optional photo, as a path under src/assets (e.g. events/foo.jpg). */
+    image: blank(z.string()),
+    imageAlt: blank(z.string()),
+    highlights: z.array(z.string()).default([]),
+    links: z.array(z.object({ label: z.string(), url: z.string() })).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
+/**
+ * The ways to get involved. Each one is a card on the home page and the
+ * pop-up that opens from it.
+ */
+const pathways = defineCollection({
+  loader: file('./src/content/pathways.yaml'),
+  schema: z.object({
+    order: z.number().default(100),
+    /** Who it is for, in two or three words. */
+    audience: z.string(),
+    title: z.string(),
+    lede: z.string(),
+    /** Which pictogram the card carries. */
+    icon: z.enum(['team', 'affiliate', 'industry']),
+    /** The three lines on the card itself. */
+    points: z.array(z.string()),
+    /** Opening paragraph of the pop-up. */
+    intro: z.string(),
+    /** Headed lists in the pop-up: who it suits, what it involves… */
+    sections: z.array(z.object({ heading: z.string(), items: z.array(z.string()) })),
+    /** An optional highlighted aside in the pop-up. */
+    note: blank(z.object({ label: z.string().min(1), body: z.string().min(1) })),
+    /** How to take the first step. */
+    start: z.string(),
+    /** Button label, and the subject line of the email it starts. */
+    cta: z.string(),
+    subject: z.string(),
+  }),
+});
+
 const docs = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/docs' }),
   schema: z.object({
@@ -299,12 +343,13 @@ const docs = defineCollection({
 });
 
 export const collections = {
-  blog,
   members,
   projects,
-  gallery,
   partners,
   boms,
   docs,
   featured,
+  programs,
+  events,
+  pathways,
 };

@@ -4,21 +4,19 @@ Everything on this site is a file in this repository. There is no CMS you
 have to learn and no permission you have to ask for — open a pull request
 and it gets reviewed.
 
-For writing posts specifically, see **[BLOGGING.md](./BLOGGING.md)**.
-
 ---
 
 ## Adding yourself to Members
 
 Create `src/content/members/your-name.md`. The filename is your **id** —
-lowercase, hyphenated — and it's what posts use to credit you.
+lowercase, hyphenated.
 
 ```markdown
 ---
 name: Your Name
 order: 11
 discipline: Mechanical
-affiliation: Rutgers Dynamics
+affiliation: Columbia University Robotics Club
 avatar: ../../assets/avatars/your-name.jpg
 roles:
   - org: esra
@@ -44,8 +42,8 @@ Notes:
 - If you hold an officer role, add a `title`:
   ```yaml
   roles:
-    - org: rutgers-dynamics
-      title: Co-president
+    - org: esra
+      title: Co-director
   ```
 
 **Please write your own bio.** The ones currently in the repo are
@@ -68,7 +66,9 @@ status: prototype # active | prototype | shipped | archived
 domains: [cad, firmware]
 ---
 
-Longer description. Supports everything in BLOGGING.md.
+Longer description. In `.mdx` files the components in
+`src/components/blog/index.ts` (`<Fig>`, `<Callout>`, `<BOM>`, `<Spec>`…)
+are available with no import.
 ```
 
 If you set `repo`, stars and last-updated come from GitHub automatically —
@@ -77,33 +77,6 @@ it just won't show repository statistics.
 
 Repos in the `esrabot` org appear on `/projects` **automatically**. You
 only need a file here to add detail or to describe work with no repo.
-
----
-
-## Adding a gallery item
-
-Add the file to `src/assets/gallery/` (or `public/media/` for video), then
-add an entry to `src/content/gallery.yaml`:
-
-```yaml
-- id: my-photo
-  type: image
-  title: What it shows
-  date: 2026-07-20
-  src: gallery/my-photo.jpg
-  alt: A description for screen-reader users.
-  category: Hardware
-  tags: [leg]
-  credits: 'Designed by A. Person. Photo: B. Person.'
-```
-
-**Please fill in `credits`.** Recording who designed, built, and
-photographed something is a convention this project has kept from the
-start, and it matters — several parts were designed by people outside the
-core team.
-
-Note the quotes around `credits`: any value containing a colon followed by
-a space must be quoted, or YAML misreads it.
 
 ---
 

@@ -3,8 +3,8 @@
 The ESRA website — [esra.bot](https://esra.bot).
 
 Built in the open, like everything else here. If you want to change what
-the site _says_, you almost certainly want **[BLOGGING.md](./BLOGGING.md)**
-or **[CONTRIBUTING.md](./CONTRIBUTING.md)** rather than this file.
+the site _says_, you almost certainly want
+**[CONTRIBUTING.md](./CONTRIBUTING.md)** rather than this file.
 
 ---
 
@@ -23,11 +23,11 @@ push to main   ─┐
 cron, 6h       ─┼─→ GitHub Action ─→ astro build ─→ Vercel
 org repo push  ─┘         │
                           ├─ GitHub API      (repos, stars, commits)
-                          ├─ YouTube feeds   (per-org channels)
+                          ├─ YouTube feed    (ESRA's channel)
                           └─ src/content/    (markdown, YAML)
 ```
 
-Publishing a post does not wait for the cron: committing markdown to
+Publishing content does not wait for the cron: committing markdown to
 `main` triggers a deploy immediately.
 
 ---
@@ -57,23 +57,28 @@ pnpm dev          # http://localhost:4321
 ```
 src/
   content/          ← the site's actual content
-    blog/             posts (.md / .mdx)
     members/          one file per person
     projects/         curated project pages
     docs/             field guides
     boms/             bills of materials
-    gallery.yaml      photo and video index
     partners.yaml     affiliated clubs
+    programs.yaml     the roadmap: H1, Q1 and the manipulator projects
+    events.yaml       featured events on /events
+    pathways.yaml     the "Get involved" cards and their pop-ups
+    featured.yaml     hand-picked links for the home page
   data/
     orgs.ts           every social/org URL, defined once
-    site.ts           site constants and navigation
+    site.ts           site constants, navigation, the events calendar
   components/
     ui/               design-system primitives
-    blog/             the markdown authoring vocabulary
+    blog/             the MDX authoring vocabulary (guides, projects)
+    search/           the search box, dialog and page
   lib/
     github.ts         repo data, cached, degrades gracefully
     youtube.ts        channel feeds
-    feed.ts           RSS with media enclosures
+    search-index.ts   builds /search-index.json from the collections
+  scripts/
+    search.ts         search in the browser (no service behind it)
   styles/
     tokens.css        every colour, size, and spacing value
   pages/            ← routes
@@ -95,25 +100,40 @@ documents the measured contrast ratio of every text colour, and
 
 ## Design system
 
-The visual language comes from a set of design mockups: a 24px baseline
-grid, a document "sheet" over a grey field, monospace labelling, and
-hairline rules. Influences are U.S. Graphics Company, NASA documentation,
-Dieter Rams, and Bell Labs-era terminal interfaces.
+A light, warm page: warm white and beige surfaces, deep navy ink, and a
+single blue for everything you can act on. Headlines are set in
+[Fraunces](https://fonts.google.com/specimen/Fraunces), a soft serif, with
+one italic word in blue; running text and the interface are in
+[Inter](https://rsms.me/inter/); code and table figures in IBM Plex Mono.
+All three are open-licence and self-hosted.
 
-Two deliberate departures from the mockups are documented in
-[tokens.css](./src/styles/tokens.css):
+Everything lives as tokens in [tokens.css](./src/styles/tokens.css) —
+colours, type sizes, spacing, radii, shadows and motion — and the shared
+pieces (buttons, cards, chips, pop-up dialogs, scroll arrivals) are defined
+once in [global.css](./src/styles/global.css).
 
-- **Typography.** The mockups specify Berkeley Mono and Houston Mono, both
-  commercial licences. The site ships self-hosted IBM Plex Mono (OFL). To
-  swap in a licensed face, add the `woff2` and change two custom
-  properties — no other file names a typeface.
+- **Motion.** Blocks rise into view once, cards lift under the pointer,
+  buttons sink when pressed, dialogs ease open, and pages cross-fade where
+  the browser supports it. All of it stands down under
+  `prefers-reduced-motion`, and nothing depends on it: without JavaScript
+  every block is simply visible.
+- **Contrast.** `pnpm check:contrast` measures every text-and-surface pair
+  in the tokens against WCAG AA and fails CI below it.
+- **Partner logos** are redrawn in the page's own ink at build time
+  ([logo-mark.ts](./src/lib/logo-mark.ts)), so none of them clash.
 
-- **Surfaces.** The mockups' muted labels measured 2.42:1, below even the
-  3:1 large-text floor. Note that lifting the background alone cannot fix
-  this, because the muted tones are translucent ink composited over it and
-  rise with it — at the limit, the mockup's `.45` alpha on pure white
-  still only reaches 4.05:1. Surfaces were lifted _and_ text darkened, to
-  4.80:1.
+### Where to change what
+
+| To change…                                    | Edit                                          |
+| --------------------------------------------- | --------------------------------------------- |
+| The robots on the roadmap, and H1's dates     | `src/content/programs.yaml`                   |
+| Featured events                               | `src/content/events.yaml`                     |
+| Everyday dates                                | the public Google Calendar — no deploy needed |
+| The "Get involved" cards and their pop-ups    | `src/content/pathways.yaml`                   |
+| The navigation, or which calendar is embedded | `src/data/site.ts`                            |
+| How many repositories show before "Show all"  | `REPO_PAGE` in `src/pages/projects.astro`     |
+
+The four YAML files can also be edited in the content editor at `/admin`.
 
 ---
 
@@ -128,12 +148,9 @@ Configuration lives in [`vercel.json`](./vercel.json). Secrets needed:
 | --------------------------- | ------------------- | ----------------------------------------- |
 | `VERCEL_DEPLOY_HOOK`        | GitHub repo secret  | Lets the scheduled job trigger a rebuild  |
 | `GITHUB_TOKEN`              | provided by Actions | Authenticated API rate limit during build |
-| `PUBLIC_GISCUS_REPO_ID`     | Vercel env          | Enables blog comments                     |
-| `PUBLIC_GISCUS_CATEGORY_ID` | Vercel env          | Enables blog comments                     |
 
 The site degrades rather than fails when these are absent: no deploy hook
-means no scheduled refresh, no giscus IDs means the comments section
-explains that it isn't enabled yet.
+means no scheduled refresh.
 
 ---
 

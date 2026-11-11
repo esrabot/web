@@ -1,41 +1,29 @@
 ---
 /**
- * A full-bleed horizontal band, separated from the next by a hairline.
- * The band's background runs edge to edge; its content centres at the
- * sheet's --content-max. Pairs with SectionHead for the kicker row.
+ * A full-bleed horizontal band whose content centres on the page measure.
+ * Pairs with SectionHead for the heading block.
  *
- * The `backdrop` slot takes decoration that sits behind the content and
- * spans the whole band (see PixelField).
+ *   tone   `plain` sits on the page; `sand` is the beige band used to set
+ *          one section apart from its neighbours; `white` is a lifted,
+ *          paper-white band.
+ *   pad    vertical room. `flush-top` / `flush-bottom` drop one side, for a
+ *          section that continues the one beside it.
+ *   width  the content measure: the default, `narrow` for reading, `wide`
+ *          for wide grids.
  */
 interface Props {
   id?: string;
-  /**
-   * Vertical padding. `tight` for dense listings, `hero` for openers, and
-   * `open` for an opener whose last block runs flush into the next band.
-   */
-  pad?: 'tight' | 'normal' | 'hero' | 'open';
-  /** `panel` renders the band on the dark instrument-panel surface. */
-  tone?: 'sheet' | 'panel';
-  /** Kept for API compatibility: a band is ruled along its top edge now. */
-  last?: boolean;
+  tone?: 'plain' | 'sand' | 'white';
+  pad?: 'normal' | 'tight' | 'flush-top' | 'flush-bottom';
+  width?: 'default' | 'narrow' | 'wide';
   class?: string;
 }
 
-const { id, pad = 'normal', tone = 'sheet', last = false, class: className } = Astro.props;
+const { id, tone = 'plain', pad = 'normal', width = 'default', class: className } = Astro.props;
 ---
 
-<section
-  id={id}
-  class:list={['section', `pad-${pad}`, { 'tone-panel': tone === 'panel', last }, className]}
->
-  {
-    Astro.slots.has('backdrop') && (
-      <div class="backdrop" aria-hidden="true">
-        <slot name="backdrop" />
-      </div>
-    )
-  }
-  <div class="inner">
+<section id={id} class:list={['section', `tone-${tone}`, `pad-${pad}`, className]}>
+  <div class:list={['container', { narrow: width === 'narrow', wide: width === 'wide' }]}>
     <slot />
   </div>
 </section>
@@ -43,63 +31,27 @@ const { id, pad = 'normal', tone = 'sheet', last = false, class: className } = A
 <style>
   .section {
     position: relative;
-    scroll-margin-top: var(--u-3);
+    padding-block: var(--section-y);
   }
 
-  .backdrop {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
+  .tone-sand {
+    background: var(--sand);
   }
 
-  /* The rule between bands is painted on the top grid line of the lower
-     one. A border here would add a pixel per band and walk the whole page
-     off the grid. */
-  .section:not(:first-child) {
-    box-shadow: inset 0 var(--rule-width) 0 var(--rule);
-  }
-
-  /* Content starts and ends on grid lines (see Sheet.astro). It is its own
-     stacking context so a background field can sit behind the content but
-     in front of the band's tone. */
-  .inner {
-    position: relative;
-    z-index: 0;
-    width: var(--content-w);
-    margin-left: var(--edge);
+  .tone-white {
+    background: var(--surface);
+    border-block: 1px solid var(--rule-soft);
   }
 
   .pad-tight {
-    padding-block: var(--u);
-  }
-  .pad-normal {
-    padding-block: var(--u-4);
-  }
-  .pad-hero {
-    padding-block: var(--u-4) var(--u-3);
-  }
-  .pad-open {
-    padding-block: var(--u-4) 0;
+    padding-block: calc(var(--section-y) * 0.6);
   }
 
-  @media (max-width: 860px) {
-    .pad-normal,
-    .pad-hero {
-      padding-block: var(--u-3);
-    }
-    .pad-open {
-      padding-block: var(--u-3) 0;
-    }
+  .pad-flush-top {
+    padding-top: 0;
   }
 
-  @media (max-width: 480px) {
-    .pad-normal,
-    .pad-hero {
-      padding-block: var(--u-2);
-    }
-    .pad-open {
-      padding-block: var(--u-2) 0;
-    }
+  .pad-flush-bottom {
+    padding-bottom: 0;
   }
 </style>

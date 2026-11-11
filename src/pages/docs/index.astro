@@ -1,12 +1,14 @@
 ---
 /**
- * Field guides index.
+ * Guides index.
  */
 import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/ui/PageHero.astro';
 import Section from '../../components/ui/Section.astro';
-import MonoLabel from '../../components/ui/MonoLabel.astro';
+import { SITE } from '../../data/site';
 
 const docs = (await getCollection('docs'))
   .filter((d) => import.meta.env.DEV || !d.data.draft)
@@ -16,107 +18,165 @@ const docs = (await getCollection('docs'))
 <BaseLayout
   title="Guides"
   description="Field guides for building, flashing, and calibrating ESRA hardware."
-  sourcePath="site/docs/index.astro"
 >
-  <Section pad="hero">
-    <MonoLabel as="div" size="sm" track="label">Field guides</MonoLabel>
-    <h1 class="on-grid">Guides</h1>
-    <p class="lede on-grid">
-      Build notes and procedures, written so someone outside the group can follow them.
-    </p>
-  </Section>
+  <PageHero
+    eyebrow="Guides"
+    title="Build it yourself."
+    lede="Build notes and procedures, written so that someone outside the group can follow them — parts lists included."
+  >
+    <Fragment slot="title">Build it <em>yourself.</em></Fragment>
+    <span class="chip sand">{`${docs.length} ${docs.length === 1 ? 'guide' : 'guides'}`}</span>
+  </PageHero>
 
-  <Section pad="normal" last>
+  <Section pad="flush-top">
     {
       docs.length === 0 ? (
-        <p class="empty">No guides published yet.</p>
+        <p class="empty card">No guides published yet.</p>
       ) : (
-        <div class="list">
+        <ol class="guides">
           {docs.map((doc, i) => (
-            <a class="row" href={`/docs/${doc.id}`}>
-              <MonoLabel size="micro" track="wide">
-                G-{String(i + 1).padStart(2, '0')}
-              </MonoLabel>
-              <span class="text">
-                <strong>{doc.data.title}</strong>
-                {doc.data.description && <span class="desc">{doc.data.description}</span>}
+            <li class="guide card lift" data-reveal style={`--i: ${i % 4}`}>
+              <span class="guide-no" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
               </span>
-              <MonoLabel size="micro" track="wide" class="dur">
-                {doc.data.duration ?? ''} &#8594;
-              </MonoLabel>
-            </a>
+              <div class="guide-text">
+                <h2>
+                  <a class="stretch" href={`/docs/${doc.id}`}>
+                    {doc.data.title}
+                  </a>
+                </h2>
+                {doc.data.description && <p>{doc.data.description}</p>}
+              </div>
+              <div class="guide-end">
+                {doc.data.duration && (
+                  <span class="chip outline">
+                    <Icon name="lucide:clock" aria-hidden="true" />
+                    {doc.data.duration}
+                  </span>
+                )}
+                <span class="guide-go" aria-hidden="true">
+                  <Icon name="lucide:arrow-right" />
+                </span>
+              </div>
+            </li>
           ))}
-        </div>
+        </ol>
       )
     }
+
+    <p class="contribute" data-reveal>
+      Built something worth writing down? Guides are plain Markdown files in{' '}
+      <a href={SITE.repoUrl} rel="noopener">the site’s repository</a>.
+    </p>
   </Section>
 </BaseLayout>
 
 <style>
-  h1 {
-    margin: var(--u) 0 0;
-    font-family: var(--font-display);
-    font-size: var(--t-display);
-    font-weight: var(--w-bold);
-    --lh: var(--lh-h1);
-    line-height: var(--lh);
-    letter-spacing: var(--track-snug);
-    text-transform: uppercase;
+  .guides {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
-  .lede {
-    margin: var(--u) 0 0;
-    max-width: 456px;
-    font-size: var(--t-md);
-    line-height: var(--lh-grid);
+  .guide {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-5);
+    padding: var(--space-5) var(--space-6);
+  }
+
+  .guide-no {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    font-style: italic;
+    line-height: 1;
+    color: var(--blue);
+  }
+
+  .guide h2 {
+    font-size: var(--t-h3);
+  }
+
+  .guide h2 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .guide:hover h2 a {
+    color: var(--blue);
+  }
+
+  .guide-text p {
+    max-width: var(--measure);
+    margin: var(--space-1) 0 0;
     color: var(--ink-body);
   }
 
-  .list {
-    border-top: var(--rule-width) solid var(--rule);
-  }
-
-  .row {
-    display: grid;
-    grid-template-columns: 64px 1fr auto;
+  .guide-end {
+    display: flex;
     align-items: center;
-    gap: 20px;
-    padding: var(--u-half) 4px;
-    border-bottom: var(--rule-width) solid var(--rule);
-    text-decoration: none;
-    color: var(--ink-strong);
-    transition: background var(--dur-fast) var(--ease);
+    gap: var(--space-4);
   }
 
-  .row:hover {
-    background: rgba(36, 36, 36, 0.04);
-    color: var(--ink-strong);
+  .guide-go {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: var(--blue-wash);
+    color: var(--blue);
+    transition:
+      background-color var(--dur) var(--ease),
+      color var(--dur) var(--ease),
+      transform var(--dur-slow) var(--ease-out);
   }
 
-  .text strong {
-    display: block;
-    font-size: var(--t-lg);
-    font-weight: var(--w-semibold);
-    line-height: var(--lh-grid);
+  .guide-go :global(svg) {
+    width: 1.125rem;
+    height: 1.125rem;
   }
 
-  .desc {
-    display: block;
-    font-size: var(--t-sm);
-    line-height: var(--lh-grid);
-    color: var(--ink-muted);
+  .guide:hover .guide-go {
+    background: var(--blue);
+    color: var(--ink-inverse);
+    transform: translateX(4px);
   }
 
   .empty {
-    font-size: var(--t-base);
+    max-width: var(--measure);
+    margin: 0;
+    padding: var(--space-6);
     color: var(--ink-muted);
   }
 
-  @media (max-width: 560px) {
-    .row {
-      grid-template-columns: 48px 1fr;
+  .contribute {
+    margin: var(--space-7) 0 0;
+    font-size: var(--t-sm);
+    color: var(--ink-muted);
+  }
+
+  .contribute a {
+    color: var(--blue);
+  }
+
+  @media (max-width: 640px) {
+    .guide {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-3) var(--space-4);
+      padding: var(--space-5);
     }
-    .row :global(.dur) {
+
+    .guide-no {
+      grid-column: 1 / -1;
+      font-size: 1.75rem;
+    }
+
+    .guide-end .chip {
       display: none;
     }
   }

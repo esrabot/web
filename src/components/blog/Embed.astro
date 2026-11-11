@@ -40,7 +40,7 @@ const poster = youtube ? `https://i.ytimg.com/vi/${youtube}/hqdefault.jpg` : und
       <span class="tri" aria-hidden="true"></span>
       <span class="sr-only">Load and play: {title}</span>
     </button>
-    <span class="notice">Loads from YouTube on play</span>
+    <span class="notice">Loads from {youtube ? 'YouTube' : 'the provider'} on play</span>
   </div>
   {caption && <figcaption>{caption}</figcaption>}
 </figure>
@@ -75,22 +75,27 @@ const poster = youtube ? `https://i.ytimg.com/vi/${youtube}/hqdefault.jpg` : und
     position: relative;
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    border: var(--rule-width) solid var(--rule-strong);
-    background: var(--sheet-sunk);
+    border-radius: var(--r-lg);
+    background: var(--sand);
+    box-shadow: var(--shadow-sm);
   }
 
   .frame :global(iframe) {
+    display: block;
     width: 100%;
     height: 100%;
     border: 0;
-    display: block;
   }
 
   .poster {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: grayscale(1) contrast(1.1);
+    transition: transform var(--dur-slow) var(--ease-out);
+  }
+
+  .frame:hover .poster {
+    transform: scale(1.03);
   }
 
   .play {
@@ -99,52 +104,68 @@ const poster = youtube ? `https://i.ytimg.com/vi/${youtube}/hqdefault.jpg` : und
     display: flex;
     align-items: center;
     justify-content: center;
-    background: transparent;
     border: 0;
+    background: linear-gradient(rgba(15, 29, 53, 0.08), rgba(15, 29, 53, 0.32));
     cursor: pointer;
   }
 
+  .play:focus-visible {
+    outline-offset: -4px;
+    border-radius: var(--r-lg);
+  }
+
   .tri {
-    width: 56px;
-    height: 56px;
-    border: var(--rule-width) solid var(--ink-strong);
-    border-radius: 50%;
-    background: rgba(212, 215, 213, 0.75);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background var(--dur) var(--ease);
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 50%;
+    background: var(--surface);
+    box-shadow: var(--shadow-md);
+    transition:
+      transform var(--dur-slow) var(--ease-spring),
+      background-color var(--dur) var(--ease);
   }
 
   .tri::after {
     content: '';
-    border-left: 16px solid var(--ink-strong);
-    border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
-    margin-left: 4px;
+    margin-left: 0.3rem;
+    border-left: 1.1rem solid var(--blue);
+    border-top: 0.7rem solid transparent;
+    border-bottom: 0.7rem solid transparent;
+    transition: border-left-color var(--dur) var(--ease);
   }
 
   .play:hover .tri {
-    background: var(--sheet);
+    transform: scale(1.08);
+    background: var(--blue);
+  }
+
+  .play:hover .tri::after {
+    border-left-color: var(--ink-inverse);
+  }
+
+  .play:active .tri {
+    transform: scale(0.96);
   }
 
   .notice {
     position: absolute;
-    right: 8px;
-    bottom: 8px;
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: var(--track-widest);
-    text-transform: uppercase;
-    color: var(--ink-inverse);
-    background: var(--ink);
-    padding: 3px 6px;
+    right: var(--space-3);
+    bottom: var(--space-3);
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--r-pill);
+    background: rgba(255, 255, 255, 0.92);
+    font-size: 0.6875rem;
+    font-weight: var(--w-semibold);
+    color: var(--ink-strong);
+    pointer-events: none;
   }
 
   figcaption {
-    margin-top: 8px;
-    font-family: var(--font-mono);
-    font-size: var(--t-micro);
+    margin-top: var(--space-3);
+    font-size: var(--t-sm);
     color: var(--ink-muted);
   }
 </style>

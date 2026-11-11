@@ -2,7 +2,7 @@
  * Asset resolution for content authors.
  *
  * Contributors write image paths the way they think about them —
- * `gallery/leg-test-stand.jpg` — rather than importing modules. This maps
+ * `uploads/workshop.jpg` — rather than importing modules. This maps
  * those paths onto the processed assets so they still go through Astro's
  * optimiser.
  *
@@ -16,28 +16,11 @@ const assets = import.meta.glob<{ default: ImageMetadata }>(
   { eager: true }
 );
 
-/** Normalised lookup: 'gallery/foo.jpg' -> ImageMetadata */
+/** Normalised lookup: 'uploads/foo.jpg' -> ImageMetadata */
 const bySubpath = new Map<string, ImageMetadata>();
 
-/**
- * Reverse lookup: built asset URL -> on-disk source path.
- *
- * The RSS builder needs the original file to derive a feed-sized
- * enclosure and report an accurate byte length. Astro's ImageMetadata
- * carries the built `src`, not a filesystem path, so the mapping is
- * captured here while both are in hand.
- */
-const diskPathBySrc = new Map<string, string>();
-
 for (const [path, mod] of Object.entries(assets)) {
-  const subpath = path.replace('/src/assets/', '');
-  bySubpath.set(subpath, mod.default);
-  diskPathBySrc.set(mod.default.src, `src/assets/${subpath}`);
-}
-
-/** On-disk source path for a processed image, for build-time tooling. */
-export function diskPathFor(image: ImageMetadata): string | undefined {
-  return diskPathBySrc.get(image.src);
+  bySubpath.set(path.replace('/src/assets/', ''), mod.default);
 }
 
 /**

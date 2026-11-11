@@ -5,7 +5,7 @@
  * to manage, no quota, and no secret to leak into a static build.
  *
  * The feed is keyed by channel ID, but the org registry records handles
- * (@RutgersDynamics), so the handle is resolved to an ID once and cached.
+ * (@CCBRRobotics), so the handle is resolved to an ID once and cached.
  *
  * Like the GitHub client: never fabricates, never fails the build, falls
  * back to the last good snapshot.

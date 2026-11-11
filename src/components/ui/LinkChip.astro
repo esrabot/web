@@ -1,20 +1,18 @@
 ---
 /**
- * A bordered link chip: `[gh  willcforte  ↗]`.
+ * A pill-shaped link: an icon, a label, and an arrow if it leads away.
  *
- * Used for member socials, org links, and call-to-action buttons. When
- * given a `platform` it labels and icons itself from the registry, so
- * callers never hardcode a platform name.
+ * Used for member profiles, org channels and a project's links. Given a
+ * `platform` it takes its icon and label from the registry, so callers
+ * never hardcode a platform name.
  */
 import { Icon } from 'astro-icon/components';
 import { PLATFORM_META, type Platform } from '../../data/orgs';
 
 interface Props {
   href: string;
-  /** Pulls icon + short tag from the platform registry. */
+  /** Pulls the icon and default label from the platform registry. */
   platform?: Platform;
-  /** Overrides the platform's short tag. */
-  tag?: string;
   /** Visible text. Defaults to the platform label. */
   label?: string;
   /** Fill the chip (primary action). */
@@ -23,104 +21,108 @@ interface Props {
   class?: string;
 }
 
-const { href, platform, tag, label, solid = false, size = 'base', class: className } = Astro.props;
+const { href, platform, label, solid = false, size = 'base', class: className } = Astro.props;
 
 const meta = platform ? PLATFORM_META[platform] : undefined;
-const shortTag = tag ?? meta?.short;
 const text = label ?? meta?.label ?? href;
 
 // mailto: and relative links are same-context; only http(s) opens away.
 const external = /^https?:/.test(href);
-const accessibleName = meta && !label ? `${meta.label}: ${text}` : undefined;
+// A handle alone ("@esra") does not say where it goes; name the platform too.
+const accessibleName = meta && label ? `${meta.label}: ${label}` : undefined;
 ---
 
 <a
   href={href}
-  class:list={['chip', `s-${size}`, { solid }, className]}
+  class:list={['link-chip', `s-${size}`, { solid }, className]}
   rel={external ? 'noopener' : undefined}
   target={external ? '_blank' : undefined}
   aria-label={accessibleName}
 >
   {meta && <Icon name={meta.icon} class="icon" aria-hidden="true" />}
-  {shortTag && <span class="tag">{shortTag}</span>}
   <span class="text">{text}</span>
-  {
-    external && (
-      <span class="arrow" aria-hidden="true">
-        &#8599;
-      </span>
-    )
-  }
+  {external && <Icon name="lucide:arrow-up-right" class="out" aria-hidden="true" />}
 </a>
 
 <style>
-  .chip {
+  .link-chip {
     display: inline-flex;
     align-items: center;
-    gap: var(--u-quarter);
-    height: var(--u-2);
-    padding: 0 var(--u-half);
-    border: var(--rule-width) solid var(--rule-strong);
-    font-family: var(--font-mono);
-    font-size: var(--t-mono-sm);
-    letter-spacing: var(--track-wide);
+    gap: 0.5rem;
+    max-width: 100%;
+    min-height: 2.5rem;
+    padding: 0 0.875rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--r-pill);
+    background: var(--surface);
+    font-size: var(--t-sm);
+    font-weight: var(--w-medium);
     color: var(--ink-strong);
     text-decoration: none;
-    background: transparent;
     transition:
-      background var(--dur) var(--ease),
       border-color var(--dur) var(--ease),
-      color var(--dur) var(--ease);
+      background-color var(--dur) var(--ease),
+      color var(--dur) var(--ease),
+      transform var(--dur) var(--ease-out),
+      box-shadow var(--dur) var(--ease-out);
   }
 
-  .chip:hover {
-    border-color: var(--accent-ink);
-    color: var(--accent-ink);
+  .link-chip:hover {
+    border-color: var(--blue);
+    color: var(--blue);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
   }
 
-  .chip.solid {
-    background: var(--ink);
+  .link-chip:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: none;
+  }
+
+  .link-chip:focus-visible {
+    border-radius: var(--r-pill);
+  }
+
+  .link-chip.solid {
+    border-color: var(--blue);
+    background: var(--blue);
     color: var(--ink-inverse);
-    border-color: var(--ink);
-    text-transform: uppercase;
-    letter-spacing: var(--track-wider);
   }
 
-  .chip.solid:hover {
-    background: var(--accent-ink);
-    border-color: var(--accent-ink);
+  .link-chip.solid:hover {
+    border-color: var(--blue-strong);
+    background: var(--blue-strong);
     color: var(--ink-inverse);
   }
 
   .s-sm {
-    height: var(--u-3);
-    height: 32px;
-    font-size: var(--t-micro);
-    padding: 0 10px;
+    min-height: 2rem;
+    padding: 0 0.75rem;
+    font-size: var(--t-xs);
   }
 
-  .icon {
-    width: 13px;
-    height: 13px;
+  .icon,
+  .out {
     flex: none;
-  }
-
-  .tag {
-    color: var(--ink-muted);
-  }
-
-  .solid .tag {
-    color: inherit;
-    opacity: 0.7;
+    width: 1em;
+    height: 1em;
   }
 
   .text {
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  .arrow {
-    opacity: 0.5;
+  .out {
+    opacity: 0.55;
+    transition:
+      transform var(--dur) var(--ease-out),
+      opacity var(--dur) var(--ease);
+  }
+
+  .link-chip:hover .out {
+    opacity: 1;
+    transform: translate(2px, -2px);
   }
 </style>

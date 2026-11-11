@@ -1,15 +1,14 @@
 /**
  * The organisation and link registry.
  *
- * This is the ONLY place a URL for ESRA, Rutgers Dynamics, or an affiliated
- * club is written down. The header, footer, members page, projects page,
- * RSS feed, and structured data all read from here — so adding a social
- * account is a one-line edit that lights it up everywhere.
+ * This is the ONLY place ESRA's own channel URLs are written down. The
+ * header, footer, contact page and structured data all read from here —
+ * so adding a social account is a one-line edit that lights it up
+ * everywhere.
  *
- * Coverage is deliberately asymmetric and honest: Rutgers Dynamics has a
- * full social footprint, ESRA currently has LinkedIn, YouTube, GitHub and
- * email only. Absent platforms are simply omitted rather than rendered as
- * dead icons. Do not add a URL here that has not been confirmed to exist.
+ * ESRA currently has LinkedIn, YouTube, GitHub and email only. Absent
+ * platforms are simply omitted rather than rendered as dead icons. Do not
+ * add a URL here that has not been confirmed to exist.
  */
 
 /** Platforms we know how to render an icon and label for. */
@@ -26,7 +25,7 @@ export type Platform =
 
 export interface SocialLink {
   platform: Platform;
-  /** Display handle, e.g. "@RutgersDynamics". Falls back to the host. */
+  /** Display handle, e.g. "@CCBRRobotics". Falls back to the host. */
   handle?: string;
   url: string;
 }
@@ -75,46 +74,11 @@ export const ESRA: Org = {
   ],
 };
 
-export const RUTGERS_DYNAMICS: Org = {
-  id: 'rutgers-dynamics',
-  name: 'Rutgers Dynamics',
-  fullName: 'Rutgers Dynamics',
-  blurb: 'Rutgers University robotics team and founding ESRA member club.',
-  youtubeHandle: 'RutgersDynamics',
-  links: [
-    { platform: 'website', handle: 'rudynamics.org', url: 'https://www.rudynamics.org/' },
-    {
-      platform: 'linkedin',
-      handle: 'rutgers-dynamics',
-      url: 'https://www.linkedin.com/company/rutgers-dynamics/',
-    },
-    {
-      platform: 'youtube',
-      handle: '@RutgersDynamics',
-      url: 'https://www.youtube.com/@RutgersDynamics',
-    },
-    {
-      platform: 'instagram',
-      handle: '@rudynamics',
-      url: 'https://www.instagram.com/rudynamics/',
-    },
-    { platform: 'x', handle: '@RutgersDynamics', url: 'https://x.com/RutgersDynamics' },
-    {
-      platform: 'bluesky',
-      handle: '@rutgersdynamics.bsky.social',
-      url: 'https://bsky.app/profile/rutgersdynamics.bsky.social',
-    },
-    {
-      platform: 'email',
-      handle: 'rutgersnbdynamics@gmail.com',
-      url: 'mailto:rutgersnbdynamics@gmail.com',
-    },
-    { platform: 'linktree', handle: 'rutgersdynamics', url: 'https://linktr.ee/rutgersdynamics' },
-  ],
-};
-
-/** Every org whose content feeds the site. Order is presentation order. */
-export const ORGS: Org[] = [ESRA, RUTGERS_DYNAMICS];
+/**
+ * Every org whose content feeds the site. Order is presentation order.
+ * Partner clubs are not orgs: they live in src/content/partners.yaml.
+ */
+export const ORGS: Org[] = [ESRA];
 
 export function getOrg(id: string): Org | undefined {
   return ORGS.find((o) => o.id === id);

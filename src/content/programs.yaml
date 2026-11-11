@@ -1,0 +1,83 @@
+# The roadmap: the robots ESRA is building, or has committed to build.
+#
+# Shown on the home page and at the top of /projects.
+#
+#   status      active | planned | complete
+#   flagship    true for the one programme that gets the wide card
+#   milestones  feed the schedule on the home page and the "on the
+#               horizon" list on /events. `starts` only places the "now"
+#               marker — readers see `when`, so keep that to what the
+#               roadmap actually commits to (a month or a season).
+#
+# Only state what is decided. A programme with no dates yet simply has no
+# `timeframe` and no `milestones`.
+
+- id: h1
+  order: 1
+  title: H1 humanoid
+  designation: H1
+  kind: Humanoid
+  level: Flagship
+  flagship: true
+  status: active
+  timeframe: Nov 2026 – Jun 2027
+  summary: A full-scale humanoid, built across campuses.
+  description: >-
+    H1 brings mechanical structures, actuators, electronics, sensing, and
+    control software together in one robot — designed, built, and tested by
+    teams at different universities.
+  focus:
+    - Structure
+    - Actuators
+    - Electronics
+    - Sensing
+    - Control
+  outputs:
+    - Technical papers
+    - Engineering videos
+    - Progress reports
+    - Open-source code and build documentation
+  milestones:
+    - starts: 2026-11-01
+      when: Nov 2026
+      title: Hardware development
+      body: Teams start building H1 subsystems at their home institutions.
+    - starts: 2026-12-15
+      when: Winter
+      title: Integration workshop
+      body: The people behind each subsystem meet to assemble and test together.
+    - starts: 2027-03-01
+      when: Spring 2027
+      title: Joint testing
+      body: Further periods of integrated testing across campuses.
+    - starts: 2027-05-01
+      when: May–Jun 2027
+      title: H1 complete
+      body: A full-scale humanoid — plus the papers, videos, and code to show how.
+
+- id: q1
+  order: 2
+  title: Q1 quadruped
+  designation: Q1
+  kind: Quadruped
+  level: Legged
+  status: planned
+  summary: A four-legged robot on the 2026–27 roadmap, alongside H1.
+
+- id: teleoperation-arm
+  order: 3
+  title: Teleoperation arm
+  kind: Manipulator
+  level: Beginner
+  status: planned
+  summary: >-
+    A robotic arm driven by a human operator — the entry point for newer
+    participants.
+
+- id: precision-manipulation
+  order: 4
+  title: Precision manipulation
+  kind: Manipulator
+  level: Advanced
+  status: planned
+  summary: An advanced project focused on precise, controlled manipulation.

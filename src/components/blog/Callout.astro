@@ -1,6 +1,6 @@
 ---
 /**
- * An aside in the document idiom — a ruled block with a mono label.
+ * An aside: a tinted block with a small label.
  *
  * Usage in markdown:
  *   <Callout kind="warn" title="Mind the enamel">
@@ -23,27 +23,48 @@ const defaultTitle = { note: 'Note', warn: 'Caution', spec: 'Spec' }[kind];
 
 <style>
   .callout {
-    border: var(--rule-width) solid var(--rule);
-    border-left-width: 6px;
-    padding: var(--u-half) var(--u);
-    background: rgba(255, 255, 255, 0.05);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--blue-soft);
+    border-left: 4px solid var(--blue);
+    border-radius: var(--r-md);
+    background: var(--blue-wash);
   }
 
   .callout.warn {
-    border-left-color: var(--ink-strong);
+    border-color: var(--sand-deep);
+    border-left-color: var(--sand-ink);
+    background: var(--sand);
   }
 
   .callout.spec {
-    border-left-color: var(--accent);
+    border-color: var(--rule);
+    border-left-color: var(--ink-strong);
+    background: var(--surface);
   }
 
   .label {
-    margin: 0 0 var(--u-quarter);
-    font-family: var(--font-mono);
-    font-size: var(--t-micro);
-    letter-spacing: var(--track-mono-label);
+    margin: 0 0 var(--space-1);
+    font-family: var(--font-label);
+    font-size: var(--t-xs);
+    font-weight: var(--w-semibold);
+    line-height: var(--lh-snug);
+    letter-spacing: var(--track-label);
     text-transform: uppercase;
+    color: var(--blue-strong);
+  }
+
+  .warn .label {
+    color: var(--sand-ink);
+  }
+
+  .spec .label {
     color: var(--ink-muted);
+  }
+
+  .body {
+    font-size: var(--t-base);
+    line-height: 1.65;
+    color: var(--ink-body);
   }
 
   .body :global(> :first-child) {
@@ -51,10 +72,5 @@ const defaultTitle = { note: 'Note', warn: 'Caution', spec: 'Spec' }[kind];
   }
   .body :global(> :last-child) {
     margin-bottom: 0;
-  }
-  .body {
-    font-size: var(--t-base);
-    line-height: var(--lh-grid);
-    color: var(--ink-body);
   }
 </style>

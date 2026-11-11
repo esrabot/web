@@ -2,84 +2,156 @@
 /**
  * Site header.
  *
- * Wordmark, the primary nav lettered in small capitals, and one call to
- * action. Sticky on a translucent sheet with a backdrop blur. No JS:
- * below the breakpoint the nav becomes a horizontally scrollable rail
- * rather than a hamburger.
+ * Wordmark, the primary nav, search, and the one call to action. Sticky
+ * on a translucent page tone with a backdrop blur; it gains a hairline
+ * and a soft shadow once the page has scrolled under it.
+ *
+ * Below the breakpoint the nav folds into a panel behind a menu button.
+ * That needs JS, so without it the nav stays a horizontally scrollable
+ * rail under the bar instead — nothing is ever unreachable.
+ *
+ * The search control is a real link to /search. With JS it opens the
+ * search dialog in place (see SearchDialog.astro).
  */
+import { Icon } from 'astro-icon/components';
+
 import Logo from '../ui/Logo.astro';
-import { NAV, SITE } from '../../data/site';
+import { JOIN_HREF, NAV, SITE } from '../../data/site';
 
 interface Props {
   /** Path of the current page, used to mark the active nav item. */
   current?: string;
 }
 
-const { current = '' } = Astro.props;
+const { current = '/' } = Astro.props;
 
 const isActive = (href: string) =>
-  href !== '/' && (current === href || current.startsWith(href + '/'));
+  href === '/' ? current === '/' : current === href || current.startsWith(href + '/');
 ---
 
-<header class="header">
-  <a href="/" class="brand" aria-label={`${SITE.name} home`}>
-    <Logo height={22} label={null} />
-  </a>
+<header class="site-header" data-header>
+  <div class="container bar">
+    <a href="/" class="brand" aria-label={`${SITE.name} home`}>
+      <Logo height={22} label={null} />
+    </a>
 
-  <nav class="nav" aria-label="Primary">
-    <ul>
-      {
-        NAV.map(({ label, href }) => (
-          <li>
-            <a
-              href={href}
-              class:list={['nav-link', { active: isActive(href) }]}
-              aria-current={isActive(href) ? 'page' : undefined}
-            >
-              {label}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </nav>
+    <nav id="site-nav" class="nav" aria-label="Primary">
+      <ul>
+        {
+          NAV.map(({ label, href }, i) => (
+            <li style={`--i: ${i}`}>
+              <a
+                href={href}
+                class:list={['nav-link', { active: isActive(href) }]}
+                aria-current={isActive(href) ? 'page' : undefined}
+              >
+                {label}
+              </a>
+            </li>
+          ))
+        }
+        <li class="nav-cta" style={`--i: ${NAV.length}`}>
+          <a class="btn" href={JOIN_HREF}>
+            Get involved <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
+          </a>
+        </li>
+      </ul>
+    </nav>
 
-  <a href="/#join" class="btn sm cta" style="--cells: 8">Get involved</a>
+    <div class="actions">
+      <a
+        class="search-trigger"
+        href="/search"
+        data-search-open
+        aria-label="Search the site"
+        aria-keyshortcuts="Control+K Meta+K"
+      >
+        <Icon name="lucide:search" aria-hidden="true" />
+        <span class="st-label">Search</span>
+        <kbd data-search-kbd aria-hidden="true">Ctrl K</kbd>
+      </a>
+
+      <a class="btn sm cta" href={JOIN_HREF}>Get involved</a>
+
+      <button
+        class="menu-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="site-nav"
+        data-menu-toggle
+      >
+        <span class="sr-only">Menu</span>
+        <span class="bars" aria-hidden="true"><span></span><span></span></span>
+      </button>
+    </div>
+  </div>
 </header>
 
 <style>
-  .header {
+  .site-header {
     position: sticky;
     top: 0;
     z-index: var(--z-sticky);
-    display: flex;
-    align-items: center;
-    gap: var(--u);
-    min-height: var(--u-3);
-    padding-block: var(--u-half);
-    padding-inline: var(--edge) var(--edge-end);
-    /* Painted on the grid line under the bar; a border would shift the page. */
-    box-shadow: 0 var(--rule-width) 0 var(--rule);
-    background: var(--sheet-glass);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: var(--bg-glass);
+    backdrop-filter: saturate(1.4) blur(14px);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid transparent;
+    transition:
+      background-color var(--dur-slow) var(--ease),
+      border-color var(--dur-slow) var(--ease),
+      box-shadow var(--dur-slow) var(--ease);
+    view-transition-name: site-header;
   }
 
-  @supports not (backdrop-filter: blur(1px)) {
-    .header {
-      background: var(--sheet);
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .site-header {
+      background: var(--bg);
     }
+  }
+
+  .site-header:global([data-scrolled]) {
+    border-bottom-color: var(--rule-soft);
+    box-shadow: 0 6px 24px rgba(15, 29, 53, 0.06);
+  }
+
+  /* At the very top there is nothing under the bar yet, so it is clear and
+     the page's opening wash runs up behind it unbroken; the glass comes in
+     with the first scroll. Only where the script that tracks scrolling is
+     running — without it the bar keeps its glass throughout. */
+  :global(.js) .site-header:not([data-scrolled]):not([data-open]) {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    height: var(--header-h);
   }
 
   .brand {
     display: flex;
     align-items: center;
-    gap: var(--u-half);
-    text-decoration: none;
-    color: var(--ink-strong);
     flex: none;
+    padding: var(--space-2) 0;
+    color: var(--ink-strong);
+    text-decoration: none;
+    transition:
+      color var(--dur) var(--ease),
+      transform var(--dur) var(--ease-out);
   }
 
+  .brand:hover {
+    color: var(--blue);
+  }
+
+  .brand:active {
+    transform: scale(0.96);
+  }
+
+  /* --- nav ------------------------------------------------------- */
   .nav {
     margin-left: auto;
   }
@@ -87,99 +159,318 @@ const isActive = (href: string) =>
   .nav ul {
     display: flex;
     align-items: center;
-    gap: var(--u);
-    list-style: none;
+    gap: 0.125rem;
     margin: 0;
     padding: 0;
+    list-style: none;
   }
 
   .nav-link {
     position: relative;
-    line-height: var(--lh-grid);
-    font-family: var(--font-pixel);
-    font-size: var(--t-pixel);
-    font-weight: var(--w-regular);
-    text-transform: uppercase;
-    color: var(--ink-muted);
-    white-space: nowrap;
+    display: block;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--r-pill);
+    font-size: 0.9375rem;
+    font-weight: var(--w-medium);
+    line-height: 1.2;
+    color: var(--ink-body);
     text-decoration: none;
+    white-space: nowrap;
+    transition:
+      color var(--dur) var(--ease),
+      background-color var(--dur) var(--ease);
   }
 
   .nav-link:hover {
+    background: rgba(15, 29, 53, 0.06);
     color: var(--ink-strong);
   }
 
-  /* A rule under the label: ruled in from the left under the pointer, in
-     the blueprint blue every link is underlined with; beige and always
-     drawn on the current page. */
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -6px;
-    height: var(--rule-width);
-    background: var(--line);
-    transform-origin: left;
-    scale: 0 1;
-    transition: scale var(--dur-slow) var(--ease-out);
-  }
-
-  .nav-link:hover::after,
-  .nav-link:focus-visible::after {
-    scale: 1 1;
+  .nav-link:active {
+    background: rgba(15, 29, 53, 0.1);
   }
 
   .nav-link.active {
-    color: var(--accent-ink);
+    background: var(--blue-wash);
+    color: var(--blue-strong);
+    font-weight: var(--w-semibold);
   }
 
-  .nav-link.active::after {
-    background: var(--accent);
-    scale: 1 1;
+  /* The CTA inside the nav list only exists for the folded menu. */
+  .nav-cta {
+    display: none;
+  }
+
+  /* --- actions --------------------------------------------------- */
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex: none;
+  }
+
+  .search-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 2.5rem;
+    padding: 0 0.5rem 0 0.75rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--r-pill);
+    background: var(--surface);
+    font-size: var(--t-sm);
+    font-weight: var(--w-medium);
+    color: var(--ink-muted);
+    text-decoration: none;
+    transition:
+      border-color var(--dur) var(--ease),
+      color var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease),
+      transform var(--dur) var(--ease-out);
+  }
+
+  .search-trigger:hover {
+    border-color: var(--blue);
+    color: var(--blue);
+    box-shadow: 0 0 0 4px var(--blue-wash);
+  }
+
+  .search-trigger:active {
+    transform: scale(0.97);
+  }
+
+  .search-trigger :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+  }
+
+  .search-trigger kbd {
+    margin-left: 0.25rem;
   }
 
   .cta {
     flex: none;
   }
 
-  @media (max-width: 1060px) {
-    .nav ul {
-      gap: var(--u-half);
+  /* --- menu button (folded nav only) ----------------------------- */
+  .menu-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--ink-strong);
+    transition:
+      border-color var(--dur) var(--ease),
+      background-color var(--dur) var(--ease),
+      transform var(--dur) var(--ease-out);
+  }
+
+  .menu-toggle:hover {
+    border-color: var(--blue);
+  }
+
+  .menu-toggle:active {
+    transform: scale(0.92);
+  }
+
+  .menu-toggle:focus-visible {
+    border-radius: 50%;
+  }
+
+  .bars {
+    position: relative;
+    display: block;
+    width: 1rem;
+    height: 0.625rem;
+  }
+
+  .bars span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transition:
+      transform var(--dur-slow) var(--ease-out),
+      top var(--dur-slow) var(--ease-out);
+  }
+
+  .bars span:first-child {
+    top: 0;
+  }
+
+  .bars span:last-child {
+    top: calc(100% - 2px);
+  }
+
+  .site-header:global([data-open]) .bars span {
+    top: calc(50% - 1px);
+  }
+
+  .site-header:global([data-open]) .bars span:first-child {
+    transform: rotate(45deg);
+  }
+
+  .site-header:global([data-open]) .bars span:last-child {
+    transform: rotate(-45deg);
+  }
+
+  /* --- tightening before the fold -------------------------------- */
+  @media (max-width: 1180px) {
+    .bar {
+      gap: var(--space-4);
+    }
+
+    .nav-link {
+      padding-inline: 0.625rem;
+    }
+
+    /* Search becomes a round icon button. */
+    .search-trigger {
+      justify-content: center;
+      width: 2.5rem;
+      padding: 0;
+    }
+
+    .st-label,
+    .search-trigger kbd {
+      display: none;
     }
   }
 
-  @media (max-width: 860px) {
-    .header {
-      flex-wrap: wrap;
-      gap: var(--u-half);
-    }
-
-    .cta {
+  /* --- folded: the nav becomes a panel under the bar -------------- */
+  @media (max-width: 1000px) {
+    .actions {
       margin-left: auto;
     }
 
-    .nav {
+    /* With JS: a panel behind the menu button. */
+    :global(.js) .menu-toggle {
+      display: inline-flex;
+    }
+
+    :global(.js) .nav {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin: 0;
+      max-height: calc(100dvh - var(--header-h));
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: var(--space-3) var(--gutter) var(--space-6);
+      border-bottom: 1px solid var(--rule);
+      background: var(--bg);
+      box-shadow: 0 24px 48px rgba(15, 29, 53, 0.12);
+      visibility: hidden;
+      opacity: 0;
+      translate: 0 -0.5rem;
+      transition:
+        opacity var(--dur-slow) var(--ease-out),
+        translate var(--dur-slow) var(--ease-out),
+        visibility 0s linear var(--dur-slow);
+    }
+
+    :global(.js) .site-header:global([data-open]) .nav {
+      visibility: visible;
+      opacity: 1;
+      translate: 0 0;
+      transition-delay: 0s;
+    }
+
+    :global(.js) .nav ul {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    :global(.js) .nav li {
+      opacity: 0;
+      translate: 0 0.5rem;
+      transition:
+        opacity var(--dur-slow) var(--ease-out),
+        translate var(--dur-slow) var(--ease-out);
+    }
+
+    :global(.js) .site-header:global([data-open]) .nav li {
+      opacity: 1;
+      translate: 0 0;
+      transition-delay: calc(60ms + var(--i) * 35ms);
+    }
+
+    :global(.js) .nav-link {
+      padding: 0.875rem 0.25rem;
+      border-radius: 0;
+      border-bottom: 1px solid var(--rule-soft);
+      font-family: var(--font-display);
+      font-size: var(--t-xl);
+      font-weight: 500;
+      letter-spacing: var(--track-tight);
+      color: var(--ink-strong);
+    }
+
+    :global(.js) .nav-link:hover,
+    :global(.js) .nav-link.active {
+      background: none;
+      color: var(--blue);
+    }
+
+    :global(.js) .nav-cta {
+      display: block;
+      margin-top: var(--space-5);
+    }
+
+    :global(.js) .nav-cta .btn {
+      width: 100%;
+    }
+
+    /* Without JS: a scrollable rail under the bar. */
+    :global(html:not(.js)) .bar {
+      flex-wrap: wrap;
+      height: auto;
+      row-gap: 0;
+      padding-top: var(--space-3);
+    }
+
+    :global(html:not(.js)) .nav {
       order: 3;
       flex-basis: 100%;
-      margin-left: calc(-1 * var(--gutter));
-      margin-right: calc(-1 * var(--gutter));
-      padding: 0 var(--gutter);
+      margin: 0 calc(-1 * var(--gutter));
+      padding: var(--space-2) var(--gutter);
       overflow-x: auto;
       scrollbar-width: none;
     }
 
-    .nav::-webkit-scrollbar {
+    :global(html:not(.js)) .nav::-webkit-scrollbar {
       display: none;
     }
+  }
 
-    .nav ul {
-      gap: var(--u);
-      padding-bottom: var(--u-half);
+  @media (max-width: 480px) {
+    .bar {
+      gap: var(--space-3);
     }
 
-    .nav-link::after {
-      bottom: -6px;
+    .actions {
+      gap: var(--space-2);
+    }
+
+    /* The panel carries the call to action at this width. */
+    :global(.js) .cta {
+      display: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .site-header {
+      border-bottom-color: CanvasText;
     }
   }
 </style>

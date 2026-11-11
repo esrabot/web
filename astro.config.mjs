@@ -5,10 +5,8 @@ import sitemap from '@astrojs/sitemap';
 import vercel from '@astrojs/vercel';
 import icon from 'astro-icon';
 
-import { remarkWordCount } from './src/lib/remark-word-count.mjs';
-
 /**
- * Canonical origin. Every absolute URL on the site (sitemap, RSS, OG tags)
+ * Canonical origin. Every absolute URL on the site (sitemap, OG tags)
  * derives from this single value — switching domains is a one-line change.
  * Vercel preview deploys override it so previews self-reference correctly.
  */
@@ -43,10 +41,43 @@ export default defineConfig({
           'x',
           'bluesky',
           'gmail',
-          'rss',
           'kicad',
         ],
-        lucide: ['globe', 'mail', 'arrow-up-right', 'external-link', 'chevron-right'],
+        // Every lucide icon a template names must be listed here, or it
+        // will not be bundled. `grep -rhoE "lucide:[a-z0-9-]+" src` lists them.
+        lucide: [
+          'arrow-down',
+          'arrow-left',
+          'arrow-right',
+          'arrow-up-right',
+          'book-open',
+          'building-2',
+          'calendar',
+          'calendar-days',
+          'calendar-plus',
+          'check',
+          'chevron-down',
+          'chevron-left',
+          'chevron-right',
+          'clock',
+          'copy',
+          'external-link',
+          'flag',
+          'globe',
+          'graduation-cap',
+          'handshake',
+          'layers',
+          'mail',
+          'map-pin',
+          'play',
+          'plus',
+          'search',
+          'user',
+          'users',
+          'wrench',
+          'x',
+          'zoom-in',
+        ],
       },
     }),
     sitemap({
@@ -55,7 +86,6 @@ export default defineConfig({
   ],
 
   markdown: {
-    remarkPlugins: [remarkWordCount],
     shikiConfig: {
       // Light-only: the site has a single paper-toned theme by design.
       theme: 'github-light',

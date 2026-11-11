@@ -1,0 +1,124 @@
+---
+/**
+ * One person on the members wall: a portrait, a name, what they do and
+ * where. The whole card is the link to their page.
+ */
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+
+import { initials } from '../../lib/order';
+import { memberPath } from '../../lib/routes';
+import { getOrg } from '../../data/orgs';
+
+interface Props {
+  member: CollectionEntry<'members'>;
+  /** Stagger position for the arrival animation. */
+  index?: number;
+}
+
+const { member, index = 0 } = Astro.props;
+const { name, avatar, discipline, affiliation, roles } = member.data;
+
+// A held title ("Co-director, ESRA") is worth a line; bare membership is not.
+const titled = roles
+  .filter((r) => r.title)
+  .map((r) => `${r.title}, ${getOrg(r.org)?.name ?? r.org}`)
+  .join(' · ');
+---
+
+<article class="member card lift" data-reveal style={`--i: ${index % 4}`}>
+  <div class="portrait">
+    {
+      avatar ? (
+        <Image src={avatar} alt="" width={160} height={160} loading="lazy" />
+      ) : (
+        <span aria-hidden="true">{initials(name)}</span>
+      )
+    }
+  </div>
+
+  <h3>
+    <a class="stretch" href={memberPath(member)}>{name}</a>
+  </h3>
+  {titled && <p class="role">{titled}</p>}
+  {affiliation && <p class="affil">{affiliation}</p>}
+  {discipline && <span class="chip sand">{discipline}</span>}
+</article>
+
+<style>
+  .member {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-5);
+  }
+
+  .portrait {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 5rem;
+    height: 5rem;
+    overflow: hidden;
+    border-radius: 50%;
+    background: var(--sand);
+    box-shadow:
+      0 0 0 3px var(--surface),
+      0 0 0 4px var(--rule);
+    font-family: var(--font-display);
+    font-size: 1.625rem;
+    font-weight: 500;
+    color: var(--sand-ink);
+    transition:
+      box-shadow var(--dur-slow) var(--ease),
+      transform var(--dur-slow) var(--ease-spring);
+  }
+
+  .portrait :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .member:hover .portrait,
+  .member:focus-within .portrait {
+    box-shadow:
+      0 0 0 3px var(--surface),
+      0 0 0 5px var(--blue);
+    transform: scale(1.05);
+  }
+
+  h3 {
+    margin-top: var(--space-4);
+    font-size: var(--t-xl);
+  }
+
+  h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .member:hover h3 a {
+    color: var(--blue);
+  }
+
+  .role {
+    margin: var(--space-1) 0 0;
+    font-size: var(--t-sm);
+    font-weight: var(--w-semibold);
+    line-height: 1.45;
+    color: var(--blue-strong);
+  }
+
+  .affil {
+    flex: 1;
+    margin: var(--space-1) 0 0;
+    font-size: var(--t-sm);
+    line-height: 1.45;
+    color: var(--ink-muted);
+  }
+
+  .chip {
+    margin-top: var(--space-4);
+  }
+</style>

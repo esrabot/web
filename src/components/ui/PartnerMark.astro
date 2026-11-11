@@ -9,7 +9,7 @@
  * src/lib/logo-mark.ts).
  *
  * A partner with no logo file gets a lettered mark — its abbreviation in
- * the display face — sized to sit in the same row as the drawn ones.
+ * bold capitals — sized to sit in the same row as the drawn ones.
  */
 import type { CollectionEntry } from 'astro:content';
 
@@ -26,8 +26,13 @@ interface Props {
   class?: string;
 }
 
-const { partner, height = 72, maxWidth = height * 2.5, decorative = false, class: className } =
-  Astro.props;
+const {
+  partner,
+  height = 72,
+  maxWidth = height * 2.5,
+  decorative = false,
+  class: className,
+} = Astro.props;
 const { name, abbr, logo, logoInvert } = partner.data;
 
 const mark = logo ? await getPartnerMark(logo, { invert: logoInvert }) : null;
@@ -79,10 +84,10 @@ const a11y = decorative
     background: none;
     -webkit-mask: none;
     mask: none;
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
     font-weight: var(--w-bold);
-    line-height: 1; /* sub-grid: a lettered logo, sized by its box not the text grid */
-    letter-spacing: var(--track-tight);
+    line-height: 1;
+    letter-spacing: -0.03em;
     white-space: nowrap;
   }
 

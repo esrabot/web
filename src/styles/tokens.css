@@ -1,167 +1,89 @@
 /*
- * ESRA design tokens — "the drawing"
- * ----------------------------------
- * The site is set as an engineering drawing: a blue-black sheet under a
- * faint drafting grid, warm-white line work, beige for the things you act
- * on, and data set the way a spec sheet sets it — ruled tables, labelled
- * fields, numbered notes. Every value lives here; components reference
- * tokens only.
- *
- * Spacing sits on a 24px baseline grid, which is also the pitch of the
- * drafting grid behind the page.
+ * ESRA design tokens
+ * ------------------
+ * A light, warm page: paper white and beige surfaces, deep navy ink, and
+ * one blue that marks everything you can act on. Headlines are set in a
+ * soft serif, running text in a clean sans. Every colour, size, radius,
+ * shadow and duration lives here; components reference tokens only.
  */
 
 :root {
-  /* ---------------------------------------------------------------
-   * Grid
-   * ------------------------------------------------------------- */
-  --u: 24px;
-  --u-half: 12px;
-  --u-quarter: 6px;
-  --u-2: 48px;
-  --u-3: 72px;
-  --u-4: 96px;
-  /* One art pixel in UI chrome: the step in a button's corners. */
-  --px: 4px;
+  color-scheme: light;
 
   /* ---------------------------------------------------------------
-   * Sheet surfaces
+   * Surfaces
    * Load-bearing for scripts/check-contrast.mjs: literal values only.
    * ------------------------------------------------------------- */
-  --sheet: #0b1320; /* the drawing sheet — blue-black */
-  --paper: #080e17; /* = --veil over --sheet: footer, raised cells */
-  --sheet-sunk: #050a12; /* image wells, empty states */
-  --sheet-glass: rgba(11, 19, 32, 0.88); /* --sheet, translucent: sticky header */
-  --ink: #f2ede1; /* line work and text — warm white */
-  --ink-inverse: #0b1320; /* text on beige- or white-filled marks */
-
-  /*
-   * Drafting grid: one fine line per 24px cell, a heavier one every five.
-   * Painted ONCE, on the page. A band that needs a different tone lays a
-   * translucent veil over it rather than repainting, so the grid runs
-   * unbroken from header to footer.
-   */
-  --grid-minor: rgba(96, 144, 214, 0.055);
-  --grid-major: rgba(96, 144, 214, 0.11);
-  --grid-major-step: 120px;
-  /* Registration marks: a small cross on every major intersection. */
-  --grid-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cpath d='M57 60.5h7M60.5 57v7' stroke='%236090d6' stroke-opacity='.42'/%3E%3C/svg%3E");
-  /* Shaded cells in the background fields (PixelField). */
-  --field: rgb(96, 144, 214);
-  --veil: rgba(0, 0, 0, 0.28); /* footer */
-  --panel-veil: rgba(0, 0, 0, 0.5); /* the flagship band */
+  --bg: #fbf8f2; /* the page — warm white */
+  --surface: #ffffff; /* cards, dialogs, inputs */
+  --sand: #f3ebdc; /* beige bands and wells */
+  --sand-deep: #e6d8bd; /* beige borders, the footer's keyline */
+  --navy: #0f1d35; /* the darkest ink, and the modal scrim's hue */
+  --bg-glass: rgba(251, 248, 242, 0.82); /* --bg, translucent: sticky header */
 
   /* ---------------------------------------------------------------
-   * Text on --sheet. Ratios in scripts/check-contrast.mjs.
-   * --ink-faint is decoration only.
+   * Ink. Ratios are enforced in scripts/check-contrast.mjs.
+   * --ink-faint is decoration only (icons, dividers), never text.
    * ------------------------------------------------------------- */
-  --ink-strong: rgba(242, 237, 225, 1);
-  --ink-body: rgba(242, 237, 225, 0.86);
-  --ink-muted: rgba(242, 237, 225, 0.68);
-  --ink-soft: rgba(242, 237, 225, 0.55);
-  --ink-faint: rgba(242, 237, 225, 0.3);
+  --ink-strong: #0f1d35;
+  --ink-body: #37445b;
+  --ink-muted: #586479;
+  --ink-faint: #a3abb9;
+  --ink-inverse: #ffffff;
+  --sand-ink: #6a5836; /* small labels set on beige */
 
   /* ---------------------------------------------------------------
-   * Rules: the drawing's line weights.
+   * Blue — the single accent
    * ------------------------------------------------------------- */
-  --rule-strong: rgba(242, 237, 225, 0.42);
-  --rule: rgba(242, 237, 225, 0.18);
-  --rule-soft: rgba(242, 237, 225, 0.1);
-  --rule-solid: #333941; /* --rule pre-composited onto --sheet */
-  --rule-width: 1px;
+  --blue: #2450c8;
+  --blue-strong: #1b3e9f; /* hover, pressed */
+  --blue-deep: #13295f; /* a button's lower edge, the CTA band's far end */
+  --blue-soft: #dce6fb; /* tinted fills, focus halo */
+  --blue-wash: #eef3fd; /* the lightest tint: hover rows, icon badges */
+  --blue-on-dark: #d3e0fd; /* accent text on the blue band */
 
   /* ---------------------------------------------------------------
-   * Colour
+   * Rules
    * ------------------------------------------------------------- */
-  --line: #4a78bd; /* blueprint blue: construction lines, link underlines */
-  --line-dim: rgba(74, 120, 189, 0.5);
-  --signal: #79b0ff; /* the one "live" colour: the current milestone */
-
-  /* Accent = beige. Light enough to be text on the sheet. */
-  --accent: #e3d3ad;
-  --accent-ink: #e3d3ad;
-  --accent-wash: rgba(227, 211, 173, 0.12);
-  --accent-deep: #a8946a; /* a button's lower edge */
-
-  /* ---------------------------------------------------------------
-   * Flagship band
-   * The same sheet under --panel-veil. --panel is that composite
-   * (black at 50% over --sheet), used wherever a solid match is needed.
-   * Sections with tone="panel" re-map the ink tokens onto these.
-   * ------------------------------------------------------------- */
-  --panel: #060a10;
-  --panel-raised: #10151e;
-  --panel-sunk: #03060b;
-  --panel-ink: #f2ede1;
-  --panel-body: rgba(242, 237, 225, 0.86);
-  --panel-muted: rgba(242, 237, 225, 0.66);
-  --panel-rule: rgba(242, 237, 225, 0.18);
-  --panel-rule-soft: rgba(242, 237, 225, 0.09);
-  --panel-rule-solid: #303235;
-  --panel-accent: #e3d3ad;
+  --rule: rgba(15, 29, 53, 0.12);
+  --rule-soft: rgba(15, 29, 53, 0.07);
+  --rule-strong: rgba(15, 29, 53, 0.24);
 
   /* ---------------------------------------------------------------
    * Typography
    *
-   *   IBM Plex Sans  — headlines and anything read as sentences.
-   *   IBM Plex Mono  — data, dates, and the small field labels.
-   *   Silkscreen     — the lettering: nav, section heads, buttons,
-   *                    reference marks. Drawn on an 8px grid, so it is
-   *                    only ever set at 16px or another multiple of 8,
-   *                    and never used for prose.
+   *   Fraunces  — headlines. A soft, old-style serif with an optical
+   *               size axis, so large settings stay delicate.
+   *   Inter     — everything read as sentences, and the interface.
+   *   Plex Mono — code, figures in tables, repository names.
    * ------------------------------------------------------------- */
-  --font-pixel: 'Silkscreen', ui-monospace, monospace;
-  --font-display:
-    'IBM Plex Sans', -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font-display: 'Fraunces Variable', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
   --font-sans:
-    'IBM Plex Sans', -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', Roboto, sans-serif;
-  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+    'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  /* The small tracked labels. One token, so the lettering can be swapped
+     without touching a component. */
+  --font-label: var(--font-sans);
 
-  --t-micro: 12px;
-  --t-mono-sm: 12px;
-  --t-mono: 12px;
-  --t-sm: 14px;
-  --t-base: 15px;
-  --t-md: 16px;
-  --t-lg: 17px;
-  --t-xl: 20px;
-  --t-h3: 22px;
-  --t-h2: clamp(28px, 3.4vw, 40px);
-  --t-h1: clamp(32px, 4.6vw, 48px);
-  --t-display: clamp(34px, 4.6vw, 48px);
-  --t-hero: clamp(44px, 7vw, 88px);
-  --t-stat: clamp(22px, 2.4vw, 28px);
-  --t-designation: 120px;
-  --t-pixel: 16px; /* Silkscreen lettering: 2 x its 8px grid */
-  /* Running text — sentences people read, as opposed to data and labels.
-     Set in Plex Sans, which reads far more easily than the mono at
-     paragraph length. --t-text-sm is for card, step and note copy. */
-  --font-text: var(--font-sans);
-  --t-text: 16px;
-  --t-text-sm: 15px;
+  --t-xs: 0.75rem; /* 12 */
+  --t-sm: 0.875rem; /* 14 */
+  --t-base: 1rem; /* 16 */
+  --t-md: 1.0625rem; /* 17 */
+  --t-lg: 1.1875rem; /* 19 */
+  --t-xl: 1.375rem; /* 22 */
+  --t-h3: clamp(1.375rem, 1.1rem + 0.9vw, 1.625rem);
+  --t-h2: clamp(1.875rem, 1.3rem + 2.4vw, 2.875rem);
+  --t-h1: clamp(2.375rem, 1.5rem + 3.8vw, 4rem);
+  --t-hero: clamp(2.75rem, 1.4rem + 6vw, 5.5rem);
+
+  --lh-tight: 1.05;
+  --lh-heading: 1.15;
+  --lh-snug: 1.4;
+  --lh-body: 1.65;
 
   --track-display: -0.025em;
-  --track-tight: -0.02em;
-  --track-snug: -0.01em;
-  --track-none: 0;
-  --track-wide: 0.04em;
-  --track-wider: 0.08em;
-  --track-widest: 0.12em;
-  --track-mono-label: 0.12em;
-
-  /* Line heights: every text line height is a grid multiple. */
-  --lh-grid: 24px;
-  --lh-snug: 18px; /* captions and tags only */
-  --lh-h1: 48px;
-  --lh-hero: 96px;
-
-  /*
-   * Baseline correction constant for .on-grid — read from IBM Plex Mono's
-   * hhea table (Plex Sans measures identically). scripts/check-grid.mjs
-   * re-derives it from the font files and fails if it drifts.
-   */
-  --bl-k: 0.375;
+  --track-tight: -0.015em;
+  --track-label: 0.14em;
 
   --w-regular: 400;
   --w-medium: 500;
@@ -169,64 +91,75 @@
   --w-bold: 700;
 
   /* ---------------------------------------------------------------
-   * Layout
+   * Space
    * ------------------------------------------------------------- */
-  --sheet-max: 1200px; /* 50 cells */
-
-  /*
-   * Column tracks that land on the drafting grid at any width: each is
-   * rounded down to whole cells, and the last column of a row takes the
-   * remainder as 1fr. At the full 50-cell measure three columns come out
-   * at 16 cells with one-cell gaps, four at 11 with two-cell gaps.
-   */
-  --col-3: round(down, calc((100% - 2 * var(--u)) / 3), var(--u));
-  --col-4: round(down, calc((100% - 3 * var(--u-2)) / 4), var(--u));
-  --gutter: var(--u-2);
-  --measure: 620px;
-  --measure-wide: 960px;
-  --margin-col: 272px;
-  --margin-gutter: 320px;
+  --space-1: 0.25rem; /* 4 */
+  --space-2: 0.5rem; /* 8 */
+  --space-3: 0.75rem; /* 12 */
+  --space-4: 1rem; /* 16 */
+  --space-5: 1.5rem; /* 24 */
+  --space-6: 2rem; /* 32 */
+  --space-7: 3rem; /* 48 */
+  --space-8: 4rem; /* 64 */
+  --space-9: 6rem; /* 96 */
 
   /* ---------------------------------------------------------------
-   * Depth and motion
-   *
-   * The page moves in three ways, and only these:
-   *
-   *   settle  a block arrives: it fades in from half a cell below.
-   *   draw    line work is ruled in from where it starts, as a pen
-   *           would draw it — section rules, the schedule, its ticks.
-   *   step    pixel things change state in whole steps and never ease:
-   *           the lit cells, the status lamp, a photo printing a row
-   *           of cells at a time, values filled into the title block.
-   *
-   * Arrivals play once, when a thing first scrolls into view, and only
-   * on screen for people who have not asked for reduced motion.
+   * Layout
    * ------------------------------------------------------------- */
-  --shadow-sheet: 0 24px 72px rgba(0, 0, 0, 0.35);
+  --container: 75rem; /* 1200 */
+  --container-narrow: 46rem; /* 736: articles */
+  --container-wide: 85rem; /* 1360: wide sections */
+  --gutter: clamp(1.25rem, 5vw, 3rem);
+  --section-y: clamp(4rem, 9vw, 7.5rem);
+  --header-h: 4.5rem;
+  --measure: 40rem; /* a comfortable line of running text */
+  /* The side-note column beside an article, and the room it needs. */
+  --margin-col: 15rem;
+  --margin-gutter: 17.5rem;
+
+  /* ---------------------------------------------------------------
+   * Shape and depth
+   * ------------------------------------------------------------- */
+  --r-sm: 0.5rem;
+  --r-md: 0.875rem;
+  --r-lg: 1.25rem;
+  --r-xl: 1.75rem;
+  --r-pill: 999px;
+
+  --shadow-xs: 0 1px 2px rgba(15, 29, 53, 0.06);
+  --shadow-sm: 0 1px 2px rgba(15, 29, 53, 0.05), 0 4px 14px rgba(15, 29, 53, 0.05);
+  --shadow-md: 0 2px 4px rgba(15, 29, 53, 0.04), 0 14px 32px rgba(15, 29, 53, 0.1);
+  --shadow-lg: 0 4px 8px rgba(15, 29, 53, 0.04), 0 28px 64px rgba(15, 29, 53, 0.16);
+  --shadow-blue: 0 10px 24px rgba(36, 80, 200, 0.28);
+  --scrim: rgba(15, 29, 53, 0.48);
+
+  /* ---------------------------------------------------------------
+   * Motion
+   *
+   *   --ease-out     things arriving and settling
+   *   --ease-spring  a small overshoot: cards lifting, dialogs opening
+   *   --ease         everything else
+   *
+   * Arrivals play once, the first time a block scrolls into view, and
+   * only for people who have not asked for reduced motion.
+   * ------------------------------------------------------------- */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1); /* settle */
-  --ease-draw: cubic-bezier(0.6, 0, 0.25, 1); /* a pen: picks up speed, slows to stop */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
   --dur-fast: 0.12s;
-  --dur: 0.15s;
-  --dur-slow: 0.3s;
-  --dur-settle: 0.6s;
-  --dur-draw: 0.9s;
-  --stagger: 80ms;
+  --dur: 0.2s;
+  --dur-slow: 0.35s;
+  --dur-reveal: 0.7s;
+  --stagger: 70ms;
 
-  /* Image treatment: photos print as a blue-black duotone with a faint
-     dot screen. */
-  --dither-size: 3px;
-  --dither-dot: rgba(0, 0, 0, 0.55);
-
-  --z-grid: 0;
   --z-content: 1;
-  --z-sticky: 10;
+  --z-sticky: 50;
   --z-overlay: 100;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 720px) {
   :root {
-    --gutter: var(--u);
+    --header-h: 4rem;
   }
 }
 
@@ -236,6 +169,7 @@
     --dur-fast: 0.01ms;
     --dur: 0.01ms;
     --dur-slow: 0.01ms;
+    --dur-reveal: 0.01ms;
   }
 
   *,
@@ -248,13 +182,11 @@
   }
 }
 
-/* Forced colours: drop the decorative layers, let the OS palette through. */
+/* Forced colours: let the OS palette through. */
 @media (forced-colors: active) {
   :root {
-    --rule-strong: CanvasText;
     --rule: CanvasText;
     --rule-soft: CanvasText;
-    --grid-minor: transparent;
-    --grid-major: transparent;
+    --rule-strong: CanvasText;
   }
 }

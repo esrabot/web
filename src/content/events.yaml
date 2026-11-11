@@ -1,0 +1,39 @@
+# Events that get a card of their own on /events.
+#
+# Day-to-day scheduling lives in the public Google Calendar embedded on
+# that page — add meetings and work sessions there, not here. This file is
+# for the few big ones worth a write-up.
+#
+#   featured    true gives the event the large card at the top
+#   start/end   sort the event and decide whether it reads as upcoming,
+#               happening now, or past. Readers see `when`, so an event
+#               without a fixed day can say "November 2026".
+#   image       optional photo, as a path under src/assets
+#               (e.g. uploads/workshop.jpg), with `imageAlt`
+#   links       buttons on the card; the first is the primary one
+#
+# To add an event: copy a block, give it a unique lowercase `id`, and edit.
+
+- id: h1-hardware-kickoff
+  featured: true
+  title: H1 hardware development begins
+  kicker: H1 humanoid · Flagship programme
+  when: November 2026
+  start: 2026-11-01
+  end: 2026-11-30
+  format: Build milestone
+  location: At each team's home campus
+  summary: >-
+    The build starts here. Teams across the network begin developing H1's
+    subsystems — structure, actuators, electronics, sensing, and control —
+    at their home institutions, each working to the interfaces agreed
+    between them.
+  highlights:
+    - Each team develops and tests its own subsystem on its own campus
+    - 'Next up: a winter workshop to assemble and test everything together'
+    - 'The target: a complete full-scale humanoid by May–June 2027'
+  links:
+    - label: Meet H1
+      url: /#h1
+    - label: Join the build
+      url: /#join

@@ -1,10 +1,9 @@
 ---
 /**
- * /members — the roster index.
+ * /members — everyone, and the partner clubs and schools.
  *
- * Individual records live at the site root (/willcforte), see
- * src/pages/[member].astro. This page selects the first member in build
- * order so the detail pane is never empty.
+ * Individual pages live at the site root (/willcforte), see
+ * src/pages/[member].astro.
  */
 import { getCollection } from 'astro:content';
 
@@ -14,4 +13,4 @@ import { seededShuffle } from '../../lib/order';
 const members = seededShuffle((await getCollection('members')).filter((m) => !m.data.inactive));
 ---
 
-<RegistryPage members={members} selected={members[0]!} isIndex />
+<RegistryPage members={members} />

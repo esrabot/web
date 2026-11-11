@@ -1,28 +1,39 @@
 ---
 /**
- * 404, in the diagnostic register rather than an apology.
+ * 404 — say what happened, then offer the ways onward: search first,
+ * then the sections.
  */
+import { Icon } from 'astro-icon/components';
+
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/ui/PageHero.astro';
 import Section from '../components/ui/Section.astro';
-import MonoLabel from '../components/ui/MonoLabel.astro';
 import { NAV } from '../data/site';
 ---
 
-<BaseLayout title="404 — not found" sourcePath="site/404.astro" noindex>
-  <Section pad="hero" last>
-    <MonoLabel as="div" size="sm" track="label">Error · 404</MonoLabel>
-    <h1 class="on-grid">No such<br />resource.</h1>
-    <p class="lede on-grid">
-      The path you requested isn't here. It may have moved when the site was rebuilt, or it may
-      never have existed.
-    </p>
+<BaseLayout title="Page not found" noindex cta={false}>
+  <PageHero
+    eyebrow="Error 404"
+    title="This page isn’t here."
+    lede="It may have moved when the site was rebuilt, or it may never have existed. Search for what you were after, or pick up from one of the sections."
+  >
+    <Fragment slot="title">This page isn’t <em>here.</em></Fragment>
+    <a class="btn" href="/search" data-search-open>
+      <Icon name="lucide:search" aria-hidden="true" />
+      Search the site
+    </a>
+    <a class="btn secondary" href="/">Back to home</a>
+  </PageHero>
 
-    <MonoLabel as="div" size="micro" track="wide" class="paths">Try one of these</MonoLabel>
+  <Section pad="flush-top">
     <ul class="links">
       {
-        NAV.filter((n) => !n.mono).map(({ label, href }) => (
-          <li>
-            <a href={href}>{href}</a> — {label}
+        NAV.map(({ label, href }, i) => (
+          <li data-reveal style={`--i: ${i}`}>
+            <a class="card lift" href={href}>
+              {label}
+              <Icon name="lucide:arrow-right" aria-hidden="true" />
+            </a>
           </li>
         ))
       }
@@ -31,37 +42,40 @@ import { NAV } from '../data/site';
 </BaseLayout>
 
 <style>
-  h1 {
-    margin: var(--u) 0 0;
-    font-family: var(--font-display);
-    font-size: var(--t-display);
-    font-weight: var(--w-bold);
-    --lh: var(--lh-h1);
-    line-height: var(--lh);
-    letter-spacing: var(--track-snug);
-    text-transform: uppercase;
-  }
-
-  .lede {
-    margin: var(--u) 0 0;
-    max-width: 456px;
-    font-size: var(--t-md);
-    line-height: var(--lh-grid);
-    color: var(--ink-body);
-  }
-
-  :global(.paths) {
-    display: block;
-    margin-top: var(--u-2);
-  }
-
   .links {
-    list-style: none;
-    margin: var(--u-half) 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
+    gap: var(--space-4);
+    margin: 0;
     padding: 0;
-    font-family: var(--font-mono);
-    font-size: var(--t-mono);
-    line-height: var(--lh-grid);
-    color: var(--ink-muted);
+    list-style: none;
+  }
+
+  .links a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    font-family: var(--font-display);
+    font-size: var(--t-lg);
+    font-weight: 560;
+    color: var(--ink-strong);
+    text-decoration: none;
+  }
+
+  .links a:hover {
+    color: var(--blue);
+  }
+
+  .links :global(svg) {
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--blue);
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .links a:hover :global(svg) {
+    transform: translateX(3px);
   }
 </style>

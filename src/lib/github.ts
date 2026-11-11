@@ -200,3 +200,10 @@ export function relativeTime(iso: string | null): string {
   if (days < 365) return `${Math.floor(days / 30)}mo`;
   return `${Math.floor(days / 365)}y`;
 }
+
+/** The same freshness as a phrase: "Updated 3w ago", "Updated today". */
+export function updatedLabel(iso: string | null): string {
+  const when = relativeTime(iso);
+  if (!when) return '';
+  return when === 'today' ? 'Updated today' : `Updated ${when} ago`;
+}

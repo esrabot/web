@@ -10,8 +10,9 @@
  * renders with the name and a link, minus the figures. It never shows a
  * placeholder number.
  */
-import MonoLabel from '../ui/MonoLabel.astro';
-import { getRepo, relativeTime } from '../../lib/github';
+import { Icon } from 'astro-icon/components';
+
+import { getRepo, updatedLabel } from '../../lib/github';
 
 interface Props {
   name: string;
@@ -29,26 +30,27 @@ const description = summary ?? repo?.description ?? null;
 
 <a class="repo" href={url} rel="noopener" target="_blank">
   <div class="top">
-    <span class="dot" aria-hidden="true"></span>
+    <Icon name="simple-icons:github" class="gh" aria-hidden="true" />
     <span class="name">{fullName}</span>
-    {repo?.isArchived && <span class="badge">archived</span>}
+    {repo?.isArchived && <span class="badge">Archived</span>}
+    <Icon name="lucide:arrow-up-right" class="out" aria-hidden="true" />
   </div>
 
   {description && <p class="desc">{description}</p>}
 
   {
     repo ? (
-      <MonoLabel as="div" size="micro" track="wide" class="stats">
+      <div class="stats">
         {repo.language && <span>{repo.language}</span>}
         <span>&#9733; {repo.stars}</span>
         {repo.forks > 0 && <span>{repo.forks} forks</span>}
-        {repo.pushedAt && <span>{relativeTime(repo.pushedAt)}</span>}
-      </MonoLabel>
+        {repo.pushedAt && <span>{updatedLabel(repo.pushedAt)}</span>}
+      </div>
     ) : (
       /* No fabricated figures — just say the data isn't available. */
-      <MonoLabel as="div" size="micro" track="wide" class="stats">
-        <span>repository details unavailable</span>
-      </MonoLabel>
+      <div class="stats">
+        <span>Repository details unavailable</span>
+      </div>
     )
   }
 </a>
@@ -56,63 +58,90 @@ const description = summary ?? repo?.description ?? null;
 <style>
   .repo {
     display: block;
-    padding: var(--u-half) var(--u);
-    border: var(--rule-width) solid var(--rule);
-    background: rgba(255, 255, 255, 0.05);
-    text-decoration: none;
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--rule-soft);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    box-shadow: var(--shadow-xs);
     color: var(--ink-strong);
-    transition: border-color var(--dur) var(--ease);
+    text-decoration: none;
+    transition:
+      border-color var(--dur) var(--ease),
+      box-shadow var(--dur-slow) var(--ease-out),
+      transform var(--dur-slow) var(--ease-out);
   }
 
   .repo:hover {
-    border-color: var(--accent-ink);
+    border-color: var(--blue);
+    box-shadow: var(--shadow-md);
     color: var(--ink-strong);
+    transform: translateY(-2px);
+  }
+
+  .repo:active {
+    transform: translateY(0);
   }
 
   .top {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0.625rem;
   }
 
-  .dot {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: var(--ink-strong);
-    opacity: 0.7;
+  .gh {
     flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--ink-strong);
   }
 
   .name {
     font-family: var(--font-mono);
     font-size: var(--t-base);
-    font-weight: var(--w-semibold);
+    font-weight: var(--w-medium);
     overflow-wrap: anywhere;
   }
 
   .badge {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: var(--track-widest);
-    border: 1px solid var(--rule);
-    padding: 1px 5px;
-    color: var(--ink-muted);
+    padding: 0.1rem 0.5rem;
+    border-radius: var(--r-pill);
+    background: var(--sand);
+    font-size: 0.6875rem;
+    font-weight: var(--w-semibold);
+    color: var(--sand-ink);
+  }
+
+  .out {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    margin-left: auto;
+    color: var(--ink-faint);
+    transition:
+      color var(--dur) var(--ease),
+      transform var(--dur) var(--ease-out);
+  }
+
+  .repo:hover .out {
+    color: var(--blue);
+    transform: translate(2px, -2px);
   }
 
   .desc {
-    margin: var(--u-quarter) 0 0;
+    margin: var(--space-2) 0 0;
     font-size: var(--t-base);
-    line-height: var(--lh-grid);
+    line-height: 1.55;
     color: var(--ink-body);
   }
 
-  .repo :global(.stats) {
+  .stats {
     display: flex;
-    gap: var(--u);
-    margin-top: var(--u-half);
-    padding-top: var(--u-quarter);
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
     border-top: 1px solid var(--rule-soft);
+    font-size: var(--t-xs);
+    color: var(--ink-muted);
   }
 </style>

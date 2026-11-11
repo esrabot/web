@@ -1,183 +1,496 @@
 ---
 /**
- * The members registry page body, shared by /members and /<slug>.
+ * The members pages, shared by /members and /<slug>.
  *
- * Both routes render the same roster; they differ only in which record is
- * selected and what the page reports as its title. Keeping the chrome here
+ *   /members   the wall of everyone, then the partner clubs and schools.
+ *   /<slug>    one person: portrait, roles, bio and where to find them,
+ *              with the rest of the roster beneath.
+ *
+ * Each person's page is a real, statically rendered URL — shareable,
+ * crawlable, and working with no JavaScript. Keeping both layouts here
  * means the two routes stay in step.
  */
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { Icon } from 'astro-icon/components';
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Section from '../../components/ui/Section.astro';
-import SectionHead from '../../components/ui/SectionHead.astro';
-import MonoLabel from '../../components/ui/MonoLabel.astro';
-import DataGrid from '../../components/ui/DataGrid.astro';
-import PartnerMark from '../../components/ui/PartnerMark.astro';
-import MemberRoster from './MemberRoster.astro';
+import PageHero from '../ui/PageHero.astro';
+import Section from '../ui/Section.astro';
+import SectionHead from '../ui/SectionHead.astro';
+import PartnerMark from '../ui/PartnerMark.astro';
+import LinkChip from '../ui/LinkChip.astro';
+import Prose from '../ui/Prose.astro';
+import MemberCard from './MemberCard.astro';
+import { initials } from '../../lib/order';
+import { getOrg } from '../../data/orgs';
+import { JOIN_HREF, SITE } from '../../data/site';
 
 interface Props {
   members: CollectionEntry<'members'>[];
-  selected: CollectionEntry<'members'>;
-  /** True on /members, false on an individual member's page. */
-  isIndex: boolean;
+  /** The person whose page this is. Omitted on /members. */
+  selected?: CollectionEntry<'members'>;
 }
 
-const { members, selected, isIndex } = Astro.props;
+const { members, selected } = Astro.props;
 
 const partners = await getCollection('partners');
+const schoolCount = new Set(partners.map((p) => p.data.school)).size;
 
-const title = isIndex ? 'Members' : selected.data.name;
-const description = isIndex
-  ? 'The people building ESRA in the open, across affiliated clubs and schools.'
-  : `${selected.data.name}${
+// The bio lives in the markdown body so it can be edited without touching
+// frontmatter or YAML quoting rules.
+const Bio = selected ? (await render(selected)).Content : null;
+const hasBio = Boolean(selected?.body?.trim());
+
+const roleLine = selected
+  ? selected.data.roles
+      .map((r) => {
+        const orgName = getOrg(r.org)?.name ?? r.org;
+        return r.title ? `${r.title}, ${orgName}` : orgName;
+      })
+      .join(' · ')
+  : '';
+
+const others = selected ? members.filter((m) => m.id !== selected.id) : members;
+
+const title = selected ? selected.data.name : 'Members';
+const description = selected
+  ? `${selected.data.name}${
       selected.data.affiliation ? ` — ${selected.data.affiliation}` : ''
-    }. Part of ESRA.`;
+    }. Part of ESRA.`
+  : 'The people building ESRA in the open, across affiliated clubs and schools.';
+
+const KIND_LABEL = {
+  club: 'Club',
+  school: 'School',
+  company: 'Company',
+  organization: 'Organization',
+};
 ---
 
-<BaseLayout title={title} description={description} sourcePath="site/members.astro">
-  <Section pad="hero">
-    <div class="masthead">
-      <div>
-        <MonoLabel as="div" size="sm" track="label">Core collaborators · registry</MonoLabel>
-        <h1 class="on-grid">Members</h1>
-        <p class="lede on-grid">
-          The people building ESRA in the open, across affiliated clubs and schools. Select a name
-          to read their record and find them elsewhere.
-        </p>
-      </div>
-      <MonoLabel as="div" size="micro" track="wide" class="counts">
-        N={members.length} · core<br />consortium registry<br />rev {
-          new Date().toISOString().slice(0, 7).replace('-', '.')
-        }
-      </MonoLabel>
-    </div>
-  </Section>
+<BaseLayout title={title} description={description} nav="/members">
+  {
+    selected ? (
+      <>
+        <section class="profile-wrap">
+          <div class="wash" aria-hidden="true" />
+          <div class="container">
+            <a class="back" href="/members" data-reveal="fade">
+              <Icon name="lucide:arrow-left" aria-hidden="true" />
+              All members
+            </a>
 
-  <MemberRoster members={members} selected={selected} />
-
-  <Section id="clubs" pad="normal" last>
-    <SectionHead title="Affiliated partners" aside={`N=${partners.length}`} />
-    <DataGrid min="220px">
-      {
-        partners.map((p) => (
-          <a class="club" href={p.data.url} rel="noopener" target="_blank">
-            <div class="club-top">
-              <div class="club-mark">
-                <PartnerMark partner={p} height={48} maxWidth={120} decorative />
+            <article class="profile card" data-reveal>
+              <div class="portrait">
+                {selected.data.avatar ? (
+                  <Image src={selected.data.avatar} alt="" width={192} height={192} />
+                ) : (
+                  <span aria-hidden="true">{initials(selected.data.name)}</span>
+                )}
               </div>
-              <span class="arrow" aria-hidden="true">
-                &#8599;
-              </span>
+
+              <div class="ident">
+                <p class="eyebrow plain">{roleLine || selected.data.discipline || 'Member'}</p>
+                <h1>{selected.data.name}</h1>
+                <ul class="facts">
+                  {selected.data.affiliation && (
+                    <li>
+                      <Icon name="lucide:graduation-cap" aria-hidden="true" />
+                      {selected.data.affiliation}
+                    </li>
+                  )}
+                  {selected.data.discipline && (
+                    <li>
+                      <Icon name="lucide:wrench" aria-hidden="true" />
+                      {selected.data.discipline}
+                    </li>
+                  )}
+                  {selected.data.pronouns && (
+                    <li>
+                      <Icon name="lucide:user" aria-hidden="true" />
+                      {selected.data.pronouns}
+                    </li>
+                  )}
+                </ul>
+              </div>
+
+              <div class="detail">
+                {hasBio && Bio && (
+                  <Prose class="bio">
+                    <Bio />
+                  </Prose>
+                )}
+
+                <h2>Find {selected.data.name.split(' ')[0]} elsewhere</h2>
+                {selected.data.links.length > 0 ? (
+                  <div class="links">
+                    {selected.data.links.map((link) => (
+                      <LinkChip
+                        href={link.url}
+                        platform={link.platform}
+                        label={link.handle ?? undefined}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p class="no-links">
+                    No public profiles listed yet.{' '}
+                    <a href={`${SITE.repoUrl}/tree/main/src/content/members`} rel="noopener">
+                      Add yours
+                    </a>
+                    .
+                  </p>
+                )}
+              </div>
+            </article>
+          </div>
+        </section>
+
+        {others.length > 0 && (
+          <Section pad="flush-bottom">
+            <SectionHead eyebrow="Members" title="More of the team" as="h2">
+              <a slot="aside" class="link-arrow" href="/members">
+                Everyone <Icon name="lucide:arrow-right" aria-hidden="true" />
+              </a>
+            </SectionHead>
+            <div class="wall">
+              {others.map((m, i) => (
+                <MemberCard member={m} index={i} />
+              ))}
             </div>
-            <div class="club-name">{p.data.name}</div>
-            <MonoLabel as="div" size="micro" track="wide" upper={false} class="club-meta">
-              {[p.data.school, p.data.location].filter(Boolean).join(' · ')}
-            </MonoLabel>
+          </Section>
+        )}
+      </>
+    ) : (
+      <>
+        <PageHero
+          eyebrow="Members"
+          title="The people building it."
+          lede="Students and engineers across affiliated clubs and schools, building in the open. Pick a name to read more and find them elsewhere."
+        >
+          <Fragment slot="title">
+            The people <em>building it.</em>
+          </Fragment>
+          <span class="chip sand">
+            {`${members.length} ${members.length === 1 ? 'member' : 'members'}`}
+          </span>
+          <span class="chip sand">{schoolCount} schools</span>
+          <a class="link-arrow" href="#partners">
+            Partner clubs and schools <Icon name="lucide:arrow-down" aria-hidden="true" />
           </a>
-        ))
-      }
-    </DataGrid>
-  </Section>
+        </PageHero>
+
+        <Section pad="flush-top">
+          <h2 class="sr-only">Everyone</h2>
+          <div class="wall">
+            {members.map((m, i) => (
+              <MemberCard member={m} index={i} />
+            ))}
+          </div>
+          <p class="order-note" data-reveal>
+            The order is shuffled on every deploy, so no one is permanently first.
+          </p>
+        </Section>
+
+        <Section id="partners" tone="sand">
+          <SectionHead
+            eyebrow="Partners"
+            title="The clubs and schools in the network."
+            lede="The teams and institutions ESRA works with."
+          >
+            <Fragment slot="title">
+              The clubs and schools in the <em>network.</em>
+            </Fragment>
+            <span slot="aside">
+              {partners.length} partners · {schoolCount} schools
+            </span>
+          </SectionHead>
+
+          <div class="clubs">
+            {partners.map((p, i) => (
+              <a
+                class="club card lift"
+                href={p.data.url}
+                rel="noopener"
+                target="_blank"
+                data-reveal
+                style={`--i: ${i % 4}`}
+              >
+                <span class="club-top">
+                  <span class="chip sand">{KIND_LABEL[p.data.kind]}</span>
+                  <Icon name="lucide:arrow-up-right" class="club-go" aria-hidden="true" />
+                </span>
+                <span class="club-mark">
+                  <PartnerMark partner={p} height={56} maxWidth={128} decorative />
+                </span>
+                <span class="club-name">{p.data.name}</span>
+                <span class="club-meta">
+                  {[p.data.kind !== 'school' && p.data.school, p.data.location]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </span>
+                <span class="sr-only">(opens in a new tab)</span>
+              </a>
+            ))}
+          </div>
+
+          <p class="join-note" data-reveal>
+            Is your club or lab missing from this list?{' '}
+            <a class="link-arrow" href={JOIN_HREF}>
+              Get involved <Icon name="lucide:arrow-right" aria-hidden="true" />
+            </a>
+          </p>
+        </Section>
+      </>
+    )
+  }
 </BaseLayout>
 
 <style>
-  .masthead {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: var(--u);
+  /* --- the wall of people ------------------------------------------ */
+  .wall {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: var(--space-5);
   }
 
-  h1 {
-    margin: var(--u) 0 0;
-    font-family: var(--font-display);
-    font-size: var(--t-display);
-    font-weight: var(--w-bold);
-    --lh: var(--lh-h1);
-    line-height: var(--lh);
-    letter-spacing: var(--track-snug);
-    text-transform: uppercase;
+  .order-note {
+    margin: var(--space-6) 0 0;
+    font-size: var(--t-sm);
+    color: var(--ink-muted);
   }
 
-  .lede {
-    margin: var(--u) 0 0;
-    max-width: 456px;
-    font-size: var(--t-md);
-    line-height: var(--lh-grid);
-    color: var(--ink-body);
-  }
-
-  .masthead :global(.counts) {
-    text-align: right;
-    white-space: nowrap;
-    flex: none;
+  /* --- partners ---------------------------------------------------- */
+  .clubs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
+    gap: var(--space-5);
   }
 
   .club {
-    display: block;
-    padding: var(--u);
-    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    min-height: 14rem;
+    padding: var(--space-5);
     color: var(--ink-strong);
+    text-decoration: none;
   }
 
-  /* DataGrid cells are solid --sheet, so the wash is composited onto it. */
   .club:hover {
-    background: linear-gradient(var(--accent-wash), var(--accent-wash)), var(--sheet);
     color: var(--ink-strong);
   }
 
   .club-top {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: flex-start;
-    gap: var(--u-half);
   }
 
-  /* The mark takes its colour from here: warm white, beige on hover. */
+  .club-go {
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--ink-faint);
+    transition:
+      color var(--dur) var(--ease),
+      transform var(--dur) var(--ease-out);
+  }
+
+  .club:hover .club-go {
+    color: var(--blue);
+    transform: translate(2px, -2px);
+  }
+
+  /* The mark takes its colour from here: navy, blue under the pointer. */
   .club-mark {
     display: flex;
     align-items: center;
-    height: var(--u-2);
-    color: var(--ink);
-    transition: color var(--dur) var(--ease);
+    flex: 1;
+    min-height: 5rem;
+    padding-block: var(--space-4);
+    color: var(--ink-strong);
+    transition: color var(--dur-slow) var(--ease);
   }
 
   .club:hover .club-mark {
-    color: var(--accent);
-  }
-
-  .arrow {
-    color: var(--ink-faint);
-    font-size: var(--t-mono);
-    line-height: var(--lh-grid);
-    transition: color var(--dur) var(--ease);
-  }
-
-  .club:hover .arrow {
-    color: var(--accent-ink);
+    color: var(--blue);
   }
 
   .club-name {
-    margin-top: var(--u);
-    font-size: var(--t-md);
-    font-weight: var(--w-semibold);
-    line-height: var(--lh-grid);
+    font-family: var(--font-display);
+    font-size: var(--t-lg);
+    font-weight: 560;
+    line-height: 1.3;
+    letter-spacing: var(--track-tight);
   }
 
-  .club :global(.club-meta) {
-    margin-top: 2px;
+  .club-meta {
+    margin-top: var(--space-1);
+    font-size: var(--t-sm);
+    line-height: 1.45;
+    color: var(--ink-muted);
+  }
+
+  .join-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    margin: var(--space-7) 0 0;
+    color: var(--sand-ink);
+  }
+
+  /* --- one person -------------------------------------------------- */
+  .profile-wrap {
+    position: relative;
+    padding-block: clamp(2.5rem, 6vw, 4.5rem) 0;
+    isolation: isolate;
+  }
+
+  .wash {
+    position: absolute;
+    inset: calc(-1 * var(--header-h)) 0 auto;
+    z-index: -1;
+    height: 34rem;
+    background:
+      radial-gradient(52rem 26rem at 88% 0%, var(--blue-soft), transparent 62%),
+      radial-gradient(44rem 24rem at 4% 8%, var(--sand), transparent 64%);
+    -webkit-mask-image: linear-gradient(#000 45%, transparent);
+    mask-image: linear-gradient(#000 45%, transparent);
+    pointer-events: none;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: var(--t-sm);
+    font-weight: var(--w-semibold);
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+
+  .back :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .back:hover {
+    color: var(--blue);
+  }
+
+  .back:hover :global(svg) {
+    transform: translateX(-3px);
+  }
+
+  .profile {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-6) var(--space-7);
+    margin-top: var(--space-5);
+    padding: clamp(1.75rem, 5vw, 3.5rem);
+    box-shadow: var(--shadow-md);
+  }
+
+  .portrait {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(7rem, 16vw, 11rem);
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: var(--r-xl);
+    background: var(--sand);
+    box-shadow:
+      0 0 0 4px var(--surface),
+      0 0 0 5px var(--sand-deep),
+      var(--shadow-md);
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 500;
+    color: var(--sand-ink);
+  }
+
+  .portrait :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ident h1 {
+    margin-top: var(--space-2);
+    font-size: var(--t-h1);
+    font-weight: 480;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--track-display);
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .facts li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--t-sm);
+    font-weight: var(--w-medium);
+    color: var(--ink-body);
+  }
+
+  .facts :global(svg) {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    color: var(--blue);
+  }
+
+  .detail {
+    grid-column: 1 / -1;
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  .detail h2 {
+    font-family: var(--font-label);
+    font-size: var(--t-xs);
+    font-weight: var(--w-semibold);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .detail :global(.bio) {
+    margin-bottom: var(--space-6);
+    font-size: var(--t-lg);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+  }
+
+  .no-links {
+    margin: var(--space-3) 0 0;
+    color: var(--ink-muted);
+  }
+
+  .no-links a {
+    color: var(--blue);
   }
 
   @media (max-width: 640px) {
-    .masthead {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--u-half);
-    }
-
-    .masthead :global(.counts) {
-      text-align: left;
+    .profile {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 </style>

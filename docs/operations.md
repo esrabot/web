@@ -18,7 +18,7 @@ Related: [`docs/cms-setup.md`](cms-setup.md) for the `/admin` editor,
 | 4   | Point `esra.bot` at Vercel (A record, **grey cloud**) | Cloudflare           | the site loading          |
 | 5   | Add Zoho mail records (MX/SPF/DKIM/DMARC)             | Cloudflare           | email working             |
 | 6   | Deploy the Sveltia auth worker                        | Cloudflare           | `/admin` sign-in          |
-| 7   | (later) Blog comments, OG cards                       | —                    | non-critical              |
+| 7   | (later) OG cards                                      | —                    | non-critical              |
 
 ---
 
@@ -190,11 +190,6 @@ arrive as pull requests.
 
 ## 7. Later, not blocking
 
-- **Blog comments (giscus).** giscus requires a **public** repo with Discussions
-  enabled — it cannot run against a private one. So comments stay off until the
-  repo is public, or point giscus at a separate public repo made only to hold
-  discussions. The wiring is in the blog layout, commented, waiting on the repo
-  IDs.
 - **Per-page social cards (OG images).** A static default ships now; per-page
   generated cards are tracked but not built.
 

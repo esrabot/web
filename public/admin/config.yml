@@ -42,68 +42,10 @@ backend:
 # pipeline backed by pull requests.
 publish_mode: editorial_workflow
 
-media_folder: src/assets/blog
-public_folder: ../../assets/blog
+media_folder: src/assets/uploads
+public_folder: ../../assets/uploads
 
 collections:
-  - name: blog
-    label: Blog posts
-    label_singular: blog post
-    folder: src/content/blog
-    create: true
-    slug: '{{slug}}'
-    extension: md
-    format: yaml-frontmatter
-    preview_path: blog/{{slug}}
-    summary: '{{title}} — {{date | date("yyyy-MM-dd")}}'
-    fields:
-      - { name: title, label: Title, widget: string }
-      - {
-          name: description,
-          label: Summary,
-          widget: text,
-          required: false,
-          hint: 'One or two sentences. Shown on the blog index and in the RSS feed.',
-        }
-      - { name: date, label: Date, widget: datetime, date_format: 'yyyy-MM-dd', time_format: false }
-      - {
-          name: authors,
-          label: Authors,
-          widget: relation,
-          collection: members,
-          search_fields: [name],
-          value_field: '{{slug}}',
-          display_fields: [name],
-          multiple: true,
-          hint: 'Pick from the members list. Add yourself under Members first if you are not there.',
-        }
-      - { name: category, label: Category, widget: string, required: false }
-      - { name: tags, label: Tags, widget: list, required: false }
-      - {
-          name: cover,
-          label: Cover image,
-          widget: image,
-          required: false,
-          hint: 'Large images are fine — they are resized automatically.',
-        }
-      - {
-          name: coverAlt,
-          label: Cover description,
-          widget: string,
-          required: false,
-          hint: 'Describe the image for readers using a screen reader.',
-        }
-      - {
-          name: org,
-          label: Organisation,
-          widget: select,
-          options:
-            [{ label: ESRA, value: esra }, { label: Rutgers Dynamics, value: rutgers-dynamics }],
-          default: esra,
-        }
-      - { name: draft, label: Draft, widget: boolean, default: false }
-      - { name: body, label: Body, widget: markdown }
-
   - name: members
     label: Members
     label_singular: member
@@ -165,35 +107,150 @@ collections:
       - { name: inactive, label: Inactive, widget: boolean, default: false }
       - { name: body, label: Bio, widget: markdown }
 
-  - name: gallery
-    label: Gallery
+  # Events, the roadmap, and the "Get involved" cards. Each file is a single
+  # top-level list, so its one list field is marked `root: true` and is
+  # saved as the file itself rather than under a key.
+  - name: events
+    label: Events
     files:
-      - name: items
-        label: Gallery items
-        file: src/content/gallery.yaml
+      - name: events
+        label: Featured events
+        file: src/content/events.yaml
+        description: 'Big events that get a card on /events. Everyday dates go in the Google Calendar instead.'
         fields:
-          - name: items
-            label: Items
+          - name: events
+            label: Events
+            label_singular: event
             widget: list
+            root: true
+            summary: '{{fields.title}} — {{fields.when}}'
             fields:
-              - { name: id, label: ID, widget: string, hint: 'Lowercase, hyphenated, unique.' }
-              - { name: type, label: Type, widget: select, options: [image, video], default: image }
+              - { name: id, label: ID, widget: string, hint: 'Lowercase, hyphenated, unique. Used in links: /events#id' }
               - { name: title, label: Title, widget: string }
+              - { name: kicker, label: Small line above the title, widget: string, required: false }
+              - { name: featured, label: Featured (large card), widget: boolean, default: false }
+              - { name: when, label: 'When, as readers see it', widget: string, hint: 'e.g. November 2026, or Jan 16–18, 2027' }
               - {
-                  name: date,
-                  label: Date,
+                  name: start,
+                  label: Start date,
                   widget: datetime,
                   date_format: 'yyyy-MM-dd',
                   time_format: false,
+                  hint: 'Decides whether the event shows as upcoming, happening now, or past.',
                 }
-              - { name: src, label: File path, widget: string }
-              - { name: alt, label: Description, widget: string, required: false }
-              - { name: category, label: Category, widget: string, required: false }
-              - { name: tags, label: Tags, widget: list, required: false }
               - {
-                  name: credits,
-                  label: Credits,
+                  name: end,
+                  label: End date,
+                  widget: datetime,
+                  date_format: 'yyyy-MM-dd',
+                  time_format: false,
+                  required: false,
+                }
+              - { name: location, label: Location, widget: string, required: false }
+              - { name: format, label: 'Format (Workshop, Meetup…)', widget: string, required: false }
+              - { name: summary, label: Summary, widget: text }
+              - { name: highlights, label: Highlights, widget: list, required: false }
+              - {
+                  name: image,
+                  label: Photo path,
                   widget: string,
                   required: false,
-                  hint: 'Who designed, built, and photographed it. Please keep this accurate.',
+                  hint: 'Optional. A path under src/assets, e.g. uploads/workshop.jpg',
                 }
+              - { name: imageAlt, label: Photo description, widget: string, required: false }
+              - name: links
+                label: Buttons
+                widget: list
+                required: false
+                summary: '{{fields.label}}'
+                fields:
+                  - { name: label, label: Label, widget: string }
+                  - { name: url, label: URL, widget: string, hint: 'A full URL, or a site path such as /#join' }
+              - { name: draft, label: Draft (hidden), widget: boolean, default: false }
+
+  - name: roadmap
+    label: Roadmap
+    files:
+      - name: programs
+        label: Robots on the roadmap
+        file: src/content/programs.yaml
+        description: 'Shown on the home page and at the top of /projects. Only state what is decided.'
+        fields:
+          - name: programs
+            label: Programmes
+            label_singular: programme
+            widget: list
+            root: true
+            summary: '{{fields.title}} ({{fields.status}})'
+            fields:
+              - { name: id, label: ID, widget: string, hint: 'Lowercase, hyphenated, unique. Used in links: /projects#id' }
+              - { name: order, label: Sort order, widget: number, default: 100 }
+              - { name: title, label: Title, widget: string }
+              - { name: designation, label: 'Designation (e.g. H1)', widget: string, required: false }
+              - { name: kind, label: 'Kind (Humanoid, Quadruped…)', widget: string }
+              - { name: level, label: 'Level (Flagship, Beginner…)', widget: string, required: false }
+              - { name: status, label: Status, widget: select, options: [active, planned, complete], default: planned }
+              - { name: flagship, label: Flagship (wide card and schedule), widget: boolean, default: false }
+              - { name: timeframe, label: Timeframe, widget: string, required: false }
+              - { name: summary, label: One-line summary, widget: string }
+              - { name: description, label: Description, widget: text, required: false }
+              - { name: focus, label: Subsystems or focus areas, widget: list, required: false }
+              - { name: outputs, label: What it publishes, widget: list, required: false }
+              - name: milestones
+                label: Milestones
+                widget: list
+                required: false
+                summary: '{{fields.when}} — {{fields.title}}'
+                fields:
+                  - {
+                      name: starts,
+                      label: Starts,
+                      widget: datetime,
+                      date_format: 'yyyy-MM-dd',
+                      time_format: false,
+                      hint: 'Only places the "now" marker. Readers see the line below.',
+                    }
+                  - { name: when, label: 'When, as readers see it', widget: string }
+                  - { name: title, label: Title, widget: string }
+                  - { name: body, label: One sentence, widget: string }
+
+  - name: pathways
+    label: Get involved
+    files:
+      - name: pathways
+        label: Ways to get involved
+        file: src/content/pathways.yaml
+        description: 'The cards in "Get involved" on the home page, and the pop-up each one opens.'
+        fields:
+          - name: pathways
+            label: Ways in
+            label_singular: way in
+            widget: list
+            root: true
+            summary: '{{fields.title}}'
+            fields:
+              - { name: id, label: ID, widget: string, hint: 'Lowercase, hyphenated, unique.' }
+              - { name: order, label: Sort order, widget: number, default: 100 }
+              - { name: icon, label: Icon, widget: select, options: [team, affiliate, industry] }
+              - { name: audience, label: 'Who it is for (two or three words)', widget: string }
+              - { name: title, label: Title, widget: string }
+              - { name: lede, label: One-line pitch, widget: string }
+              - { name: points, label: Three lines on the card, widget: list }
+              - { name: intro, label: Pop-up opening paragraph, widget: text }
+              - name: sections
+                label: Pop-up sections
+                widget: list
+                summary: '{{fields.heading}}'
+                fields:
+                  - { name: heading, label: Heading, widget: string }
+                  - { name: items, label: Items, widget: list }
+              - name: note
+                label: Highlighted note
+                widget: object
+                required: false
+                fields:
+                  - { name: label, label: Label, widget: string }
+                  - { name: body, label: Text, widget: text }
+              - { name: start, label: How to start, widget: text }
+              - { name: cta, label: Button label, widget: string }
+              - { name: subject, label: Email subject line, widget: string }

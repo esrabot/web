@@ -1,0 +1,1011 @@
+---
+/**
+ * Events.
+ *
+ * Two layers, on purpose:
+ *
+ *   - The few big events get a card each, written by hand in
+ *     src/content/events.yaml. Featured ones get the large card.
+ *   - Everything else — work sessions, meetings, deadlines — lives in the
+ *     public Google Calendar embedded below, so adding a date never needs
+ *     a deploy.
+ *
+ * Between them, "on the horizon" lists the flagship's milestones, read
+ * from the same programme record the home page's schedule uses.
+ *
+ * Whether an event reads as upcoming, happening now, or past is worked
+ * out from its dates at build time; the scheduled rebuild keeps it true.
+ */
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import { Icon } from 'astro-icon/components';
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/ui/PageHero.astro';
+import Section from '../components/ui/Section.astro';
+import SectionHead from '../components/ui/SectionHead.astro';
+import { CALENDAR, CONTACTS } from '../data/site';
+import { requireAsset } from '../lib/assets';
+
+const [allEvents, allPrograms] = await Promise.all([
+  getCollection('events'),
+  getCollection('programs'),
+]);
+
+const now = new Date();
+const DAY = 86_400_000;
+
+type Phase = 'now' | 'upcoming' | 'past';
+const PHASE_LABEL: Record<Phase, string> = {
+  now: 'Happening now',
+  upcoming: 'Upcoming',
+  past: 'Past',
+};
+// On now first, then what is coming (soonest first), then what has been.
+const PHASE_ORDER: Record<Phase, number> = { now: 0, upcoming: 1, past: 2 };
+
+const monthFmt = new Intl.DateTimeFormat('en-US', { month: 'short', timeZone: 'UTC' });
+
+const events = allEvents
+  .filter((e) => !e.data.draft)
+  .map((e) => {
+    const start = e.data.start.getTime();
+    // An event's last day counts in full.
+    const end = (e.data.end ?? e.data.start).getTime() + DAY;
+    const phase: Phase = now.getTime() < start ? 'upcoming' : now.getTime() < end ? 'now' : 'past';
+    return {
+      ...e.data,
+      id: e.id,
+      phase,
+      month: monthFmt.format(e.data.start),
+      year: e.data.start.getUTCFullYear(),
+      photo: e.data.image ? requireAsset(e.data.image, `events.yaml: ${e.id}`) : null,
+    };
+  })
+  .sort((a, b) => {
+    if (a.phase !== b.phase) return PHASE_ORDER[a.phase] - PHASE_ORDER[b.phase];
+    const diff = a.start.getTime() - b.start.getTime();
+    return a.phase === 'past' ? -diff : diff;
+  });
+
+const featured = events.filter((e) => e.featured);
+const others = events.filter((e) => !e.featured);
+
+/* --- On the horizon: the flagship's milestones ---------------------- */
+const flagship = allPrograms.find((p) => p.data.flagship);
+const milestones = flagship?.data.milestones ?? [];
+const currentMilestone = milestones.findLastIndex((m) => m.starts <= now);
+
+const general = CONTACTS[0].address;
+const hostMail = `mailto:${general}?subject=${encodeURIComponent('An event for the ESRA calendar')}`;
+
+const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
+---
+
+<BaseLayout
+  title="Events"
+  description="Featured ESRA events, the H1 roadmap, and the public calendar you can subscribe to."
+>
+  <PageHero
+    eyebrow="Events"
+    title="Where the network meets."
+    lede="Build milestones, integration workshops, and everything else on the ESRA calendar — with a feed you can add to your own."
+  >
+    <Fragment slot="title">Where the network <em>meets.</em></Fragment>
+    <a class="btn" href="#calendar">
+      <Icon name="lucide:calendar-days" aria-hidden="true" />
+      Open the calendar
+    </a>
+    <a class="btn secondary" href={CALENDAR.googleUrl} rel="noopener" target="_blank">
+      <Icon name="lucide:calendar-plus" aria-hidden="true" />
+      Add to Google Calendar
+      <span class="sr-only"> (opens in a new tab)</span>
+    </a>
+  </PageHero>
+
+  <!-- ============================================================
+       Featured
+       ============================================================ -->
+  <Section id="featured" pad="tight">
+    <SectionHead eyebrow="Featured" title="The big ones" />
+
+    {
+      featured.length === 0 ? (
+        <p class="empty card" data-reveal>
+          Nothing is featured right now. The <a href="#calendar">calendar</a> below has every date.
+        </p>
+      ) : (
+        <div class="features">
+          {featured.map((e, i) => (
+            <article id={e.id} class="feature card" data-reveal style={`--i: ${i}`}>
+              <div class:list={['feature-date', { 'has-photo': e.photo }]}>
+                {e.photo && (
+                  <Image src={e.photo} alt={e.imageAlt ?? ''} width={720} class="feature-photo" />
+                )}
+                <span class="rings" aria-hidden="true" />
+                <span class:list={['chip', 'phase', e.phase]}>
+                  {e.phase === 'now' && <span class="pulse" aria-hidden="true" />}
+                  {PHASE_LABEL[e.phase]}
+                </span>
+                <p class="date-big" aria-hidden="true">
+                  <span class="date-month">{e.month}</span>
+                  <span class="date-year">{e.year}</span>
+                </p>
+              </div>
+
+              <div class="feature-body">
+                {e.kicker && <p class="eyebrow plain">{e.kicker}</p>}
+                <h3>{e.title}</h3>
+
+                <ul class="facts">
+                  <li>
+                    <Icon name="lucide:calendar" aria-hidden="true" />
+                    <span>
+                      <span class="sr-only">When: </span>
+                      {e.when}
+                    </span>
+                  </li>
+                  {e.location && (
+                    <li>
+                      <Icon name="lucide:map-pin" aria-hidden="true" />
+                      <span>
+                        <span class="sr-only">Where: </span>
+                        {e.location}
+                      </span>
+                    </li>
+                  )}
+                  {e.format && (
+                    <li>
+                      <Icon name="lucide:flag" aria-hidden="true" />
+                      <span>
+                        <span class="sr-only">Format: </span>
+                        {e.format}
+                      </span>
+                    </li>
+                  )}
+                </ul>
+
+                <p class="feature-summary">{e.summary}</p>
+
+                {e.highlights.length > 0 && (
+                  <ul class="highlights">
+                    {e.highlights.map((h) => (
+                      <li>
+                        <Icon name="lucide:check" aria-hidden="true" />
+                        <span>{h}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {e.links.length > 0 && (
+                  <div class="feature-actions">
+                    {e.links.map((l, n) => (
+                      <a
+                        class:list={['btn', { secondary: n > 0 }]}
+                        href={l.url}
+                        rel={isInternal(l.url) ? undefined : 'noopener'}
+                        target={isInternal(l.url) ? undefined : '_blank'}
+                      >
+                        {l.label}
+                        {n === 0 && (
+                          <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
+                        )}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      )
+    }
+
+    {
+      others.length > 0 && (
+        <div class="more">
+          <SectionHead as="h3" size="sm" eyebrow="Also" title="More events" />
+          <ul class="more-list">
+            {others.map((e, i) => (
+              <li id={e.id} class="more-item card" data-reveal style={`--i: ${i % 3}`}>
+                <p class="more-date">
+                  <span>{e.month}</span>
+                  <span>{e.year}</span>
+                </p>
+                <div class="more-body">
+                  <p class="more-when">
+                    {e.when}
+                    {e.location && <> · {e.location}</>}
+                  </p>
+                  <h4>{e.title}</h4>
+                  <p>{e.summary}</p>
+                  {e.links[0] && (
+                    <a
+                      class="link-arrow"
+                      href={e.links[0].url}
+                      rel={isInternal(e.links[0].url) ? undefined : 'noopener'}
+                      target={isInternal(e.links[0].url) ? undefined : '_blank'}
+                    >
+                      {e.links[0].label} <Icon name="lucide:arrow-right" aria-hidden="true" />
+                    </a>
+                  )}
+                </div>
+                <span class:list={['chip', e.phase === 'now' ? 'solid' : 'sand']}>
+                  {PHASE_LABEL[e.phase]}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+  </Section>
+
+  <!-- ============================================================
+       On the horizon
+       ============================================================ -->
+  {
+    flagship && milestones.length > 0 && (
+      <Section id="horizon" pad="tight">
+        <SectionHead
+          eyebrow={`${flagship.data.designation ?? flagship.data.title} roadmap`}
+          title="On the horizon"
+          lede="The milestones the flagship build is working toward. Dates firm up as each one gets closer — the calendar below always has the latest."
+        >
+          <a slot="aside" class="link-arrow" href="/#h1">
+            About {flagship.data.designation ?? flagship.data.title}
+            <Icon name="lucide:arrow-right" aria-hidden="true" />
+          </a>
+        </SectionHead>
+
+        <ol class="horizon">
+          {milestones.map((m, i) => (
+            <li
+              class:list={[
+                'stage',
+                'card',
+                { done: i < currentMilestone, current: i === currentMilestone },
+              ]}
+              data-reveal
+              style={`--i: ${i}`}
+            >
+              <p class="stage-top">
+                <span class="stage-no" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                {i === currentMilestone && (
+                  <span class="chip solid">
+                    <span class="pulse" aria-hidden="true" />
+                    Now
+                  </span>
+                )}
+                {i < currentMilestone && (
+                  <span class="chip sand">
+                    <Icon name="lucide:check" aria-hidden="true" />
+                    Done
+                  </span>
+                )}
+              </p>
+              <p class="stage-when">{m.when}</p>
+              <h3>{m.title}</h3>
+              <p class="stage-body">{m.body}</p>
+            </li>
+          ))}
+        </ol>
+      </Section>
+    )
+  }
+
+  <!-- ============================================================
+       The calendar
+       ============================================================ -->
+  <Section id="calendar" tone="sand">
+    <SectionHead
+      eyebrow="Calendar"
+      title="Every date, in one place."
+      lede="Workshops, work sessions, and deadlines all land on the public ESRA calendar. Subscribe once and they show up in yours."
+    >
+      <Fragment slot="title">Every date, in one <em>place.</em></Fragment>
+    </SectionHead>
+
+    <div class="cal">
+      <div class="cal-frame card" data-reveal>
+        <iframe
+          id="esra-calendar"
+          src={CALENDAR.embedUrl('MONTH')}
+          data-agenda-src={CALENDAR.embedUrl('AGENDA')}
+          title="ESRA events calendar"
+          loading="lazy"></iframe>
+        <!-- A month grid is unreadable on a phone: swap to the agenda
+             view there. Runs straight after the iframe is parsed, and the
+             iframe is lazy, so on most pages nothing has loaded yet. -->
+        <script is:inline>
+          (function () {
+            var frame = document.getElementById('esra-calendar');
+            var agenda = frame && frame.getAttribute('data-agenda-src');
+            if (agenda && window.matchMedia('(max-width: 640px)').matches) frame.src = agenda;
+          })();
+        </script>
+      </div>
+
+      <aside class="cal-side card" data-reveal style="--i: 1" aria-labelledby="subscribe-title">
+        <h3 id="subscribe-title">Subscribe</h3>
+        <p>Add the ESRA calendar to the one you already use. New dates appear on their own.</p>
+
+        <div class="cal-actions">
+          <a class="btn" href={CALENDAR.googleUrl} rel="noopener" target="_blank">
+            <Icon name="lucide:calendar-plus" aria-hidden="true" />
+            Google Calendar
+            <span class="sr-only"> (opens in a new tab)</span>
+          </a>
+          <a class="btn secondary" href={CALENDAR.webcalUrl}>
+            <Icon name="lucide:calendar-days" aria-hidden="true" />
+            Apple Calendar or Outlook
+          </a>
+        </div>
+
+        <div class="ical">
+          <label for="ical-url">iCal feed, for any other app</label>
+          <div class="ical-row">
+            <input id="ical-url" type="text" readonly value={CALENDAR.icalUrl} data-ical-input />
+            <button type="button" class="copy" data-ical-copy>
+              <span class="copy-idle">
+                <Icon name="lucide:copy" aria-hidden="true" />
+                Copy
+              </span>
+              <span class="copy-done" aria-hidden="true">
+                <Icon name="lucide:check" />
+                Copied
+              </span>
+            </button>
+          </div>
+          <p class="sr-only" role="status" aria-live="polite" data-ical-status></p>
+        </div>
+
+        <p class="cal-note">
+          <Icon name="lucide:clock" aria-hidden="true" />
+          <span>Times are shown in {CALENDAR.timezoneLabel}.</span>
+        </p>
+        <a class="link-arrow out" href={CALENDAR.publicUrl} rel="noopener" target="_blank">
+          Open the full calendar <Icon name="lucide:arrow-up-right" aria-hidden="true" />
+          <span class="sr-only"> (opens in a new tab)</span>
+        </a>
+      </aside>
+    </div>
+
+    <p class="host" data-reveal>
+      Hosting something the network should know about?{' '}
+      <a href={hostMail}>Email {general}</a>.
+    </p>
+  </Section>
+</BaseLayout>
+
+<script>
+  // Copy the iCal feed's address. The field is a real, selectable input,
+  // so where the clipboard is unavailable the address is selected for the
+  // visitor to copy by hand instead.
+  const input = document.querySelector<HTMLInputElement>('[data-ical-input]');
+  const button = document.querySelector<HTMLButtonElement>('[data-ical-copy]');
+  const status = document.querySelector<HTMLElement>('[data-ical-status]');
+
+  if (input && button) {
+    let reset = 0;
+
+    // Clicking into the field selects the whole address.
+    input.addEventListener('focus', () => input.select());
+
+    button.addEventListener('click', async () => {
+      let copied = false;
+      try {
+        await navigator.clipboard.writeText(input.value);
+        copied = true;
+      } catch {
+        input.focus();
+        input.select();
+      }
+
+      if (status) {
+        status.textContent = copied
+          ? 'Calendar link copied.'
+          : 'Copying is unavailable here. The link is selected — copy it from the field.';
+      }
+      if (!copied) return;
+
+      button.setAttribute('data-copied', '');
+      window.clearTimeout(reset);
+      reset = window.setTimeout(() => {
+        button.removeAttribute('data-copied');
+        if (status) status.textContent = '';
+      }, 2200);
+    });
+  }
+</script>
+
+<style>
+  /* ================================================================
+   * Featured
+   * ============================================================== */
+  .features {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .feature {
+    display: grid;
+    grid-template-columns: minmax(15rem, 0.8fr) minmax(0, 1.7fr);
+    overflow: hidden;
+    scroll-margin-top: calc(var(--header-h) + var(--space-5));
+    transition:
+      box-shadow var(--dur-slow) var(--ease-out),
+      border-color var(--dur-slow) var(--ease);
+  }
+
+  @media (hover: hover) {
+    .feature:hover {
+      border-color: var(--blue-soft);
+      box-shadow: var(--shadow-md);
+    }
+  }
+
+  .feature:target,
+  .more-item:target {
+    border-color: var(--blue);
+    box-shadow:
+      0 0 0 4px var(--blue-soft),
+      var(--shadow-md);
+  }
+
+  /* The date, set large on the site's one saturated block of blue. */
+  .feature-date {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-8);
+    min-height: 18rem;
+    padding: var(--space-6);
+    background: linear-gradient(
+      150deg,
+      var(--blue) 0%,
+      var(--blue-strong) 55%,
+      var(--blue-deep) 100%
+    );
+    color: var(--ink-inverse);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .feature-photo {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+  }
+
+  /* Over a photo, a blue veil keeps the lettering legible. */
+  .feature-date.has-photo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(160deg, rgba(27, 62, 159, 0.72), rgba(19, 41, 95, 0.9));
+  }
+
+  /* Rings going out from the lower corner, turning slowly. */
+  .rings {
+    position: absolute;
+    right: -7rem;
+    bottom: -7rem;
+    z-index: -1;
+    width: 22rem;
+    height: 22rem;
+    border-radius: 50%;
+    background: repeating-radial-gradient(
+      circle,
+      transparent 0 1.6rem,
+      rgba(255, 255, 255, 0.1) 1.6rem calc(1.6rem + 1px)
+    );
+    -webkit-mask-image: radial-gradient(circle, #000 20%, transparent 70%);
+    mask-image: radial-gradient(circle, #000 20%, transparent 70%);
+    transition: transform 1.2s var(--ease-out);
+  }
+
+  .feature:hover .rings {
+    transform: scale(1.12);
+  }
+
+  .phase {
+    background: rgba(255, 255, 255, 0.16);
+    color: var(--ink-inverse);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .phase.now {
+    background: var(--surface);
+    color: var(--blue-strong);
+  }
+
+  .date-big {
+    display: grid;
+    margin: 0;
+    font-family: var(--font-display);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+  }
+
+  .date-month {
+    font-size: clamp(3.5rem, 2.5rem + 3.5vw, 5.5rem);
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  .date-year {
+    font-size: var(--t-h3);
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--blue-on-dark);
+  }
+
+  .feature-body {
+    padding: clamp(1.75rem, 4vw, 3rem);
+  }
+
+  .feature h3 {
+    margin-top: var(--space-3);
+    font-size: var(--t-h2);
+  }
+
+  .feature h3:first-child {
+    margin-top: 0;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .facts li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--t-sm);
+    font-weight: var(--w-medium);
+    color: var(--ink-strong);
+  }
+
+  .facts :global(svg) {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    color: var(--blue);
+  }
+
+  .feature-summary {
+    max-width: var(--measure);
+    margin: var(--space-5) 0 0;
+    font-size: var(--t-md);
+    color: var(--ink-body);
+  }
+
+  .highlights {
+    display: grid;
+    gap: var(--space-2);
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .highlights li {
+    display: grid;
+    grid-template-columns: 1.125rem minmax(0, 1fr);
+    gap: var(--space-3);
+    font-size: var(--t-base);
+    color: var(--ink-body);
+  }
+
+  .highlights :global(svg) {
+    width: 1.125rem;
+    height: 1.125rem;
+    margin-top: 0.25rem;
+    color: var(--blue);
+  }
+
+  .feature-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+
+  .empty {
+    max-width: var(--measure);
+    margin: 0;
+    padding: var(--space-6);
+    color: var(--ink-body);
+  }
+
+  .empty a {
+    color: var(--blue);
+  }
+
+  /* --- more events ------------------------------------------------- */
+  .more {
+    margin-top: var(--space-8);
+  }
+
+  .more-list {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .more-item {
+    display: grid;
+    grid-template-columns: 5rem minmax(0, 1fr) auto;
+    align-items: start;
+    gap: var(--space-5);
+    padding: var(--space-5);
+    scroll-margin-top: calc(var(--header-h) + var(--space-5));
+    transition:
+      box-shadow var(--dur-slow) var(--ease-out),
+      border-color var(--dur-slow) var(--ease);
+  }
+
+  .more-date {
+    display: grid;
+    justify-items: center;
+    margin: 0;
+    padding: var(--space-3) 0;
+    border-radius: var(--r-md);
+    background: var(--blue-wash);
+    color: var(--blue-strong);
+    line-height: 1.15;
+  }
+
+  .more-date span:first-child {
+    font-family: var(--font-display);
+    font-size: var(--t-xl);
+    font-style: italic;
+  }
+
+  .more-date span:last-child {
+    font-size: var(--t-xs);
+    font-weight: var(--w-semibold);
+  }
+
+  .more-when {
+    margin: 0;
+    font-size: var(--t-sm);
+    font-weight: var(--w-semibold);
+    color: var(--blue);
+  }
+
+  .more-item h4 {
+    margin-top: var(--space-1);
+    font-size: var(--t-xl);
+  }
+
+  .more-body p:not(.more-when) {
+    margin: var(--space-2) 0 0;
+    color: var(--ink-body);
+  }
+
+  .more-body .link-arrow {
+    margin-top: var(--space-3);
+    font-size: var(--t-sm);
+  }
+
+  /* ================================================================
+   * On the horizon
+   * ============================================================== */
+  .horizon {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stage {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-5) var(--space-5) var(--space-6);
+  }
+
+  .stage.current {
+    border-color: var(--blue);
+    box-shadow:
+      0 0 0 4px var(--blue-wash),
+      var(--shadow-sm);
+  }
+
+  .stage-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 2.5rem;
+    margin: 0;
+  }
+
+  .stage-no {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-style: italic;
+    line-height: 1;
+    color: var(--sand-deep);
+  }
+
+  .stage.done .stage-no,
+  .stage.current .stage-no {
+    color: var(--blue);
+  }
+
+  .stage-when {
+    margin: var(--space-5) 0 0;
+    font-size: var(--t-sm);
+    font-weight: var(--w-semibold);
+    color: var(--blue);
+  }
+
+  .stage h3 {
+    margin-top: var(--space-1);
+    font-size: var(--t-xl);
+  }
+
+  .stage-body {
+    margin: var(--space-2) 0 0;
+    font-size: var(--t-sm);
+    line-height: 1.6;
+    color: var(--ink-body);
+  }
+
+  /* ================================================================
+   * Calendar
+   * ============================================================== */
+  .cal {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    align-items: start;
+    gap: var(--space-5);
+  }
+
+  .cal-frame {
+    overflow: hidden;
+    padding: var(--space-3);
+  }
+
+  .cal-frame iframe {
+    display: block;
+    width: 100%;
+    height: 37.5rem;
+    border: 0;
+    border-radius: var(--r-md);
+    /* Google's embed is white; match it so there is no flash while it loads. */
+    background: #fff;
+  }
+
+  .cal-side {
+    padding: var(--space-6);
+  }
+
+  .cal-side h3 {
+    font-size: var(--t-h3);
+  }
+
+  .cal-side > p {
+    margin: var(--space-2) 0 0;
+    font-size: var(--t-sm);
+    color: var(--ink-body);
+  }
+
+  .cal-actions {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+  }
+
+  .cal-actions .btn {
+    justify-content: flex-start;
+    width: 100%;
+    padding-block: var(--space-2);
+    font-size: 0.9375rem;
+    line-height: 1.25;
+    white-space: normal;
+  }
+
+  .ical {
+    margin-top: var(--space-5);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  .ical label {
+    display: block;
+    margin-bottom: var(--space-2);
+    font-size: var(--t-sm);
+    font-weight: var(--w-semibold);
+    color: var(--ink-strong);
+  }
+
+  .ical-row {
+    display: flex;
+    border: 1px solid var(--rule);
+    border-radius: var(--r-pill);
+    background: var(--bg);
+    overflow: hidden;
+    transition:
+      border-color var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+
+  .ical-row:focus-within {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px var(--blue-wash);
+  }
+
+  .ical-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 0 0 0 var(--space-4);
+    border: 0;
+    background: none;
+    font-family: var(--font-mono);
+    font-size: var(--t-xs);
+    color: var(--ink-muted);
+    text-overflow: ellipsis;
+    outline: none;
+  }
+
+  /* The button swaps "Copy" for "Copied" in place: both labels share one
+     cell so its width never jumps. */
+  .copy {
+    display: grid;
+    flex: none;
+    min-height: 2.5rem;
+    padding: 0 var(--space-4);
+    border: 0;
+    border-left: 1px solid var(--rule);
+    background: var(--surface);
+    font-size: var(--t-sm);
+    font-weight: var(--w-semibold);
+    color: var(--blue);
+    transition:
+      background-color var(--dur) var(--ease),
+      color var(--dur) var(--ease);
+  }
+
+  .copy:hover {
+    background: var(--blue-wash);
+  }
+
+  .copy:active {
+    background: var(--blue-soft);
+  }
+
+  .copy:focus-visible {
+    outline-offset: -3px;
+    border-radius: var(--r-pill);
+  }
+
+  .copy span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    grid-area: 1 / 1;
+    transition:
+      opacity var(--dur) var(--ease),
+      translate var(--dur-slow) var(--ease-spring);
+  }
+
+  .copy :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .copy-done {
+    opacity: 0;
+    translate: 0 0.5rem;
+  }
+
+  .copy[data-copied] {
+    background: var(--blue);
+    color: var(--ink-inverse);
+  }
+
+  .copy[data-copied] .copy-idle {
+    opacity: 0;
+    translate: 0 -0.5rem;
+  }
+
+  .copy[data-copied] .copy-done {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .cal-side .cal-note {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: var(--space-5);
+    color: var(--ink-muted);
+  }
+
+  .cal-note :global(svg) {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .cal-side .link-arrow {
+    margin-top: var(--space-3);
+    font-size: var(--t-sm);
+  }
+
+  .host {
+    margin: var(--space-6) 0 0;
+    color: var(--sand-ink);
+    text-align: center;
+  }
+
+  .host a {
+    font-weight: var(--w-semibold);
+    color: var(--blue-strong);
+  }
+
+  @media (max-width: 960px) {
+    .cal {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .feature {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .feature-date {
+      flex-direction: row;
+      align-items: flex-end;
+      gap: var(--space-4);
+      min-height: 0;
+    }
+
+    /* Date first, status after it, on one line. */
+    .date-big {
+      order: -1;
+    }
+
+    .more-item {
+      grid-template-columns: 4rem minmax(0, 1fr);
+    }
+
+    .more-item > .chip {
+      grid-column: 2;
+      justify-self: start;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .cal-frame {
+      padding: var(--space-2);
+    }
+
+    .cal-frame iframe {
+      height: 32rem;
+    }
+  }
+</style>

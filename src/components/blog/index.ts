@@ -1,8 +1,8 @@
 /**
  * The markdown authoring vocabulary.
  *
- * Every component here is injected into MDX automatically by the post and
- * docs layouts, so an author writes `<Fig …/>` or `<BOM …/>` with no
+ * Every component here is injected into MDX automatically by the guide and
+ * project layouts, so an author writes `<Fig …/>` or `<BOM …/>` with no
  * import line and no knowledge of where the component lives. Adding a
  * component to this map is all it takes to make it available site-wide.
  *

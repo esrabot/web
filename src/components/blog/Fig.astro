@@ -3,12 +3,12 @@
  * A figure, addressed by asset path rather than by import.
  *
  * Usage in markdown:
- *   <Fig src="gallery/leg-test-stand.jpg" alt="The leg test stand."
+ *   <Fig src="uploads/test-stand.jpg" alt="The leg test stand."
  *        caption="**Figure 1.** Assembled on a linear slide." />
  *
- * `margin` floats it into the side-note column, matching the blog design.
+ * `margin` floats it into the side-note column beside the text.
  * A bad path fails the build with the available paths listed, rather than
- * silently rendering an empty plate.
+ * silently rendering an empty frame.
  */
 import Figure from '../ui/Figure.astro';
 import { resolveAsset, requireAsset } from '../../lib/assets';
@@ -22,21 +22,12 @@ interface Props {
   ratio?: string;
   /** Float into the margin column. */
   margin?: boolean;
+  /** Accepted for older posts; photos now print in full colour. */
   dither?: boolean;
   mono?: boolean;
 }
 
-const {
-  src,
-  alt = '',
-  caption,
-  plate,
-  ref,
-  ratio,
-  margin = false,
-  dither = true,
-  mono = true,
-} = Astro.props;
+const { src, alt = '', caption, plate, ref, ratio, margin = false } = Astro.props;
 
 // Remote and /public sources pass through untouched; local ones must exist.
 const resolved = resolveAsset(src) ? requireAsset(src, `<Fig src="${src}" />`) : src;
@@ -50,8 +41,6 @@ const resolved = resolveAsset(src) ? requireAsset(src, `<Fig src="${src}" />`) :
     plate={plate}
     ref={ref}
     ratio={ratio ?? (margin ? '1/1' : '16/9')}
-    dither={dither}
-    mono={mono}
     width={margin ? 560 : 1200}
   />
 </div>
@@ -61,14 +50,16 @@ const resolved = resolveAsset(src) ? requireAsset(src, `<Fig src="${src}" />`) :
     float: right;
     clear: right;
     width: var(--margin-col);
-    margin: 0 calc(-1 * var(--margin-gutter)) var(--u) 0;
+    margin-right: calc(-1 * var(--margin-gutter));
+    margin-bottom: var(--space-5);
   }
 
-  @media (max-width: 1000px) {
+  @media (max-width: 1100px) {
     .fig-wrap.margin {
       float: none;
       width: auto;
-      margin: var(--u) 0;
+      margin-right: 0;
+      margin-bottom: 0;
     }
   }
 </style>

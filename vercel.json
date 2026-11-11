@@ -24,20 +24,25 @@
       "permanent": true
     },
     {
-      "source": "/feed",
-      "destination": "/rss.xml",
+      "source": "/guides",
+      "destination": "/docs",
       "permanent": true
     },
     {
-      "source": "/feed.xml",
-      "destination": "/rss.xml",
-      "permanent": true
+      "source": "/calendar",
+      "destination": "/events",
+      "permanent": false
     },
-    {
-      "source": "/rss",
-      "destination": "/rss.xml",
-      "permanent": true
-    }
+    { "source": "/blog", "destination": "/", "permanent": true },
+    { "source": "/blog/:path*", "destination": "/", "permanent": true },
+    { "source": "/gallery", "destination": "/", "permanent": true },
+    { "source": "/gallery/:path*", "destination": "/", "permanent": true },
+    { "source": "/rss.xml", "destination": "/", "permanent": true },
+    { "source": "/rss", "destination": "/", "permanent": true },
+    { "source": "/feed", "destination": "/", "permanent": true },
+    { "source": "/feed.xml", "destination": "/", "permanent": true },
+    { "source": "/feed-media/:path*", "destination": "/", "permanent": true },
+    { "source": "/media/:path*", "destination": "/", "permanent": true }
   ],
 
   "headers": [
@@ -51,21 +56,6 @@
           "key": "Permissions-Policy",
           "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()"
         }
-      ]
-    },
-    {
-      "source": "/feed-media/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
-    },
-    {
-      "source": "/media/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
-    },
-    {
-      "source": "/rss.xml",
-      "headers": [
-        { "key": "Content-Type", "value": "application/rss+xml; charset=utf-8" },
-        { "key": "Cache-Control", "value": "public, max-age=3600" }
       ]
     }
   ]

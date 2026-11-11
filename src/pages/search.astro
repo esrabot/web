@@ -1,0 +1,227 @@
+---
+/**
+ * /search — the search box as a page of its own.
+ *
+ * The header's search control opens a dialog with the same box in it;
+ * this page is the linkable version (/search?q=actuator), the target of
+ * the header link when the dialog is unavailable, and the SearchAction
+ * advertised to search engines in the site's structured data.
+ *
+ * It runs on the same script and index as the dialog. Before a query —
+ * and for anyone without JavaScript — it lists every section of the site.
+ */
+import { Icon } from 'astro-icon/components';
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/ui/PageHero.astro';
+import Section from '../components/ui/Section.astro';
+import SearchPanel from '../components/search/SearchPanel.astro';
+import { JOIN_HREF } from '../data/site';
+
+const sections = [
+  {
+    label: 'Projects',
+    href: '/projects',
+    icon: 'lucide:layers',
+    hint: 'The roadmap, workshop builds, and every repository.',
+  },
+  {
+    label: 'Events',
+    href: '/events',
+    icon: 'lucide:calendar-days',
+    hint: 'Featured events and the calendar.',
+  },
+  {
+    label: 'Guides',
+    href: '/docs',
+    icon: 'lucide:book-open',
+    hint: 'Build notes and procedures, with parts lists.',
+  },
+  {
+    label: 'Members',
+    href: '/members',
+    icon: 'lucide:users',
+    hint: 'The people, and the partner clubs and schools.',
+  },
+  {
+    label: 'Get involved',
+    href: JOIN_HREF,
+    icon: 'lucide:handshake',
+    hint: 'Three ways in, for clubs, labs and companies.',
+  },
+  {
+    label: 'Contact',
+    href: '/contact',
+    icon: 'lucide:mail',
+    hint: 'Email addresses and where we post.',
+  },
+];
+---
+
+<BaseLayout
+  title="Search"
+  description="Search every page, project, event, guide and person on the ESRA site."
+  cta={false}
+>
+  <PageHero
+    eyebrow="Search"
+    title="Find anything."
+    lede="Every page, project, event, guide and person on the site."
+  >
+    <Fragment slot="title">Find <em>anything.</em></Fragment>
+  </PageHero>
+
+  <Section pad="flush-top">
+    <div class="search-page" data-reveal>
+      <SearchPanel variant="page">
+        <noscript>
+          <p class="nojs">
+            Search needs JavaScript, which is switched off in this browser. Every section of the
+            site is listed below.
+          </p>
+        </noscript>
+
+        <h2 class="browse-head">Or browse by section</h2>
+        <ul class="browse">
+          {
+            sections.map((s) => (
+              <li>
+                <a class="card lift" href={s.href}>
+                  <span class="b-icon" aria-hidden="true">
+                    <Icon name={s.icon} />
+                  </span>
+                  <span class="b-text">
+                    <strong>{s.label}</strong>
+                    <span>{s.hint}</span>
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </SearchPanel>
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  /* The shared search box, dressed for a page rather than a dialog. */
+  .search-page :global(.search-form) {
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-pill);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    transition:
+      border-color var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+
+  .search-page :global(.search-form:focus-within) {
+    border-color: var(--blue);
+    box-shadow:
+      0 0 0 4px var(--blue-wash),
+      var(--shadow-sm);
+  }
+
+  .search-page :global(.search-body) {
+    margin-top: var(--space-5);
+  }
+
+  .search-page :global(.search-results) {
+    padding: var(--space-2);
+    border: 1px solid var(--rule-soft);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .search-page :global(.search-note) {
+    padding-inline: var(--space-5);
+  }
+
+  .nojs {
+    margin: 0 0 var(--space-5);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--r-md);
+    background: var(--sand);
+    color: var(--sand-ink);
+  }
+
+  .browse-head {
+    margin: var(--space-6) 0 var(--space-4);
+    font-family: var(--font-label);
+    font-size: var(--t-xs);
+    font-weight: var(--w-semibold);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .browse {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16.5rem), 1fr));
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .browse a {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    height: 100%;
+    padding: var(--space-5);
+    color: var(--ink-strong);
+    text-decoration: none;
+  }
+
+  .b-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--r-md);
+    background: var(--blue-wash);
+    color: var(--blue);
+    transition:
+      background-color var(--dur-slow) var(--ease),
+      color var(--dur-slow) var(--ease);
+  }
+
+  .b-icon :global(svg) {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .browse a:hover .b-icon {
+    background: var(--blue);
+    color: var(--ink-inverse);
+  }
+
+  .b-text {
+    display: grid;
+    gap: 0.125rem;
+  }
+
+  .b-text strong {
+    font-family: var(--font-display);
+    font-size: var(--t-lg);
+    font-weight: 560;
+    letter-spacing: var(--track-tight);
+    transition: color var(--dur) var(--ease);
+  }
+
+  .browse a:hover .b-text strong {
+    color: var(--blue);
+  }
+
+  .b-text span {
+    font-size: var(--t-sm);
+    line-height: 1.5;
+    color: var(--ink-muted);
+  }
+</style>

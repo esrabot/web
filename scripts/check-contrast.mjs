@@ -90,30 +90,40 @@ const tokens = readTokens(css);
  *   4.5 — normal text
  *   3.0 — large text (>=24px, or >=18.7px bold) and UI component boundaries
  *
- * Decorative tokens (--ink-faint, --rule*) carry no text and are exempt;
- * they are asserted to stay BELOW their misuse threshold instead, which
- * catches someone quietly repurposing them for copy.
+ * Decorative tokens (--ink-faint, --rule*, --sand-deep) carry no text and
+ * are not checked.
  */
 const REQUIRED = [
-  { fg: '--ink-strong', bg: '--sheet', min: 4.5, note: 'headings, primary body' },
-  { fg: '--ink-body', bg: '--sheet', min: 4.5, note: 'body copy' },
-  { fg: '--ink-muted', bg: '--sheet', min: 4.5, note: 'small mono labels' },
-  { fg: '--ink-soft', bg: '--sheet', min: 3.0, note: 'large text only' },
-  { fg: '--accent-ink', bg: '--sheet', min: 4.5, note: 'accent text' },
-  { fg: '--ink-strong', bg: '--paper', min: 4.5, note: 'text on the outer field' },
-  { fg: '--ink-body', bg: '--paper', min: 4.5, note: 'body on the outer field' },
-  { fg: '--ink-muted', bg: '--paper', min: 4.5, note: 'labels on the outer field' },
-  { fg: '--ink-inverse', bg: '--ink', min: 4.5, note: 'inverted text (buttons)' },
-  { fg: '--ink-inverse', bg: '--accent', min: 4.5, note: 'text on beige-filled buttons' },
-  { fg: '--accent-ink', bg: '--paper', min: 4.5, note: 'accent text in raised cells' },
-  { fg: '--signal', bg: '--sheet', min: 4.5, note: 'the live marker on the sheet' },
-  { fg: '--signal', bg: '--panel', min: 4.5, note: 'the live marker on the dark panel' },
-  { fg: '--panel-ink', bg: '--panel', min: 4.5, note: 'headings on the dark panel' },
-  { fg: '--panel-body', bg: '--panel', min: 4.5, note: 'body on the dark panel' },
-  { fg: '--panel-muted', bg: '--panel', min: 4.5, note: 'labels on the dark panel' },
-  { fg: '--panel-accent', bg: '--panel', min: 4.5, note: 'accent text on the dark panel' },
-  { fg: '--panel-muted', bg: '--panel-raised', min: 4.5, note: 'labels in panel cells' },
-  { fg: '--panel-accent', bg: '--panel-raised', min: 4.5, note: 'accent in panel cells' },
+  // Ink on the three surfaces a page is built from.
+  { fg: '--ink-strong', bg: '--bg', min: 4.5, note: 'headings on the page' },
+  { fg: '--ink-body', bg: '--bg', min: 4.5, note: 'body copy on the page' },
+  { fg: '--ink-muted', bg: '--bg', min: 4.5, note: 'captions and meta on the page' },
+  { fg: '--ink-strong', bg: '--surface', min: 4.5, note: 'headings on cards' },
+  { fg: '--ink-body', bg: '--surface', min: 4.5, note: 'body copy on cards' },
+  { fg: '--ink-muted', bg: '--surface', min: 4.5, note: 'captions and meta on cards' },
+  { fg: '--ink-strong', bg: '--sand', min: 4.5, note: 'headings on beige bands' },
+  { fg: '--ink-body', bg: '--sand', min: 4.5, note: 'body copy on beige bands' },
+  { fg: '--ink-muted', bg: '--sand', min: 4.5, note: 'captions on beige bands' },
+  { fg: '--sand-ink', bg: '--sand', min: 4.5, note: 'small labels on beige' },
+  { fg: '--sand-ink', bg: '--surface', min: 4.5, note: 'beige-ink labels on cards' },
+
+  // The accent, as text and as a fill.
+  { fg: '--blue', bg: '--bg', min: 4.5, note: 'links and eyebrows on the page' },
+  { fg: '--blue', bg: '--surface', min: 4.5, note: 'links and eyebrows on cards' },
+  { fg: '--blue', bg: '--sand', min: 4.5, note: 'links and eyebrows on beige' },
+  { fg: '--blue', bg: '--blue-wash', min: 4.5, note: 'icons and text on the lightest tint' },
+  { fg: '--blue-strong', bg: '--blue-wash', min: 4.5, note: 'chip text' },
+  { fg: '--blue-strong', bg: '--blue-soft', min: 4.5, note: 'text on the tinted fill' },
+  { fg: '--ink-inverse', bg: '--blue', min: 4.5, note: 'button text' },
+  { fg: '--ink-inverse', bg: '--blue-strong', min: 4.5, note: 'button text, hovered' },
+  {
+    fg: '--ink-inverse',
+    bg: '--blue-deep',
+    min: 4.5,
+    note: 'text at the dark end of the blue band',
+  },
+  { fg: '--blue-on-dark', bg: '--blue', min: 4.5, note: 'accent text on the blue band' },
+  { fg: '--sand', bg: '--blue', min: 4.5, note: 'the italic accent on the blue band' },
 ];
 
 let failed = 0;
@@ -154,9 +164,7 @@ for (const r of rows) {
 if (failed > 0) {
   console.error(
     `\n${failed} contrast requirement(s) not met.\n` +
-      `Adjust the token alpha or the surface colour in src/styles/tokens.css.\n` +
-      `Note: lifting the background alone has limited effect, because the muted\n` +
-      `tones are translucent ink composited over it — both rise together.\n`
+      `Darken the text token or lighten the surface in src/styles/tokens.css.\n`
   );
   process.exit(1);
 }

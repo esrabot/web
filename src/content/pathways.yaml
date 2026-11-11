@@ -1,0 +1,138 @@
+# The ways to get involved.
+#
+# Each entry is one card in the "Get involved" section of the home page,
+# and the pop-up that opens when the card is clicked.
+#
+#   points     the three lines on the card itself
+#   intro      the opening paragraph of the pop-up
+#   sections   headed lists in the pop-up
+#   note       optional highlighted aside in the pop-up
+#   start      how to take the first step
+#   cta        button label; `subject` is the subject of the email it starts
+#   icon       team | affiliate | industry
+#
+# Keep this to what ESRA actually offers. Nothing here should promise a
+# benefit, a deadline or a process that has not been decided.
+
+- id: member-team
+  order: 1
+  icon: team
+  audience: University clubs
+  title: Member team
+  lede: Take responsibility for part of a robot.
+  points:
+    - Own a subsystem on a joint build
+    - Develop and test it at your home institution
+    - Integrate with the other teams at workshops
+  intro: >-
+    Member teams are the clubs that build. On a joint build, the
+    participating teams agree on what the robot should do, divide the
+    engineering work, and settle how their contributions will fit together.
+    Then each team owns its part.
+  sections:
+    - heading: A good fit if you are
+      items:
+        - A student-led university robotics club
+        - Ready to own a subsystem — mechanical, electrical, or software
+        - Willing to build to interfaces agreed with teams on other campuses
+    - heading: What it involves
+      items:
+        - Agreeing the specification and interfaces with the other teams
+        - Developing and testing your subsystem at your home institution
+        - Meeting at integration workshops to assemble, test, and trace faults together
+    - heading: What your team gets
+      items:
+        - A real part in a robot no single campus could build alone
+        - Technical exchange with teams working through the same problems
+        - Help finding mentorship, equipment, and funding
+        - A share in what the project publishes — papers, videos, open-source code
+  note:
+    label: Building now
+    body: >-
+      H1, a full-scale humanoid. Hardware development began in November 2026,
+      with a winter integration workshop next.
+  start: >-
+    Email us with your club, your school, and the kind of work your team
+    does. We will talk through where you could fit on a current build.
+  cta: Join a build
+  subject: Member team
+
+- id: affiliate-club
+  order: 2
+  icon: affiliate
+  audience: Newer clubs
+  title: Affiliate club
+  lede: Join the network before you take on a build.
+  points:
+    - Exchange technical advice with experienced teams
+    - Share your team’s milestones
+    - Take part in, or co-host, workshops, conferences, and networking events
+  intro: >-
+    The affiliate partnership is for clubs that want to be part of the
+    network before they are ready to take responsibility for part of a
+    robot. It is a way to learn from experienced teams, and to explore a
+    future project as your membership and capabilities grow.
+  sections:
+    - heading: A good fit if you are
+      items:
+        - A newer or growing robotics club
+        - Still building up members, skills, or lab space
+        - Curious whether a joint build is right for your team
+    - heading: What it involves
+      items:
+        - Exchanging technical advice with teams in the network
+        - Sharing your team’s milestones
+        - Taking part in, or co-hosting, workshops, conferences, and networking events
+    - heading: What your club gets
+      items:
+        - Access to teams that have already solved the problem you are on
+        - A path into a future project when you are ready for one
+        - No subsystem to commit to up front
+  start: >-
+    Email us and tell us about your club: what you are working on, and what
+    you would like to learn. There is nothing to commit to first.
+  cta: Become an affiliate
+  subject: Affiliate club
+
+- id: industry-research
+  order: 3
+  icon: industry
+  audience: Companies & labs
+  title: Industry and research
+  lede: Support a build, or start one with us.
+  points:
+    - Provide components, loan equipment, mentor a team, or fund development
+    - Lead a workshop on a specific engineering problem
+    - Through the planned Industry Research Alliance, define a research question with students
+  intro: >-
+    Companies and research labs work with ESRA in two ways: by supporting a
+    university-led build such as H1, or — through the planned Industry
+    Research Alliance — by defining a research project together with
+    students.
+  sections:
+    - heading: A good fit if you are
+      items:
+        - A company building robots, components, or tools
+        - A research lab
+        - An engineer who wants to mentor a student team
+    - heading: Ways to support a build
+      items:
+        - Provide components, or loan equipment
+        - Mentor a student team
+        - Fund development
+        - Lead a workshop on a specific engineering problem
+    - heading: What ESRA does
+      items:
+        - Connects you with the students doing the work
+        - Coordinates the opportunities to build and test together
+        - Helps make what is learned accessible to the wider student robotics community
+  note:
+    label: Industry Research Alliance · planned
+    body: >-
+      A company, a research lab, and students define a research question
+      together, and carry out a project around it.
+  start: >-
+    Email us with what you have in mind — a component, a workshop, a
+    question worth researching — and we will take it from there.
+  cta: Start a conversation
+  subject: Industry & research partnership
