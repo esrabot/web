@@ -259,7 +259,11 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   <Section id="why">
     <div class="why">
       <div class="why-copy">
-        <SectionHead eyebrow="Why ESRA" title="Every campus is debugging the same robot alone.">
+        <SectionHead
+          eyebrow="Why ESRA"
+          title="Every campus is debugging the same robot alone."
+          align="center"
+        >
           <Fragment slot="title">
             Every campus is debugging the same robot <em>alone.</em>
           </Fragment>
@@ -787,6 +791,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
   .hero-grid {
     max-width: 52rem;
+    text-align: center;
   }
 
   .hero h1 {
@@ -798,13 +803,14 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   .hero .lede {
-    margin-top: var(--space-5);
+    margin: var(--space-5) auto 0;
     max-width: 34rem;
   }
 
   .hero-actions {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: var(--space-3);
     margin-top: var(--space-6);
   }
@@ -812,7 +818,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   .hero-facts {
     display: grid;
     grid-template-columns: repeat(4, auto);
-    justify-content: start;
+    justify-content: center;
     gap: var(--space-4) var(--space-7);
     margin: var(--space-7) 0 0;
     padding-top: var(--space-5);
@@ -950,13 +956,17 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   /* ================================================================
    * Why
    * ============================================================== */
+  .why-copy {
+    text-align: center;
+  }
+
   .why-copy :global(.section-head) {
     margin-bottom: var(--space-5);
   }
 
   .why-body p {
     max-width: var(--measure);
-    margin: 0;
+    margin: 0 auto;
     font-size: var(--t-md);
   }
 
@@ -964,12 +974,14 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     margin-top: var(--space-4);
   }
 
+  /* Centred under the copy, so the accent rule runs along the top
+     rather than down one side. */
   .example {
     max-width: var(--measure);
-    margin-top: var(--space-6);
+    margin: var(--space-6) auto 0;
     padding: var(--space-4) var(--space-5);
-    border-left: 3px solid var(--blue);
-    border-radius: 0 var(--r-md) var(--r-md) 0;
+    border-top: 3px solid var(--blue);
+    border-radius: 0 0 var(--r-md) var(--r-md);
     background: var(--blue-wash);
   }
 
