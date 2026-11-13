@@ -6,7 +6,7 @@
  * so adding a social account is a one-line edit that lights it up
  * everywhere.
  *
- * ESRA currently has LinkedIn, YouTube and GitHub only; its email
+ * ESRA currently has LinkedIn and GitHub only; its email
  * addresses live in CONTACTS in data/site.ts. Absent platforms are simply
  * omitted rather than rendered as dead icons. Do not add a URL here that
  * has not been confirmed to exist.
@@ -26,7 +26,7 @@ export type Platform =
 
 export interface SocialLink {
   platform: Platform;
-  /** Display handle, e.g. "@CCBRRobotics". Falls back to the host. */
+  /** Display handle, e.g. "esra-robotics". Falls back to the host. */
   handle?: string;
   url: string;
 }
@@ -42,12 +42,6 @@ export interface Org {
   /** Former name, surfaced where the rebrand needs explaining. */
   formerly?: string;
   links: SocialLink[];
-  /**
-   * YouTube handle, used to resolve a channel ID for the video feed.
-   * Kept separate from `links` because the feed pipeline needs it
-   * independently of presentation.
-   */
-  youtubeHandle?: string;
 }
 
 export const ESRA: Org = {
@@ -57,19 +51,13 @@ export const ESRA: Org = {
   blurb:
     'A national nonprofit connecting university robotics teams to build humanoids, quadrupeds, and manipulators together — in the open.',
   formerly: 'CCBR',
-  youtubeHandle: 'CCBRRobotics',
   links: [
     { platform: 'website', handle: 'esra.bot', url: 'https://esra.bot' },
     { platform: 'github', handle: 'esrabot', url: 'https://github.com/esrabot' },
     {
       platform: 'linkedin',
-      handle: 'ccbr-robotics',
-      url: 'https://www.linkedin.com/company/ccbr-robotics/',
-    },
-    {
-      platform: 'youtube',
-      handle: '@CCBRRobotics',
-      url: 'https://www.youtube.com/@CCBRRobotics',
+      handle: 'esra-robotics',
+      url: 'https://www.linkedin.com/company/esra-robotics/',
     },
   ],
 };
@@ -83,13 +71,6 @@ export const ORGS: Org[] = [ESRA];
 export function getOrg(id: string): Org | undefined {
   return ORGS.find((o) => o.id === id);
 }
-
-/** Channels the video feed pulls from. */
-export const YOUTUBE_SOURCES = ORGS.filter((o) => o.youtubeHandle).map((o) => ({
-  orgId: o.id,
-  orgName: o.name,
-  handle: o.youtubeHandle as string,
-}));
 
 /**
  * Human-readable platform labels. Icon names map to the `simple-icons`

@@ -176,15 +176,15 @@ const boms = defineCollection({
 /**
  * The home page showcase.
  *
- * A hand-curated strip that sits above the auto-generated repo and video
- * tiles, so anything worth surfacing — a LinkedIn post, a talk, an
- * external write-up — can be featured without touching a component.
- * Reorder or retire an item by editing one YAML file.
+ * A hand-curated strip that sits above the auto-generated repo tiles,
+ * so anything worth surfacing — a LinkedIn post, a talk, an external
+ * write-up — can be featured without touching a component. Reorder or
+ * retire an item by editing one YAML file.
  */
 const featured = defineCollection({
   loader: file('./src/content/featured.yaml'),
   schema: z.object({
-    type: z.enum(['linkedin', 'youtube', 'repo', 'link']),
+    type: z.enum(['linkedin', 'repo', 'link']),
     title: z.string(),
     /** Short line under the title. */
     summary: z.string().optional(),
@@ -195,8 +195,6 @@ const featured = defineCollection({
      * urn:li:activity:<id>, which appear in the post's URL.
      */
     activityId: z.string().optional(),
-    /** For youtube: the 11-character video id. */
-    videoId: z.string().optional(),
     /** For repo: owner/name. */
     repo: z.string().optional(),
     /** Canonical link, and the fallback for every type. */

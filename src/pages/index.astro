@@ -7,9 +7,9 @@
  * lately, and who is already here.
  *
  * Every figure is real: counts come from the partners and programmes
- * lists, repo stats from the GitHub API at build time, videos from ESRA's
- * channel feed. The schedule's "now" marker is computed from the
- * build date, and the scheduled rebuild keeps it current.
+ * lists, repo stats from the GitHub API at build time. The schedule's
+ * "now" marker is computed from the build date, and the scheduled
+ * rebuild keeps it current.
  *
  * The four "ways in" open as pop-up cards. Their copy lives in
  * src/content/pathways.yaml, the roadmap in src/content/programs.yaml.
@@ -25,11 +25,9 @@ import DataTable from '../components/ui/DataTable.astro';
 import Scratch from '../components/ui/Scratch.astro';
 import { CONTACTS, SITE } from '../data/site';
 import { getPublicRepos } from '../lib/github';
-import { getLatestPerOrg } from '../lib/youtube';
 
-const [repos, videos, partners, allFeatured, allPrograms, allPathways] = await Promise.all([
+const [repos, partners, allFeatured, allPrograms, allPathways] = await Promise.all([
   getPublicRepos(),
-  getLatestPerOrg(),
   getCollection('partners'),
   getCollection('featured'),
   getCollection('programs'),
@@ -185,8 +183,7 @@ const ways = [...allPathways]
   }));
 
 /* ------------------------------------------------------------------
- * Recent activity: featured links, videos and repo pushes as a short
- * list.
+ * Recent activity: featured links and repo pushes as a short list.
  * ---------------------------------------------------------------- */
 interface Activity {
   date: Date | null;
@@ -196,7 +193,7 @@ interface Activity {
   href: string;
 }
 
-const FEATURED_KIND = { linkedin: 'LinkedIn', youtube: 'Video', repo: 'Repo', link: 'Link' };
+const FEATURED_KIND = { linkedin: 'LinkedIn', repo: 'Repo', link: 'Link' };
 
 const activity: Activity[] = [
   ...allFeatured
@@ -208,13 +205,6 @@ const activity: Activity[] = [
       source: 'ESRA',
       href: f.data.url,
     })),
-  ...videos.map((v) => ({
-    date: new Date(v.published),
-    kind: 'Video',
-    title: v.title,
-    source: v.orgName,
-    href: v.url,
-  })),
   ...repos.slice(0, 3).map((r) => ({
     date: r.pushedAt ? new Date(r.pushedAt) : null,
     kind: 'Repo',

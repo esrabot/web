@@ -33,8 +33,8 @@ const build = buildInfo();
         <a href={SITE.repoUrl} rel="noopener">{SITE.repo}</a>.
       </p>
       <p>
-        External data — repository statistics, video listings — is fetched at build time rather than
-        in the browser, so pages ship as plain HTML with no client-side data fetching. A scheduled
+        External data — repository statistics from GitHub — is fetched at build time rather than in
+        the browser, so pages ship as plain HTML with no client-side data fetching. A scheduled
         rebuild keeps that data current without anyone running a build. Where a source is
         unavailable, the affected section renders without it; no figure on this site is a
         placeholder.

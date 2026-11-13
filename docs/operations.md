@@ -45,7 +45,7 @@ pull request gets a preview URL commented on it. Until it exists, the workflow
 skips itself with a warning rather than failing — so merging this is safe before
 you have the token.
 
-The scheduled rebuild (every 6h, to refresh GitHub/YouTube data) rides the same
+The scheduled rebuild (every 6h, to refresh GitHub data) rides the same
 workflow. `refresh.yml` is deliberately dormant; it is the path to switch back
 to once native Vercel Git deploys are available (see the end of this doc).
 

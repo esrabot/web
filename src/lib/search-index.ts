@@ -182,7 +182,7 @@ function staticEntries(): SearchEntry[] {
       k: 'Page',
       d: 'Email addresses and the channels where ESRA posts.',
       w: words(
-        'email mail reach message press partnerships social linkedin youtube github',
+        'email mail reach message press partnerships social linkedin github',
         ...CONTACTS.map((c) => `${c.address} ${c.label}`)
       ),
     },
