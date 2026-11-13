@@ -28,7 +28,7 @@ Ready-to-paste copy, page by page and section by section. Each section names the
 
 **Eyebrow:** Why ESRA
 
-**Headline:** Every campus is debugging the same robot *alone.*
+**Headline:** Every campus debugging the same robot *alone.*
 
 **Body:**
 
