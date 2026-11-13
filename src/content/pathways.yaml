@@ -3,136 +3,240 @@
 # Each entry is one card in the "Get involved" section of the home page,
 # and the pop-up that opens when the card is clicked.
 #
+#   icon       student | club | lab | company
 #   points     the three lines on the card itself
 #   intro      the opening paragraph of the pop-up
-#   sections   headed lists in the pop-up
-#   note       optional highlighted aside in the pop-up
-#   start      how to take the first step
+#   sections   headed blocks in the pop-up. Each has a `heading` and
+#              exactly one body:
+#                items  a list
+#                table  `columns`, then `rows` of `cells` (one per
+#                       column), and an optional `note` under the table
+#                text   a short paragraph
+#   notes      up to two highlighted asides after the sections
+#              ("Good to know", "Coming soon")
+#   start      how to take the first step (optional)
 #   cta        button label; `subject` is the subject of the email it starts
-#   icon       team | affiliate | industry
+#   email      the inbox the button writes to (default: info@esra.bot)
+#   secondary  an optional second button: label, email, subject
 #
 # Keep this to what ESRA actually offers. Nothing here should promise a
 # benefit, a deadline or a process that has not been decided.
 
-- id: member-team
+- id: students
   order: 1
-  icon: team
-  audience: University clubs
-  title: Member team
-  lede: Take responsibility for part of a robot.
+  icon: student
+  audience: Students
+  title: Join the team
+  lede: Help build the robots, or the organisation behind them.
   points:
-    - Own a subsystem on a joint build
-    - Develop and test it at your home institution
-    - Integrate with the other teams at workshops
+    - Own a real part of a working robot
+    - Work with students from other universities
+    - Leave with work you can show in interviews
   intro: >-
-    Member teams are the clubs that build. On a joint build, the
-    participating teams agree on what the robot should do, divide the
-    engineering work, and settle how their contributions will fit together.
-    Then each team owns its part.
+    ESRA is run by students. Engineers and programmers build the robots.
+    Business and marketing students build the partnerships, funding and
+    stories that keep the projects going.
   sections:
-    - heading: A good fit if you are
+    - heading: Where you could work
+      table:
+        columns: [Track, Areas, Email]
+        rows:
+          - cells:
+              - Engineering
+              - Mechanical design and CAD, actuators, electronics and power, fabrication and testing, system integration
+              - engineering@esra.bot
+          - cells:
+              - Computer science
+              - Robotics and embedded software, controls, perception, simulation, data and test tools
+              - engineering@esra.bot
+          - cells:
+              - Business and marketing
+              - Partnerships, marketing and communications, finance, events and operations, strategy and growth
+              # TODO(confirm): marketing@ must exist in Zoho. If it doesn't yet, use info@esra.bot.
+              - marketing@esra.bot
+    - heading: What you get
       items:
-        - A student-led university robotics club
-        - Ready to own a subsystem — mechanical, electrical, or software
-        - Willing to build to interfaces agreed with teams on other campuses
-    - heading: What it involves
-      items:
-        - Agreeing the specification and interfaces with the other teams
-        - Developing and testing your subsystem at your home institution
-        - Meeting at integration workshops to assemble, test, and trace faults together
-    - heading: What your team gets
-      items:
-        - A real part in a robot no single campus could build alone
-        - Technical exchange with teams working through the same problems
-        - Help finding mentorship, equipment, and funding
-        - A share in what the project publishes — papers, videos, open-source code
-  note:
-    label: Building now
-    body: >-
-      H1, a full-scale humanoid. Hardware development began in November 2026,
-      with a winter integration workshop next.
-  start: >-
-    Email us with your club, your school, and the kind of work your team
-    does. We will talk through where you could fit on a current build.
-  cta: Join a build
-  subject: Member team
+        - Responsibility for a real subsystem, software component, campaign or proposal
+        - Design reviews and problem-solving with students from other schools
+        - CAD, code, test results, proposals or campaigns to show employers
+  start: Email us and tell us which part of ESRA you want to own.
+  cta: Email engineering@esra.bot
+  subject: Join the team
+  email: engineering@esra.bot
+  # TODO(confirm): marketing@ must exist in Zoho. If it doesn't yet, use info@esra.bot.
+  secondary:
+    label: Email marketing@esra.bot
+    email: marketing@esra.bot
+    subject: Join the team
 
-- id: affiliate-club
+- id: partner-club
   order: 2
-  icon: affiliate
-  audience: Newer clubs
-  title: Affiliate club
-  lede: Join the network before you take on a build.
+  icon: club
+  audience: University clubs
+  title: Partner club
+  lede: Build part of a robot no single campus could build alone.
   points:
-    - Exchange technical advice with experienced teams
-    - Share your team’s milestones
-    - Take part in, or co-host, workshops, conferences, and networking events
+    - Own a subsystem on a shared robot
+    - Build and test at your own university
+    - Share designs, code and events across the network
   intro: >-
-    The affiliate partnership is for clubs that want to be part of the
-    network before they are ready to take responsibility for part of a
-    robot. It is a way to learn from experienced teams, and to explore a
-    future project as your membership and capabilities grow.
+    Partner clubs build. Teams agree on what the robot should do, split the
+    engineering, and agree how the parts fit together. Then each club owns
+    its part.
   sections:
-    - heading: A good fit if you are
-      items:
-        - A newer or growing robotics club
-        - Still building up members, skills, or lab space
-        - Curious whether a joint build is right for your team
-    - heading: What it involves
-      items:
-        - Exchanging technical advice with teams in the network
-        - Sharing your team’s milestones
-        - Taking part in, or co-hosting, workshops, conferences, and networking events
+    # TODO(confirm): an affiliate tier is left out until it is confirmed. If it
+    # still exists, add a third row for it here.
+    - heading: Ways to take part
+      table:
+        columns: [Role, Fits]
+        rows:
+          - cells: [Lead a subsystem, 'A club that can own a whole part, like the legs or a hand']
+          - cells: [Contribute to a project, A club helping on a project without leading a part]
     - heading: What your club gets
+      # TODO(confirm): add "A vote on the Leadership Council" once the bylaws are adopted.
       items:
-        - Access to teams that have already solved the problem you are on
-        - A path into a future project when you are ready for one
-        - No subsystem to commit to up front
-  start: >-
-    Email us and tell us about your club: what you are working on, and what
-    you would like to learn. There is nothing to commit to first.
-  cta: Become an affiliate
-  subject: Affiliate club
+        - Events, workshops and design reviews across the network
+        - Shared designs, code and documentation
+        - A starter kit for hosting ESRA events
+        - Spotlights on the ESRA site and socials
+        - Introductions to sponsors and mentors
+    - heading: What we ask
+      items:
+        - A rep and a backup who reply within 7 days
+        - One ESRA activity a semester
+        - One hosted or co-hosted event a year
+  notes:
+    - label: Good to know
+      body: >-
+        Your club signs, not your university. It’s a good-faith agreement, not
+        a contract, and you can leave with 30 days’ notice. You keep your
+        name, members, robot and designs.
+  start: Email us your club, your school, and what your team builds.
+  cta: Join as a club
+  subject: Partner club
 
-- id: industry-research
+- id: partner-lab
   order: 3
-  icon: industry
-  audience: Companies & labs
-  title: Industry and research
-  lede: Support a build, or start one with us.
+  icon: lab
+  audience: Research labs
+  title: Partner lab
+  lede: Mentor student teams and meet motivated students.
   points:
-    - Provide components, loan equipment, mentor a team, or fund development
-    - Lead a workshop on a specific engineering problem
-    - Through the planned Industry Research Alliance, define a research question with students
+    - Review designs and advise on research
+    - Speak, teach or judge at ESRA events
+    - Share tools, data and research openings
   intro: >-
-    Companies and research labs work with ESRA in two ways: by supporting a
-    university-led build such as H1, or — through the planned Industry
-    Research Alliance — by defining a research project together with
-    students.
+    Labs bring research experience to student teams. Students stay
+    responsible for the engineering; labs help them frame problems, test
+    well and learn from current research.
   sections:
-    - heading: A good fit if you are
+    - heading: What your lab could do
       items:
-        - A company building robots, components, or tools
-        - A research lab
-        - An engineer who wants to mentor a student team
-    - heading: Ways to support a build
+        - Review designs and test plans
+        - Advise on papers and research questions
+        - Give talks, lead workshops, judge challenges
+        - Share open-source tools, datasets or test time
+        - Post undergraduate research openings
+    - heading: What we ask
+      table:
+        columns: [Commitment, Amount]
+        rows:
+          - cells: [Mentor a project team, '1 team, about 4 hours a month']
+          - cells: [Speak or exhibit at ESRA events, 2 a year]
+    - heading: What your lab gets
       items:
-        - Provide components, or loan equipment
-        - Mentor a student team
-        - Fund development
-        - Lead a workshop on a specific engineering problem
-    - heading: What ESRA does
+        - ESRA handles event logistics
+        - A named student lead for each team you mentor
+        - Introductions to industry partners
+        - Your papers and news shared on ESRA channels
+        - Letters of collaboration for grant proposals
+  notes:
+    - label: Good to know
+      body: >-
+        Labs advise and don’t build. Your research, equipment and members stay
+        entirely yours.
+  start: Email us your lab and research areas.
+  cta: Become a partner lab
+  subject: Partner lab
+  # TODO(confirm): partnerships@ must exist in Zoho. If it doesn't yet, use info@esra.bot.
+  email: partnerships@esra.bot
+
+- id: industry-partner
+  order: 4
+  icon: company
+  audience: Companies
+  title: Industry partner
+  lede: Put your platform in student hands across many campuses.
+  points:
+    - Fund a project or supply what you make
+    - One contribution reaches many universities
+    - Recognition on the robots you support
+  intro: >-
+    Companies give ESRA’s projects the resources to build real systems. In
+    return, your product is used, tested and documented by students who
+    carry it into labs, startups and industry.
+  sections:
+    - heading: Why sponsor
       items:
-        - Connects you with the students doing the work
-        - Coordinates the opportunities to build and test together
-        - Helps make what is learned accessible to the wider student robotics community
-  note:
-    label: Industry Research Alliance · planned
-    body: >-
-      A company, a research lab, and students define a research question
-      together, and carry out a project around it.
-  start: >-
-    Email us with what you have in mind — a component, a workshop, a
-    question worth researching — and we will take it from there.
+        - Students learn on your platform and take it with them
+        - One contribution reaches teams at many universities
+        - Projects produce documentation other teams reuse
+    - heading: Two ways to give
+      table:
+        columns: [Route, What it is]
+        rows:
+          - cells: [Direct funding, Cash for one project or for shared resources]
+          - cells:
+              - Project package
+              - Hardware, machining, software or compute built around what you make
+    - heading: Partnership levels
+      table:
+        columns: [Level, Value, What it unlocks, What you get]
+        rows:
+          - cells:
+              - Bronze
+              - Under $2,500
+              - Your platform as the reference for ROS 2, controls or perception work
+              - Recognition on the robot, esra.bot and the repo
+          - cells:
+              - Silver
+              - $2,500–$7,500
+              - 'A new ESRA subsystem: a leg module, arm or perception stack'
+              - Bronze, plus featured branding, regular content and student access
+          - cells:
+              - Gold
+              - $7,500–$12,500
+              - A flagship project, from architecture to tested hardware
+              - Silver, plus prominent branding and a co-branded case study
+          - cells:
+              - Platinum
+              - $12,500+
+              - A programme across several robots
+              - Gold, plus priority recognition, a partnership announcement and year-round coverage
+        note: Levels go by the agreed practical value of a contribution, not list price.
+    - heading: Where your support is seen
+      items:
+        - On the robot
+        - esra.bot and GitHub
+        - Build updates and videos
+        - Events and trade-show booths
+        - Talks with the students
+    - heading: How it starts
+      items:
+        - Intro call
+        - Scope the package and level
+        - Confirm in writing
+        - Teams build and report back
+  notes:
+    - label: Good to know
+      body: >-
+        Recognition is neutral, with no endorsements. Support gives no control
+        over projects. ESRA is a 501(c)(3), so donations are tax-deductible.
+    - label: Coming soon
+      body: >-
+        The Industry Research Alliance, where a company brings a research
+        question and labs and students take it on together.
   cta: Start a conversation
-  subject: Industry & research partnership
+  subject: Industry partnership
+  # TODO(confirm): partnerships@ must exist in Zoho. If it doesn't yet, use info@esra.bot.
+  email: partnerships@esra.bot

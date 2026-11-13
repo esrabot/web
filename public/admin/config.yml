@@ -42,8 +42,12 @@ backend:
 # pipeline backed by pull requests.
 publish_mode: editorial_workflow
 
+# Sveltia requires the top-level public_folder to be an absolute path; a
+# relative one stops the whole CMS from loading. No field uses this global
+# library today: members set their own folder below, and an event's photo
+# is typed in as a path.
 media_folder: src/assets/uploads
-public_folder: ../../assets/uploads
+public_folder: /src/assets/uploads
 
 collections:
   - name: members
@@ -131,12 +135,19 @@ collections:
               - { name: featured, label: Featured (large card), widget: boolean, default: false }
               - { name: when, label: 'When, as readers see it', widget: string, hint: 'e.g. November 2026, or Jan 16–18, 2027' }
               - {
+                  name: tentative,
+                  label: Tentative date,
+                  widget: boolean,
+                  default: false,
+                  hint: "Date not final: the card shows the 'When' text instead of the month",
+                }
+              - {
                   name: start,
                   label: Start date,
                   widget: datetime,
                   date_format: 'yyyy-MM-dd',
                   time_format: false,
-                  hint: 'Decides whether the event shows as upcoming, happening now, or past.',
+                  hint: 'Decides whether the event shows as upcoming, happening now, or past. For a tentative date, use the later of the candidate dates.',
                 }
               - {
                   name: end,
@@ -231,26 +242,61 @@ collections:
             fields:
               - { name: id, label: ID, widget: string, hint: 'Lowercase, hyphenated, unique.' }
               - { name: order, label: Sort order, widget: number, default: 100 }
-              - { name: icon, label: Icon, widget: select, options: [team, affiliate, industry] }
-              - { name: audience, label: 'Who it is for (two or three words)', widget: string }
+              - { name: icon, label: Icon, widget: select, options: [student, club, lab, company] }
+              - { name: audience, label: 'Who it is for (a word or two)', widget: string }
               - { name: title, label: Title, widget: string }
               - { name: lede, label: One-line pitch, widget: string }
               - { name: points, label: Three lines on the card, widget: list }
               - { name: intro, label: Pop-up opening paragraph, widget: text }
               - name: sections
                 label: Pop-up sections
+                label_singular: section
                 widget: list
                 summary: '{{fields.heading}}'
+                hint: 'Give each section a heading, then fill in exactly one of: a list, a table, or a paragraph.'
                 fields:
                   - { name: heading, label: Heading, widget: string }
-                  - { name: items, label: Items, widget: list }
-              - name: note
-                label: Highlighted note
-                widget: object
+                  - { name: items, label: List, widget: list, required: false }
+                  - name: table
+                    label: Table
+                    widget: object
+                    required: false
+                    fields:
+                      - { name: columns, label: Column headings, widget: list }
+                      - name: rows
+                        label: Rows
+                        label_singular: row
+                        widget: list
+                        fields:
+                          - { name: cells, label: 'Cells, one per column', widget: list }
+                      - { name: note, label: Line under the table, widget: string, required: false }
+                  - { name: text, label: Paragraph, widget: text, required: false }
+              - name: notes
+                label: Highlighted notes
+                label_singular: note
+                widget: list
                 required: false
+                max: 2
+                summary: '{{fields.label}}'
+                hint: 'Up to two, shown after the sections, e.g. "Good to know" and "Coming soon".'
                 fields:
                   - { name: label, label: Label, widget: string }
                   - { name: body, label: Text, widget: text }
-              - { name: start, label: How to start, widget: text }
+              - { name: start, label: How to start, widget: text, required: false }
               - { name: cta, label: Button label, widget: string }
               - { name: subject, label: Email subject line, widget: string }
+              - {
+                  name: email,
+                  label: Button email address,
+                  widget: string,
+                  required: false,
+                  hint: 'Leave blank to use info@esra.bot.',
+                }
+              - name: secondary
+                label: Second button
+                widget: object
+                required: false
+                fields:
+                  - { name: label, label: Button label, widget: string }
+                  - { name: email, label: Email address, widget: string }
+                  - { name: subject, label: Email subject line, widget: string }

@@ -11,10 +11,13 @@
  *     a deploy.
  *
  * Between them, "on the horizon" lists the flagship's milestones, read
- * from the same programme record the home page's schedule uses.
+ * from the same programme record the home page's schedule uses, and a
+ * short strip says what ESRA publishes and how often.
  *
  * Whether an event reads as upcoming, happening now, or past is worked
  * out from its dates at build time; the scheduled rebuild keeps it true.
+ * An event marked `tentative` has no final date yet: it always reads as
+ * upcoming, and shows its `when` text in place of the month and year.
  */
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
@@ -46,19 +49,41 @@ const PHASE_ORDER: Record<Phase, number> = { now: 0, upcoming: 1, past: 2 };
 
 const monthFmt = new Intl.DateTimeFormat('en-US', { month: 'short', timeZone: 'UTC' });
 
+const DATE_TBC = 'Date to be confirmed';
+
+/**
+ * A tentative event's `when`, split for the two-line date block the way
+ * a month sits over its year: "Winter" over "2026–27", "Early" over
+ * "2027", "Mid" over "2027".
+ */
+const splitWhen = (when: string): [string, string] => {
+  const parts = when.match(/^(\S+?)[\s-]+(\S.*)$/);
+  return parts ? [parts[1]!, parts[2]!] : [when, ''];
+};
+
 const events = allEvents
   .filter((e) => !e.data.draft)
   .map((e) => {
     const start = e.data.start.getTime();
     // An event's last day counts in full.
     const end = (e.data.end ?? e.data.start).getTime() + DAY;
-    const phase: Phase = now.getTime() < start ? 'upcoming' : now.getTime() < end ? 'now' : 'past';
+    // A date that is not final never claims to be on now, or over.
+    const phase: Phase = e.data.tentative
+      ? 'upcoming'
+      : now.getTime() < start
+        ? 'upcoming'
+        : now.getTime() < end
+          ? 'now'
+          : 'past';
+    const [dateTop, dateBottom] = e.data.tentative
+      ? splitWhen(e.data.when)
+      : [monthFmt.format(e.data.start), String(e.data.start.getUTCFullYear())];
     return {
       ...e.data,
       id: e.id,
       phase,
-      month: monthFmt.format(e.data.start),
-      year: e.data.start.getUTCFullYear(),
+      dateTop,
+      dateBottom,
       photo: e.data.image ? requireAsset(e.data.image, `events.yaml: ${e.id}`) : null,
     };
   })
@@ -76,6 +101,14 @@ const flagship = allPrograms.find((p) => p.data.flagship);
 const milestones = flagship?.data.milestones ?? [];
 const currentMilestone = milestones.findLastIndex((m) => m.starts <= now);
 
+/* --- What we publish ------------------------------------------------ */
+const PUBLISH = [
+  { output: 'Newsletter', often: 'Twice a week' },
+  { output: 'Researcher and engineer blog', often: 'Monthly' },
+  { output: 'Progress posts', often: 'Twice a month' },
+  { output: 'Progress reports', often: 'December, March and at H1’s completion' },
+];
+
 const general = CONTACTS[0].address;
 const hostMail = `mailto:${general}?subject=${encodeURIComponent('An event for the ESRA calendar')}`;
 
@@ -89,7 +122,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
   <PageHero
     eyebrow="Events"
     title="Where the network meets."
-    lede="Build milestones, integration workshops, and everything else on the ESRA calendar — with a feed you can add to your own."
+    lede="Build milestones, integration sessions, and everything else on the ESRA calendar — with a feed you can add to your own."
   >
     <Fragment slot="title">Where the network <em>meets.</em></Fragment>
     <a class="btn" href="#calendar">
@@ -123,13 +156,16 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
                   <Image src={e.photo} alt={e.imageAlt ?? ''} width={720} class="feature-photo" />
                 )}
                 <span class="rings" aria-hidden="true" />
-                <span class:list={['chip', 'phase', e.phase]}>
-                  {e.phase === 'now' && <span class="pulse" aria-hidden="true" />}
-                  {PHASE_LABEL[e.phase]}
+                <span class="feature-chips">
+                  <span class:list={['chip', 'phase', e.phase]}>
+                    {e.phase === 'now' && <span class="pulse" aria-hidden="true" />}
+                    {PHASE_LABEL[e.phase]}
+                  </span>
+                  {e.tentative && <span class="chip phase">{DATE_TBC}</span>}
                 </span>
-                <p class="date-big" aria-hidden="true">
-                  <span class="date-month">{e.month}</span>
-                  <span class="date-year">{e.year}</span>
+                <p class:list={['date-big', { tbc: e.tentative }]} aria-hidden="true">
+                  <span class="date-month">{e.dateTop}</span>
+                  <span class="date-year">{e.dateBottom}</span>
                 </p>
               </div>
 
@@ -209,9 +245,9 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
           <ul class="more-list">
             {others.map((e, i) => (
               <li id={e.id} class="more-item card" data-reveal style={`--i: ${i % 3}`}>
-                <p class="more-date">
-                  <span>{e.month}</span>
-                  <span>{e.year}</span>
+                <p class:list={['more-date', { tbc: e.tentative }]} aria-hidden="true">
+                  <span>{e.dateTop}</span>
+                  <span>{e.dateBottom}</span>
                 </p>
                 <div class="more-body">
                   <p class="more-when">
@@ -219,7 +255,18 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
                     {e.location && <> · {e.location}</>}
                   </p>
                   <h4>{e.title}</h4>
+                  {e.kicker && <p class="more-kicker">{e.kicker}</p>}
                   <p>{e.summary}</p>
+                  {e.highlights.length > 0 && (
+                    <ul class="more-highlights">
+                      {e.highlights.map((h) => (
+                        <li>
+                          <Icon name="lucide:check" aria-hidden="true" />
+                          <span>{h}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   {e.links[0] && (
                     <a
                       class="link-arrow"
@@ -231,9 +278,12 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
                     </a>
                   )}
                 </div>
-                <span class:list={['chip', e.phase === 'now' ? 'solid' : 'sand']}>
-                  {PHASE_LABEL[e.phase]}
-                </span>
+                <div class="more-chips">
+                  <span class:list={['chip', e.phase === 'now' ? 'solid' : 'sand']}>
+                    {PHASE_LABEL[e.phase]}
+                  </span>
+                  {e.tentative && <span class="chip outline">{DATE_TBC}</span>}
+                </div>
               </li>
             ))}
           </ul>
@@ -296,6 +346,23 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
       </Section>
     )
   }
+
+  <!-- ============================================================
+       What we publish
+       ============================================================ -->
+  <Section id="publish" pad="tight">
+    <SectionHead size="sm" eyebrow="Updates" title="What we publish" />
+    <dl class="publish">
+      {
+        PUBLISH.map((p, i) => (
+          <div class="pub card" data-reveal style={`--i: ${i}`}>
+            <dt>{p.output}</dt>
+            <dd>{p.often}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </Section>
 
   <!-- ============================================================
        The calendar
@@ -530,6 +597,12 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     color: var(--blue-strong);
   }
 
+  .feature-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
   .date-big {
     display: grid;
     margin: 0;
@@ -549,6 +622,11 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     font-weight: 500;
     letter-spacing: 0;
     color: var(--blue-on-dark);
+  }
+
+  /* A season is a longer word than a month: set it a step smaller. */
+  .date-big.tbc .date-month {
+    font-size: clamp(2.75rem, 2rem + 2.5vw, 4rem);
   }
 
   .feature-body {
@@ -683,6 +761,48 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     font-weight: var(--w-semibold);
   }
 
+  /* Not a fixed date yet: the badge is drawn in dashes, and the season
+     ("Winter") is set a step smaller than a month would be, to fit. */
+  .more-date.tbc {
+    border: 1px dashed var(--blue);
+    background: var(--surface);
+  }
+
+  .more-date.tbc span:first-child {
+    font-size: var(--t-lg);
+  }
+
+  .more-highlights {
+    display: grid;
+    gap: var(--space-1);
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .more-highlights li {
+    display: grid;
+    grid-template-columns: 1rem minmax(0, 1fr);
+    gap: var(--space-2);
+    font-size: var(--t-sm);
+    line-height: 1.55;
+    color: var(--ink-body);
+  }
+
+  .more-highlights :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.2rem;
+    color: var(--blue);
+  }
+
+  .more-chips {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-2);
+  }
+
   .more-when {
     margin: 0;
     font-size: var(--t-sm);
@@ -698,6 +818,13 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
   .more-body p:not(.more-when) {
     margin: var(--space-2) 0 0;
     color: var(--ink-body);
+  }
+
+  .more-body p.more-kicker {
+    margin-top: var(--space-1);
+    font-size: var(--t-sm);
+    font-weight: var(--w-medium);
+    color: var(--ink-muted);
   }
 
   .more-body .link-arrow {
@@ -768,6 +895,41 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     font-size: var(--t-sm);
     line-height: 1.6;
     color: var(--ink-body);
+  }
+
+  /* ================================================================
+   * What we publish
+   * ============================================================== */
+  .publish {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin: 0;
+  }
+
+  /* How often, set large; what it is, underneath. */
+  .pub {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: var(--space-1);
+    padding: var(--space-5);
+  }
+
+  .pub dt {
+    font-size: var(--t-sm);
+    font-weight: var(--w-semibold);
+    color: var(--ink-strong);
+  }
+
+  .pub dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--t-xl);
+    font-style: italic;
+    line-height: 1.25;
+    letter-spacing: var(--track-tight);
+    color: var(--blue);
   }
 
   /* ================================================================
@@ -968,6 +1130,10 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     .cal {
       grid-template-columns: minmax(0, 1fr);
     }
+
+    .publish {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   @media (max-width: 760px) {
@@ -991,13 +1157,27 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
       grid-template-columns: 4rem minmax(0, 1fr);
     }
 
-    .more-item > .chip {
+    .more-chips {
       grid-column: 2;
-      justify-self: start;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .more-date.tbc span:first-child {
+      font-size: var(--t-md);
     }
   }
 
   @media (max-width: 640px) {
+    .pub {
+      padding: var(--space-4);
+    }
+
+    .pub dd {
+      font-size: var(--t-lg);
+    }
+
     .cal-frame {
       padding: var(--space-2);
     }

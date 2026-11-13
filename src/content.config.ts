@@ -211,14 +211,16 @@ const featured = defineCollection({
 /**
  * An optional field that also treats a blank value as absent. The content
  * editor at /admin can save a field it left empty as '' (or an empty
- * object), and an empty date would otherwise fail the build.
+ * object or list, or an object whose lists are all empty), and an empty
+ * date or an empty table would otherwise fail the build.
  */
+const isEmptyValue = (x: unknown): boolean =>
+  x === '' || x === null || x === undefined || (Array.isArray(x) && x.length === 0);
+
 const isBlank = (v: unknown): boolean =>
   v === '' ||
   v === null ||
-  (typeof v === 'object' &&
-    !(v instanceof Date) &&
-    Object.values(v as object).every((x) => x === '' || x === null || x === undefined));
+  (typeof v === 'object' && !(v instanceof Date) && Object.values(v as object).every(isEmptyValue));
 
 const blank = <T extends ZodType>(schema: T) =>
   z.preprocess((v) => (isBlank(v) ? undefined : v), schema.optional());
@@ -245,7 +247,7 @@ const programs = defineCollection({
     flagship: z.boolean().default(false),
     summary: z.string(),
     description: blank(z.string()),
-    /** Human-readable span, e.g. "Nov 2026 – Jun 2027". */
+    /** Human-readable span, e.g. "Oct 2026 – mid-2027" or "From Feb 2027". */
     timeframe: blank(z.string()),
     /** Subsystems or focus areas. */
     focus: z.array(z.string()).default([]),
@@ -291,6 +293,13 @@ const events = defineCollection({
     format: blank(z.string()),
     /** Featured events get the large card. */
     featured: z.boolean().default(false),
+    /**
+     * The date is not final. The card shows `when` ("Winter 2026–27") in
+     * place of the month and year, with a "Date to be confirmed" chip, and
+     * the event always reads as upcoming. `start` then only sorts it: set
+     * it to the later of the candidate dates.
+     */
+    tentative: z.boolean().default(false),
     /** Optional photo, as a path under src/assets (e.g. events/foo.jpg). */
     image: blank(z.string()),
     imageAlt: blank(z.string()),
@@ -301,6 +310,33 @@ const events = defineCollection({
 });
 
 /**
+ * A headed block in a "Get involved" pop-up. Its body is exactly one of: a
+ * list, a small table, or a short paragraph.
+ */
+const pathwaySection = z
+  .object({
+    heading: z.string(),
+    items: blank(z.array(z.string()).min(1)),
+    table: blank(
+      z.object({
+        columns: z.array(z.string()).min(2),
+        /** One entry per row, with one cell per column. */
+        rows: z.array(z.object({ cells: z.array(z.string()) })).min(1),
+        /** One muted line under the table. */
+        note: blank(z.string()),
+      })
+    ),
+    text: blank(z.string()),
+  })
+  .refine((s) => [s.items, s.table, s.text].filter((b) => b !== undefined).length === 1, {
+    error: 'A pop-up section needs exactly one of: items, table or text.',
+  })
+  .refine(
+    (s) => !s.table || s.table.rows.every((r) => r.cells.length === s.table!.columns.length),
+    { error: 'Every table row needs exactly one cell per column.', path: ['table', 'rows'] }
+  );
+
+/**
  * The ways to get involved. Each one is a card on the home page and the
  * pop-up that opens from it.
  */
@@ -308,25 +344,34 @@ const pathways = defineCollection({
   loader: file('./src/content/pathways.yaml'),
   schema: z.object({
     order: z.number().default(100),
-    /** Who it is for, in two or three words. */
+    /** Who it is for, in a word or two. */
     audience: z.string(),
     title: z.string(),
     lede: z.string(),
     /** Which pictogram the card carries. */
-    icon: z.enum(['team', 'affiliate', 'industry']),
+    icon: z.enum(['student', 'club', 'lab', 'company']),
     /** The three lines on the card itself. */
     points: z.array(z.string()),
     /** Opening paragraph of the pop-up. */
     intro: z.string(),
-    /** Headed lists in the pop-up: who it suits, what it involves… */
-    sections: z.array(z.object({ heading: z.string(), items: z.array(z.string()) })),
-    /** An optional highlighted aside in the pop-up. */
-    note: blank(z.object({ label: z.string().min(1), body: z.string().min(1) })),
-    /** How to take the first step. */
-    start: z.string(),
+    /** Headed blocks in the pop-up: what you do, what you get… */
+    sections: z.array(pathwaySection),
+    /** Highlighted asides after the sections: "Good to know", "Coming soon". */
+    notes: z
+      .array(z.object({ label: z.string().min(1), body: z.string().min(1) }))
+      .max(2)
+      .default([]),
+    /** How to take the first step. A card can end on a "How it starts" list instead. */
+    start: blank(z.string()),
     /** Button label, and the subject line of the email it starts. */
     cta: z.string(),
     subject: z.string(),
+    /** The inbox the button writes to. Without one, the general inbox. */
+    email: blank(z.email()),
+    /** A second button beside the first, writing to another inbox. */
+    secondary: blank(
+      z.object({ label: z.string().min(1), email: z.email(), subject: z.string().min(1) })
+    ),
   }),
 });
 

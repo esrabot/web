@@ -18,8 +18,14 @@ export const SITE = {
   description: ESRA.blurb!,
   /** Used in the footer and on the home page. */
   established: 'ICRA 2025',
-  /** Legal status, from the incorporation record. */
-  incorporated: 'New Jersey nonprofit, June 2026',
+  /**
+   * Legal status, from the incorporation record.
+   * TODO(confirm): incorporated on May 28 or in June 2026? Until it is
+   * settled, the line gives the year alone.
+   */
+  incorporated: 'New Jersey nonprofit, 2026',
+  /** Federal tax status. Shown in the footer and the home page's facts. */
+  taxStatus: '501(c)(3)',
   license: 'MIT + CERN-OHL-S',
   repo: 'esrabot/web',
   repoUrl: 'https://github.com/esrabot/web',
@@ -27,12 +33,17 @@ export const SITE = {
 } as const;
 
 /**
- * Contact addresses.
+ * Contact addresses, in the order the contact page lists them. The first
+ * is the general inbox that every "email us" link falls back to.
  *
- * These are real, monitored mailboxes on Zoho Mail (free plan for now).
- * They are the only email addresses that should appear anywhere on the
- * site — do not invent role addresses that no one is reading. Adding a new
- * mailbox is a one-line edit here once it exists in Zoho.
+ * These are mailboxes on Zoho Mail (free plan for now), and they are the
+ * only email addresses that should appear anywhere on the site — do not
+ * invent role addresses that no one is reading. Adding a new mailbox is a
+ * one-line edit here once it exists in Zoho.
+ *
+ * TODO(confirm): partnerships@ and marketing@ may not exist in Zoho yet.
+ * Create them before this ships, or point these entries (and the buttons
+ * in src/content/pathways.yaml that use them) at info@ until they do.
  *
  * Receive-only aliases (press@, join@, …) can be added later; see
  * docs/operations.md for why they must live in Zoho rather than Cloudflare
@@ -47,12 +58,19 @@ export const CONTACTS: { address: string; label: string; note: string }[] = [
   {
     address: 'engineering@esra.bot',
     label: 'Engineering',
-    note: 'Hardware, firmware, and questions about the open designs.',
+    note: 'Hardware, software, the open designs, and project timelines. Students who want to build start here.',
   },
   {
-    address: 'vibhu@esra.bot',
-    label: 'Vibhu T. Gooty',
-    note: 'Co-director. Partnerships and anything organisational.',
+    // TODO(confirm): mailbox exists in Zoho; until it does, use info@esra.bot.
+    address: 'partnerships@esra.bot',
+    label: 'Partnerships',
+    note: 'Companies and research labs: sponsorship, mentoring and joint research.',
+  },
+  {
+    // TODO(confirm): mailbox exists in Zoho; until it does, use info@esra.bot.
+    address: 'marketing@esra.bot',
+    label: 'Marketing',
+    note: 'Business and marketing students who want to join, and media.',
   },
 ];
 

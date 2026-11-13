@@ -2,13 +2,18 @@
 /**
  * Projects.
  *
- * Three shelves, from the largest thing down:
+ * From the broadest view down to the code:
  *
- *   1. The roadmap — the robots ESRA is building or has committed to
+ *   1. Project areas — what ESRA projects can involve.
+ *   2. The roadmap — the robots ESRA is building or has committed to
  *      build (src/content/programs.yaml).
- *   2. From the workshop — builds written up in full, each with a page of
+ *   3. Inside H1 — how the flagship is built across universities, and
+ *      what happens at an integration session.
+ *   4. From the workshop — builds written up in full, each with a page of
  *      its own (src/content/projects/*.md).
- *   3. Repositories — generated from the org's real repositories, so the
+ *   5. Open documentation — what every release includes, the reports,
+ *      and the Industry Research Alliance to come.
+ *   6. Repositories — generated from the org's real repositories, so the
  *      list stays current with no hand-maintenance. It shows the first
  *      eight; a button brings in the rest.
  *
@@ -23,11 +28,79 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/ui/PageHero.astro';
 import Section from '../components/ui/Section.astro';
 import SectionHead from '../components/ui/SectionHead.astro';
+import DataTable from '../components/ui/DataTable.astro';
 import { getPublicRepos, updatedLabel } from '../lib/github';
 import { JOIN_HREF, SITE } from '../data/site';
 
 /** Repositories shown before "Show all". */
 const REPO_PAGE = 8;
+
+/** What ESRA projects can involve. */
+const AREAS = [
+  {
+    title: 'Humanoids',
+    body: 'Mechanical systems, balance, whole-body control, perception, computing, power, integration',
+  },
+  {
+    title: 'Quadrupeds',
+    body: 'Legged robotics, actuator control, gait development, state estimation, locomotion',
+  },
+  {
+    title: 'Manipulators',
+    body: 'Robot arms, end effectors, calibration, force-aware control, manipulation',
+  },
+  {
+    title: 'Enabling systems',
+    body: 'Custom electronics, embedded systems, software, simulation, test rigs, tooling',
+  },
+];
+
+/** Inside H1: how the flagship is built across universities. */
+const BUILT = [
+  'Each university develops its assigned subsystems against a shared technical baseline.',
+  'Parts travel between universities, and engineers visit other teams for hands-on work.',
+  'Everything comes together at two-week, in-person integration sessions.',
+  'Every session is recorded: telemetry, configurations, calibration changes, test conditions and video.',
+];
+
+/** The two weeks of an integration session, day by day. */
+const SESSION = [
+  [
+    '1–2',
+    'Assemble the robot, calibrate sensors and joints',
+    'A calibrated system and baseline data',
+  ],
+  ['3–5', 'Tune control on the real hardware', 'Controller settings and measured response'],
+  [
+    '6–7',
+    'Trace and fix failures across subsystems',
+    'Failure analysis and before-and-after tests',
+  ],
+  [
+    '8–10',
+    'Run agreed experiments; compare with simulation',
+    'Datasets and simulation comparisons',
+  ],
+  ['11–12', 'Repeat trials for reliability and heat', 'Repeatability and reliability data'],
+  ['13–14', 'Confirm the best setups', 'Validated configurations and curated datasets'],
+];
+
+/** What every release on GitHub includes. */
+const RELEASE = [
+  'CAD files',
+  'Bills of materials',
+  'Electronics docs',
+  'Source code',
+  'Setup instructions',
+  'Calibration procedures',
+  'Test resources',
+  'Versioned releases',
+];
+
+// TODO(confirm): "papers" or "reports"? The sources use both. Until it is
+// settled, the line names both.
+const REPORTS =
+  'Technical papers and reports document design decisions, methods, results and limitations. The final H1 report is a full build guide.';
 
 const [repos, curated, allPrograms] = await Promise.all([
   getPublicRepos(),
@@ -86,10 +159,10 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
 >
   <PageHero
     eyebrow="Projects"
-    title="What we are building."
-    lede="A full-scale humanoid first, with a quadruped and two manipulators alongside it — and everything we make along the way, published in the open."
+    title="Real robots, built in the open."
+    lede="Humanoids, quadrupeds and manipulators, built by student teams across universities and documented well enough for others to rebuild."
   >
-    <Fragment slot="title">What we are <em>building.</em></Fragment>
+    <Fragment slot="title">Real robots, built <em>in the open.</em></Fragment>
     <a class="btn" href="#roadmap">
       See the roadmap <Icon name="lucide:arrow-down" aria-hidden="true" />
     </a>
@@ -100,7 +173,24 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
   </PageHero>
 
   <!-- ============================================================
-       1 — The roadmap
+       1 — Project areas
+       ============================================================ -->
+  <Section id="areas" pad="tight">
+    <SectionHead size="sm" eyebrow="Project areas" title="What ESRA projects can involve" />
+    <ul class="areas">
+      {
+        AREAS.map((a, i) => (
+          <li class="area card" data-reveal style={`--i: ${i}`}>
+            <h3>{a.title}</h3>
+            <p>{a.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <!-- ============================================================
+       2 — The roadmap
        ============================================================ -->
   <Section id="roadmap" pad="tight">
     <SectionHead
@@ -174,9 +264,15 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
                   </li>
                 ))}
               </ol>
-              <a class="link-arrow" href="/events">
-                Events and calendar <Icon name="lucide:arrow-right" aria-hidden="true" />
-              </a>
+              <div class="flag-links">
+                <a class="link-arrow down" href="#inside-h1">
+                  How {flagship.data.designation ?? flagship.data.title} is built
+                  <Icon name="lucide:arrow-down" aria-hidden="true" />
+                </a>
+                <a class="link-arrow" href="/events">
+                  Events and calendar <Icon name="lucide:arrow-right" aria-hidden="true" />
+                </a>
+              </div>
             </div>
           )}
         </article>
@@ -216,7 +312,43 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
   </Section>
 
   <!-- ============================================================
-       2 — From the workshop
+       3 — Inside H1
+       ============================================================ -->
+  <Section id="inside-h1" tone="white">
+    <SectionHead eyebrow="Inside H1" title="How it’s built" />
+    <ol class="built">
+      {
+        BUILT.map((b, i) => (
+          <li class="built-step" data-reveal style={`--i: ${i}`}>
+            <span class="built-no" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <p>{b}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="session">
+      <SectionHead
+        as="h3"
+        size="sm"
+        eyebrow="Two weeks in person"
+        title="Inside an integration session"
+      />
+      <div data-reveal>
+        <DataTable
+          columns={['Days', 'What happens', 'What it produces']}
+          rows={SESSION}
+          label="Inside an integration session"
+          minWidth="20rem"
+        />
+      </div>
+    </div>
+  </Section>
+
+  <!-- ============================================================
+       4 — From the workshop
        ============================================================ -->
   {
     builds.length > 0 && (
@@ -260,11 +392,52 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
   }
 
   <!-- ============================================================
-       3 — Repositories
+       5 — Open documentation
+       ============================================================ -->
+  <Section id="open-documentation" pad="flush-bottom">
+    <SectionHead
+      eyebrow="Open source"
+      title="Engineering others can rebuild."
+      lede="Every project is published on GitHub, so other student teams can understand the design decisions, reproduce the work and build on it."
+    >
+      <Fragment slot="title">Engineering others can <em>rebuild.</em></Fragment>
+    </SectionHead>
+
+    <div class="docs-grid">
+      <section class="docs-card card" data-reveal aria-labelledby="release-title">
+        <span class="docs-icon" aria-hidden="true">
+          <Icon name="lucide:layers" />
+        </span>
+        <h3 id="release-title">Each release includes</h3>
+        <ul class="release">
+          {RELEASE.map((r) => <li class="chip outline">{r}</li>)}
+        </ul>
+      </section>
+      <section class="docs-card card" data-reveal style="--i: 1" aria-labelledby="reports-title">
+        <span class="docs-icon" aria-hidden="true">
+          <Icon name="lucide:book-open" />
+        </span>
+        <h3 id="reports-title">Reports</h3>
+        <p>{REPORTS}</p>
+      </section>
+    </div>
+
+    <aside class="ira" data-reveal aria-labelledby="ira-title">
+      <p class="ira-label">Coming soon</p>
+      <h3 id="ira-title">Industry Research Alliance</h3>
+      <p>
+        A company brings a research question. Research labs carry out the work, with qualified ESRA
+        students involved from the start. Separate from H1 and its public releases.
+      </p>
+    </aside>
+  </Section>
+
+  <!-- ============================================================
+       6 — Repositories
        ============================================================ -->
   <Section id="repositories" pad="flush-bottom">
     <SectionHead
-      eyebrow="Open source"
+      eyebrow="On GitHub"
       title="Repositories"
       lede="Everything here is public. The figures come straight from GitHub each time the site is built — none of it is maintained by hand."
     >
@@ -389,6 +562,33 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
 </script>
 
 <style>
+  /* ================================================================
+   * Project areas
+   * ============================================================== */
+  .areas {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .area {
+    padding: var(--space-5) var(--space-6) var(--space-6);
+  }
+
+  .area h3 {
+    font-size: var(--t-xl);
+  }
+
+  .area p {
+    margin: var(--space-2) 0 0;
+    font-size: var(--t-sm);
+    line-height: 1.6;
+    color: var(--ink-body);
+  }
+
   /* ================================================================
    * Roadmap: the flagship
    * ============================================================== */
@@ -556,6 +756,17 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     color: var(--ink-strong);
   }
 
+  .flag-links {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-2);
+  }
+
+  /* This one points down the page, so its arrow leans down. */
+  .flag-links .down:hover :global(svg) {
+    transform: translateY(3px);
+  }
+
   /* ================================================================
    * Roadmap: the other programmes
    * ============================================================== */
@@ -627,6 +838,126 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     gap: var(--space-2) var(--space-3);
     margin: var(--space-7) 0 0;
     color: var(--ink-muted);
+  }
+
+  /* ================================================================
+   * Inside H1
+   * ============================================================== */
+  .built {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-6) var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .built-step {
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--rule);
+  }
+
+  .built-no {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1;
+    color: var(--blue);
+  }
+
+  .built-step p {
+    margin: var(--space-3) 0 0;
+    font-size: var(--t-base);
+    color: var(--ink-body);
+  }
+
+  .session {
+    margin-top: var(--space-8);
+  }
+
+  /* ================================================================
+   * Open documentation
+   * ============================================================== */
+  .docs-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+
+  .docs-card {
+    padding: var(--space-6);
+  }
+
+  .docs-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--r-md);
+    background: var(--blue-wash);
+    color: var(--blue);
+  }
+
+  .docs-icon :global(svg) {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .docs-card h3 {
+    margin-top: var(--space-4);
+    font-size: var(--t-xl);
+  }
+
+  .docs-card p {
+    max-width: var(--measure);
+    margin: var(--space-2) 0 0;
+    color: var(--ink-body);
+  }
+
+  .release {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .release .chip.outline {
+    background: var(--bg);
+    color: var(--ink-body);
+  }
+
+  /* Not built yet: set apart on beige, like a note in the margin. */
+  .ira {
+    margin-top: var(--space-5);
+    padding: var(--space-5) var(--space-6);
+    border: 1px solid var(--sand-deep);
+    border-radius: var(--r-lg);
+    background: var(--sand);
+  }
+
+  .ira-label {
+    margin: 0;
+    font-family: var(--font-label);
+    font-size: var(--t-xs);
+    font-weight: var(--w-semibold);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--sand-ink);
+  }
+
+  .ira h3 {
+    margin-top: var(--space-2);
+    font-size: var(--t-xl);
+  }
+
+  .ira p:last-child {
+    max-width: var(--measure);
+    margin: var(--space-2) 0 0;
+    color: var(--ink-body);
   }
 
   /* ================================================================
@@ -856,6 +1187,13 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     color: var(--blue);
   }
 
+  @media (max-width: 1000px) {
+    .areas,
+    .built {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
   @media (max-width: 860px) {
     .flag {
       grid-template-columns: minmax(0, 1fr);
@@ -864,6 +1202,17 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     .flag-side {
       border-top: 1px solid var(--sand-deep);
       border-left: 0;
+    }
+
+    .docs-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .areas,
+    .built {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 </style>

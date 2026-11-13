@@ -63,6 +63,7 @@ export default defineConfig({
           'copy',
           'external-link',
           'flag',
+          'flask-conical',
           'globe',
           'graduation-cap',
           'handshake',

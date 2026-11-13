@@ -11,7 +11,7 @@
  * channel feed. The schedule's "now" marker is computed from the
  * build date, and the scheduled rebuild keeps it current.
  *
- * The three "ways in" open as pop-up cards. Their copy lives in
+ * The four "ways in" open as pop-up cards. Their copy lives in
  * src/content/pathways.yaml, the roadmap in src/content/programs.yaml.
  */
 import { getCollection } from 'astro:content';
@@ -21,6 +21,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Section from '../components/ui/Section.astro';
 import SectionHead from '../components/ui/SectionHead.astro';
 import PartnerMark from '../components/ui/PartnerMark.astro';
+import DataTable from '../components/ui/DataTable.astro';
+import Scratch from '../components/ui/Scratch.astro';
 import { CONTACTS, SITE } from '../data/site';
 import { getPublicRepos } from '../lib/github';
 import { getLatestPerOrg } from '../lib/youtube';
@@ -58,11 +60,11 @@ const fills = milestones.map((m, i) => {
   return Math.min(1, Math.max(0, (now.getTime() - m.starts.getTime()) / span));
 });
 
-// The flagship's one-line summary is the section's headline; its last two
-// words take the italic accent ("…built *across campuses.*").
+// The flagship's one-line summary is the section's headline; its last
+// word takes the italic accent ("…built across *campuses.*").
 const summaryWords = (flagship?.data.summary ?? '').split(' ');
-const summaryLead = summaryWords.slice(0, -2).join(' ');
-const summaryTail = summaryWords.slice(-2).join(' ');
+const summaryLead = summaryWords.slice(0, -1).join(' ');
+const summaryTail = summaryWords.at(-1) ?? '';
 
 const firstWhen = milestones[0]?.when;
 const lastWhen = milestones.at(-1)?.when;
@@ -73,21 +75,85 @@ const programStatus =
       ? 'Completing'
       : 'In progress';
 
+// "Launched: October 2026", from the day the first milestone began.
+const monthYear = new Intl.DateTimeFormat('en-US', {
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+const launched = milestones[0] ? monthYear.format(milestones[0].starts) : undefined;
+
+// The outputs read as one sentence: "Technical papers and reports,
+// engineering videos, …".
+const outputsLine = (flagship?.data.outputs ?? [])
+  .map((o, i) => (i === 0 ? o : o.charAt(0).toLowerCase() + o.slice(1)))
+  .join(', ');
+
+/** Why sharing one robot works: the four reasons under "Why ESRA". */
+const reasons = [
+  {
+    title: 'Combine skills',
+    body: 'Students contribute across mechanical, electrical, software and controls work.',
+  },
+  {
+    title: 'Learn on real systems',
+    body: 'Teams work through design decisions, physical testing, integration and iteration.',
+  },
+  {
+    title: 'Stop repeating work',
+    body: 'Shared code, drawings, test methods and documentation let teams build on each other.',
+  },
+  {
+    title: 'Support goes further',
+    body: 'One mentor or one piece of shared equipment helps many teams at once.',
+  },
+];
+
+/** Who does what: the three roles that support the university teams. */
+const supportRoles = [
+  {
+    title: 'Research labs and engineers',
+    body: 'Mentor teams, review designs and advise on hard problems.',
+  },
+  {
+    title: 'Companies',
+    body: 'Supply funding, hardware, software, machining and technical support.',
+  },
+  {
+    title: 'ESRA',
+    body: 'Coordinates the teams, connects support, and keeps knowledge across student cohorts.',
+  },
+];
+const teamsRole = {
+  title: 'University teams',
+  body: 'Design, build, program, test and document the robots.',
+};
+
 const steps = [
   {
-    title: 'Agree on the robot',
-    body: 'Teams agree on what it should do, divide the engineering, and fix how the parts fit together.',
-    output: 'Spec + interfaces',
+    title: 'Define the project',
+    body: 'Teams agree on the goal, the scope and the resources it needs.',
+    output: 'Project scope',
+  },
+  {
+    title: 'Split the work',
+    body: 'Each team takes a subsystem, and the interfaces between them are agreed up front.',
+    output: 'Owners + interfaces',
   },
   {
     title: 'Build at home',
-    body: 'Each team develops and tests its subsystem at its own institution.',
+    body: 'Each team develops and tests its part at its own university, with mentors’ feedback.',
     output: 'Tested subsystems',
   },
   {
     title: 'Integrate together',
-    body: 'At integration workshops, the people behind each system assemble the hardware, run tests, and trace faults across mechanical, electrical, and software boundaries.',
+    body: 'Teams meet in person to assemble the robot, test it, and trace faults across mechanical, electrical and software boundaries.',
     output: 'One working robot',
+  },
+  {
+    title: 'Document it',
+    body: 'Designs, code, test results and lessons are published so others can build on them.',
+    output: 'Open releases',
   },
 ];
 
@@ -95,12 +161,14 @@ const steps = [
  * Ways in.
  * ---------------------------------------------------------------- */
 const general = CONTACTS[0].address;
-const mailto = (subject: string) => `mailto:${general}?subject=${encodeURIComponent(subject)}`;
+const mailto = (address: string, subject: string) =>
+  `mailto:${address}?subject=${encodeURIComponent(subject)}`;
 
 const WAY_ICON = {
-  team: 'lucide:users',
-  affiliate: 'lucide:handshake',
-  industry: 'lucide:building-2',
+  student: 'lucide:graduation-cap',
+  club: 'lucide:users',
+  lab: 'lucide:flask-conical',
+  company: 'lucide:building-2',
 } as const;
 
 const ways = [...allPathways]
@@ -110,7 +178,10 @@ const ways = [...allPathways]
     id: w.id,
     dialogId: `way-${w.id}`,
     iconName: WAY_ICON[w.data.icon],
-    href: mailto(w.data.subject),
+    href: mailto(w.data.email ?? general, w.data.subject),
+    secondaryHref: w.data.secondary && mailto(w.data.secondary.email, w.data.secondary.subject),
+    // A four-column table needs more room than the standard pop-up gives.
+    wide: w.data.sections.some((s) => (s.table?.columns.length ?? 0) >= 4),
   }));
 
 /* ------------------------------------------------------------------
@@ -188,8 +259,9 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
         <h1 data-reveal style="--i: 1">One robot.<br /><em>Many campuses.</em></h1>
 
         <p class="lede" data-reveal style="--i: 2">
-          ESRA is a national nonprofit that connects university robotics teams&nbsp;— to share what
-          they learn, split the engineering, and build robots no single campus could build alone.
+          ESRA is a national nonprofit that connects university robotics teams, so they can share
+          what they learn, split the engineering, and build robots no single campus could build
+          alone.
         </p>
 
         <div class="hero-actions" data-reveal style="--i: 3">
@@ -221,6 +293,10 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
           <div>
             <dt>Since</dt>
             <dd class="text">{SITE.established}</dd>
+          </div>
+          <div>
+            <dt>Nonprofit status</dt>
+            <dd class="text">{SITE.taxStatus}</dd>
           </div>
         </dl>
       </div>
@@ -265,19 +341,20 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
           align="center"
         >
           <Fragment slot="title">
-            Every campus is debugging the same robot <em>alone.</em>
+            Every campus is debugging the same robot <em><Scratch>alone</Scratch>.</em>
           </Fragment>
         </SectionHead>
 
         <div class="why-body" data-reveal>
           <p>
-            One team spends a semester learning to control a robot’s joints while another works
-            through the same problem, with little chance to compare notes. ESRA connects student-led
-            robotics clubs with each other, and with research labs, engineers, and companies.
+            Today, one team spends a semester working out joint control while another works through
+            the same problem, with little chance to compare notes.
           </p>
           <p>
-            We coordinate joint builds, run technical workshops, and help teams find mentorship,
-            equipment, and funding.
+            In ESRA, teams share designs, code, test methods and lessons learned. Each team starts
+            from what the others have already worked out, instead of repeating it or its mistakes.
+            ESRA connects student robotics clubs with each other, and with research labs, engineers
+            and companies.
           </p>
         </div>
 
@@ -292,8 +369,58 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
       </div>
     </div>
 
+    <div class="model">
+      <SectionHead
+        as="h3"
+        size="sm"
+        align="center"
+        eyebrow="The model"
+        title="Why the model works"
+      />
+      <ul class="reasons">
+        {
+          reasons.map((r, i) => (
+            <li class="reason" data-reveal style={`--i: ${i}`}>
+              <h4>{r.title}</h4>
+              <p>{r.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="roles">
+      <SectionHead as="h3" size="sm" align="center" eyebrow="The network" title="Who does what" />
+      <figure class="roles-figure" data-reveal>
+        <ul class="supports" aria-label="Supporting the teams">
+          {
+            supportRoles.map((r) => (
+              <li class="role card">
+                <h4>{r.title}</h4>
+                <p>{r.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="role-bus" aria-hidden="true"></div>
+        <div class="role card teams">
+          <h4>{teamsRole.title}</h4>
+          <p>{teamsRole.body}</p>
+        </div>
+        <figcaption>
+          Teams stay responsible for their own work, and facilities stay with their universities.
+        </figcaption>
+      </figure>
+    </div>
+
     <div class="process">
-      <SectionHead as="h3" size="sm" eyebrow="The method" title="How a joint build works" />
+      <SectionHead
+        as="h3"
+        size="sm"
+        align="center"
+        eyebrow="The method"
+        title="How a joint build works"
+      />
       <ol class="steps">
         {
           steps.map((s, i) => (
@@ -360,10 +487,10 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
               <dt>Type</dt>
               <dd>{flagship.data.kind}, full-scale</dd>
             </div>
-            {firstWhen && (
+            {launched && (
               <div>
-                <dt>Hardware start</dt>
-                <dd>{firstWhen}</dd>
+                <dt>Launched</dt>
+                <dd>{launched}</dd>
               </div>
             )}
             {lastWhen && (
@@ -372,10 +499,10 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
                 <dd>{lastWhen}</dd>
               </div>
             )}
-            {flagship.data.outputs.length > 0 && (
+            {outputsLine && (
               <div>
                 <dt>Outputs</dt>
-                <dd>{flagship.data.outputs.join(', ')}</dd>
+                <dd>{outputsLine}</dd>
               </div>
             )}
             <div>
@@ -431,7 +558,9 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
                     </a>
                   </h4>
                   <p class="track-body">{p.data.summary}</p>
-                  <span class="chip sand">{STATUS_LABEL[p.data.status]}</span>
+                  <span class="chip sand">
+                    {[STATUS_LABEL[p.data.status], p.data.timeframe].filter(Boolean).join(' · ')}
+                  </span>
                 </article>
               ))}
             </div>
@@ -442,15 +571,15 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   <!-- ============================================================
-       Get involved: three cards, each opening a pop-up
+       Get involved: four cards, each opening a pop-up
        ============================================================ -->
   <Section id="join">
     <SectionHead
       eyebrow="Get involved"
-      title="Three ways in. Start where your team fits."
-      lede="Whether your club is ready to own part of a robot or is just getting started, there is a place for it. Open a card to see what each one involves."
+      title="Four ways in. Start where you fit."
+      lede="Whether you are a student, a club, a lab or a company, there is a place for you. Open a card to see what each involves."
     >
-      <Fragment slot="title">Three ways in. Start where your team <em>fits.</em></Fragment>
+      <Fragment slot="title">Four ways in. Start where you <em>fit.</em></Fragment>
     </SectionHead>
 
     <div class="ways">
@@ -488,14 +617,18 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     </div>
 
     <p class="ways-note" data-reveal>
-      Not sure which fits? <a href={mailto('Getting involved')}>Email {general}</a> and we will point
-      you the right way.
+      Not sure which fits? <a href={mailto(general, 'Getting involved')}>Email {general}</a> and we will
+      point you the right way.
     </p>
   </Section>
 
   {
     ways.map((w) => (
-      <dialog class="modal way-modal" id={w.dialogId} aria-labelledby={`${w.dialogId}-title`}>
+      <dialog
+        class:list={['modal', 'way-modal', { wide: w.wide }]}
+        id={w.dialogId}
+        aria-labelledby={`${w.dialogId}-title`}
+      >
         <button type="button" class="modal-close" data-modal-close aria-label="Close">
           <Icon name="lucide:x" aria-hidden="true" />
         </button>
@@ -515,42 +648,67 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
           <div class="wm-body">
             <p class="wm-intro">{w.intro}</p>
 
-            {w.note && (
-              <aside class="wm-note">
-                <p class="wm-note-label">{w.note.label}</p>
-                <p>{w.note.body}</p>
-              </aside>
-            )}
-
+            {/* Lists sit side by side where there is room; a table or a
+                paragraph takes the full width. */}
             <div class="wm-sections">
               {w.sections.map((s) => (
-                <section>
+                <section class:list={{ full: !s.items }}>
                   <h3>{s.heading}</h3>
-                  <ul>
-                    {s.items.map((item) => (
-                      <li>
-                        <Icon name="lucide:check" aria-hidden="true" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  {s.items && (
+                    <ul>
+                      {s.items.map((item) => (
+                        <li>
+                          <Icon name="lucide:check" aria-hidden="true" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {s.table && (
+                    <DataTable
+                      columns={s.table.columns}
+                      rows={s.table.rows.map((r) => r.cells)}
+                      note={s.table.note}
+                      label={s.heading}
+                    />
+                  )}
+                  {s.text && <p class="wm-text">{s.text}</p>}
                 </section>
               ))}
             </div>
 
-            <section class="wm-start">
-              <h3>How to start</h3>
-              <p>{w.start}</p>
-            </section>
+            {w.notes.length > 0 && (
+              <div class="wm-notes">
+                {w.notes.map((n) => (
+                  <aside class="wm-note">
+                    <p class="wm-note-label">{n.label}</p>
+                    <p>{n.body}</p>
+                  </aside>
+                ))}
+              </div>
+            )}
+
+            {w.start && (
+              <section class="wm-start">
+                <h3>How to start</h3>
+                <p>{w.start}</p>
+              </section>
+            )}
           </div>
 
           <footer class="wm-foot">
             <a class="btn" href={w.href}>
               {w.cta} <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
             </a>
-            <a class="btn quiet" href="/contact">
-              Other ways to reach us
-            </a>
+            {w.secondary ? (
+              <a class="btn secondary" href={w.secondaryHref}>
+                {w.secondary.label}
+              </a>
+            ) : (
+              <a class="btn quiet" href="/contact">
+                Other ways to reach us
+              </a>
+            )}
           </footer>
         </div>
       </dialog>
@@ -815,9 +973,12 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     margin-top: var(--space-6);
   }
 
+  /* Five facts in one row where they fit. Where they don't, they wrap
+     into centred rows, so a fact left over never sits stranded at one
+     side. */
   .hero-facts {
-    display: grid;
-    grid-template-columns: repeat(4, auto);
+    display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     gap: var(--space-4) var(--space-7);
     margin: var(--space-7) 0 0;
@@ -923,8 +1084,20 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
   .marquee.is-running {
     overflow: hidden;
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 var(--fade),
+      #000 calc(100% - var(--fade)),
+      transparent
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 var(--fade),
+      #000 calc(100% - var(--fade)),
+      transparent
+    );
   }
 
   /* The left padding sets where the first partner rests: just clear of
@@ -1001,13 +1174,145 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     color: var(--blue-strong);
   }
 
+  .model,
+  .roles,
   .process {
     margin-top: var(--space-9);
   }
 
-  .steps {
+  /* --- why the model works ---------------------------------------- */
+  .reasons {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-6) var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .reason {
+    padding-top: var(--space-4);
+    border-top: 2px solid var(--blue);
+  }
+
+  .reason h4 {
+    font-size: var(--t-xl);
+  }
+
+  .reason p {
+    margin: var(--space-2) 0 0;
+    font-size: var(--t-base);
+    color: var(--ink-body);
+  }
+
+  /* --- who does what ------------------------------------------------
+     Three supporting roles in a row. A rule drops from each into one
+     bar, and from the bar down into the university teams they serve. */
+  .roles-figure {
+    --drop: var(--space-6);
+    --gap: var(--space-5);
+    margin: 0;
+    text-align: center;
+  }
+
+  .supports {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .role {
+    padding: var(--space-5);
+  }
+
+  .role h4 {
+    font-size: var(--t-lg);
+  }
+
+  .role p {
+    margin: var(--space-2) 0 0;
+    font-size: var(--t-sm);
+    line-height: 1.6;
+    color: var(--ink-body);
+  }
+
+  .supports .role::after,
+  .role-bus,
+  .role-bus::after {
+    background: var(--rule-strong);
+  }
+
+  .supports .role::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: 1px;
+    height: var(--drop);
+  }
+
+  /* The bar runs from the first card's centre to the last one's: a sixth
+     of the row (less its gaps) in from either side. */
+  .role-bus {
+    position: relative;
+    height: 1px;
+    margin: var(--drop) calc((100% - 2 * var(--gap)) / 6) 0;
+  }
+
+  .role-bus::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 1px;
+    height: var(--drop);
+  }
+
+  .teams {
+    max-width: 34rem;
+    margin: var(--drop) auto 0;
+    border-color: var(--blue-soft);
+    background: var(--blue-wash);
+  }
+
+  /* Where the line arrives. */
+  .teams::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -0.3125rem;
+    width: 0.625rem;
+    height: 0.625rem;
+    margin-left: -0.3125rem;
+    border-radius: 50%;
+    background: var(--blue);
+  }
+
+  .teams h4 {
+    font-size: var(--t-xl);
+    color: var(--blue-strong);
+  }
+
+  .teams p {
+    font-size: var(--t-base);
+  }
+
+  .roles-figure figcaption {
+    max-width: var(--measure);
+    margin: var(--space-5) auto 0;
+    font-size: var(--t-base);
+    color: var(--ink-muted);
+  }
+
+  /* --- how a joint build works --------------------------------------
+     Five across on a wide screen. Narrower, a row of three with the
+     last two centred beneath it, on six tracks; then one column. */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: var(--space-5);
     margin: 0;
     padding: 0;
@@ -1019,7 +1324,11 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: var(--space-6);
+    padding: var(--space-5);
+  }
+
+  .step .chip {
+    white-space: normal;
   }
 
   /* An arrow in the gap, from each step to the next. */
@@ -1294,7 +1603,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
    * ============================================================== */
   .ways {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-5);
   }
 
@@ -1302,6 +1611,18 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     display: flex;
     flex-direction: column;
     padding: var(--space-6);
+  }
+
+  /* Cards side by side share their rows, so a shorter lede on one card
+     does not lift its checklist above its neighbours'. Six rows: icon,
+     audience, title, lede, checklist, button. */
+  @supports (grid-template-rows: subgrid) {
+    .way {
+      display: grid;
+      grid-row: span 6;
+      grid-template-rows: subgrid;
+      row-gap: 0;
+    }
   }
 
   .way-icon {
@@ -1446,6 +1767,12 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   /* --- the pop-up -------------------------------------------------- */
+
+  /* Room for a four-column table (the partnership levels). */
+  .way-modal.wide {
+    width: min(60rem, calc(100vw - 2rem));
+  }
+
   .way-modal .modal-close {
     position: absolute;
     right: var(--space-4);
@@ -1490,8 +1817,13 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     color: var(--ink-body);
   }
 
+  .wm-notes {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+
   .wm-note {
-    margin-top: var(--space-5);
     padding: var(--space-4) var(--space-5);
     border: 1px solid var(--sand-deep);
     border-radius: var(--r-md);
@@ -1514,11 +1846,32 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     color: var(--sand-ink);
   }
 
+  /* Lists share a row where there is room, each growing to fill it; a
+     table or a paragraph always takes a row of its own. Flex rather than
+     grid, so a list left alone on a row grows to the full width instead
+     of leaving an empty track beside it. */
   .wm-sections {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: var(--space-6);
     margin-top: var(--space-6);
+  }
+
+  .wm-sections > section {
+    flex: 1 1 13rem;
+    /* Lets a wide table scroll inside its own box instead of stretching
+       the pop-up. */
+    min-width: 0;
+  }
+
+  .wm-sections > section.full {
+    flex-basis: 100%;
+  }
+
+  .wm-text {
+    margin: 0;
+    font-size: var(--t-base);
+    color: var(--ink-body);
   }
 
   .wm-body h3 {
@@ -1759,6 +2112,31 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   /* ================================================================
    * Narrower screens
    * ============================================================== */
+  @media (max-width: 1180px) {
+    /* The steps: three, then two centred beneath them. A connector only
+       joins steps that sit side by side, so the third (end of the first
+       row) loses its own. */
+    .steps {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .step {
+      grid-column: span 2;
+    }
+
+    .step:nth-child(4) {
+      grid-column: 2 / span 2;
+    }
+
+    .step:nth-child(3)::after {
+      display: none;
+    }
+
+    .ways {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
   @media (max-width: 1000px) {
     .flagship {
       grid-template-columns: minmax(0, 1fr);
@@ -1766,13 +2144,21 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     }
 
     .steps,
-    .also-grid,
-    .ways {
+    .also-grid {
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    .step,
+    .step:nth-child(4) {
+      grid-column: auto;
     }
 
     .step:not(:last-child)::after {
       display: none;
+    }
+
+    .reasons {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     /* The schedule turns to run down the page. */
@@ -1825,9 +2211,43 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     }
   }
 
+  /* Who does what: the three roles stack, and one line runs from the
+     stack down to the university teams. */
+  @media (max-width: 760px) {
+    .supports {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-3);
+    }
+
+    .supports .role::after,
+    .role-bus::after {
+      display: none;
+    }
+
+    .role-bus {
+      width: 1px;
+      height: var(--drop);
+      margin: 0 auto;
+    }
+
+    .teams {
+      margin-top: 0;
+    }
+  }
+
   @media (max-width: 640px) {
+    /* Two facts a row; the fifth centres on a row of its own. */
     .hero-facts {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-4) var(--space-5);
+    }
+
+    .hero-facts div {
+      flex: 0 0 calc((100% - var(--space-5)) / 2);
+    }
+
+    .ways,
+    .reasons {
+      grid-template-columns: minmax(0, 1fr);
     }
 
     .hero-actions .btn {

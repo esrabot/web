@@ -6,9 +6,10 @@
  * so adding a social account is a one-line edit that lights it up
  * everywhere.
  *
- * ESRA currently has LinkedIn, YouTube, GitHub and email only. Absent
- * platforms are simply omitted rather than rendered as dead icons. Do not
- * add a URL here that has not been confirmed to exist.
+ * ESRA currently has LinkedIn, YouTube and GitHub only; its email
+ * addresses live in CONTACTS in data/site.ts. Absent platforms are simply
+ * omitted rather than rendered as dead icons. Do not add a URL here that
+ * has not been confirmed to exist.
  */
 
 /** Platforms we know how to render an icon and label for. */
@@ -70,7 +71,6 @@ export const ESRA: Org = {
       handle: '@CCBRRobotics',
       url: 'https://www.youtube.com/@CCBRRobotics',
     },
-    { platform: 'email', handle: 'ccbrrobotics@gmail.com', url: 'mailto:ccbrrobotics@gmail.com' },
   ],
 };
 

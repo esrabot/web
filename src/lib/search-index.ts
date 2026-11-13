@@ -97,14 +97,14 @@ function staticEntries(): SearchEntry[] {
       u: '/#why',
       k: 'Page',
       d: 'The problem ESRA exists to solve, and how a joint build works.',
-      w: 'about mission purpose joint build integration workshop how it works',
+      w: 'about mission purpose joint build integration session how it works why the model works who does what roles universities labs companies',
     },
     {
       t: 'Get involved',
       u: JOIN_HREF,
       k: 'Page',
-      d: 'Three ways in: member team, affiliate club, industry and research.',
-      w: 'join sign up apply membership member team affiliate club industry research alliance partner sponsor volunteer company lab mentor fund',
+      d: 'Four ways in: students, partner clubs, labs and companies.',
+      w: 'join sign up apply volunteer students engineering computer science business marketing partner club lab research mentor company sponsor sponsorship levels bronze silver gold platinum industry research alliance',
     },
     {
       t: 'Projects',
@@ -121,6 +121,20 @@ function staticEntries(): SearchEntry[] {
       w: 'upcoming planned programmes programs humanoid quadruped manipulator schedule',
     },
     {
+      t: 'Inside H1',
+      u: '/projects#inside-h1',
+      k: 'Page',
+      d: 'How H1 is built across universities, and what happens at an integration session.',
+      w: 'h1 humanoid how it is built baseline subsystems parts engineers integration session two weeks in person telemetry calibration experiments datasets',
+    },
+    {
+      t: 'Open documentation',
+      u: '/projects#open-documentation',
+      k: 'Page',
+      d: 'What every release includes, and the technical papers and reports.',
+      w: 'open source documentation rebuild cad bill of materials bom electronics source code setup instructions calibration procedures test resources versioned releases reports papers build guide industry research alliance',
+    },
+    {
       t: 'Repositories',
       u: '/projects#repositories',
       k: 'Page',
@@ -132,7 +146,7 @@ function staticEntries(): SearchEntry[] {
       u: '/events',
       k: 'Page',
       d: 'Featured events and the ESRA calendar.',
-      w: 'calendar schedule dates workshop meetup conference upcoming',
+      w: 'calendar schedule dates workshop meetup conference upcoming integration session newsletter blog progress posts progress reports what we publish',
     },
     {
       t: 'Calendar',
