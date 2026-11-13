@@ -1,0 +1,166 @@
+---
+/**
+ * A small data table: a header row in the label lettering, hairline
+ * rules, and the first cell of each row set as that row's header.
+ *
+ * The table sits in a scroll box of its own. Wherever it is given less
+ * room than it needs (a phone, a pop-up), it scrolls sideways inside the
+ * box, never the page. The box is labelled and focusable, so it can be
+ * scrolled from the keyboard too.
+ *
+ * A cell that is just an email address becomes a mail link. Short cells
+ * ("$2,500–$7,500", "13–14") never break across lines.
+ */
+interface Props {
+  columns: string[];
+  /** One array per row, one string per column. */
+  rows: string[][];
+  /** Names the scroll box for assistive tech; usually the heading above it. */
+  label: string;
+  /** One muted line under the table. */
+  note?: string;
+  /**
+   * How narrow the table may get before it scrolls instead. By default a
+   * two-column table stays whole on a phone, and a wider one keeps 10rem
+   * a column so no column is squeezed to a sliver.
+   */
+  minWidth?: string;
+}
+
+const { columns, rows, label, note, minWidth } = Astro.props;
+
+const min = minWidth ?? (columns.length <= 2 ? '18rem' : `${columns.length * 10}rem`);
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const SHORT = 14;
+
+const body = rows.map((cells) =>
+  cells.map((text) => ({ text, email: EMAIL.test(text), short: text.length <= SHORT }))
+);
+---
+
+<div class="data-table">
+  <div class="scroll" role="region" aria-label={label} tabindex="0">
+    <table style={`--table-min: ${min}`}>
+      <thead>
+        <tr>
+          {columns.map((c) => <th scope="col">{c}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {
+          body.map((cells) => (
+            <tr>
+              {cells.map((cell, i) => {
+                const content = cell.email ? (
+                  <a href={`mailto:${cell.text}`}>{cell.text}</a>
+                ) : (
+                  cell.text
+                );
+                return i === 0 ? (
+                  <th scope="row" class:list={{ short: cell.short }}>
+                    {content}
+                  </th>
+                ) : (
+                  <td class:list={{ short: cell.short }}>{content}</td>
+                );
+              })}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  {note && <p class="note">{note}</p>}
+</div>
+
+<style>
+  /* A soft shadow on whichever side has more table to scroll to. The
+     white covers travel with the content and hide each shadow once that
+     edge is reached. Assumes a white backdrop, as in a pop-up or a white
+     band. */
+  .scroll {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    background:
+      linear-gradient(to right, var(--surface) 40%, rgba(255, 255, 255, 0)) left / 2.5rem 100%
+        no-repeat local,
+      linear-gradient(to left, var(--surface) 40%, rgba(255, 255, 255, 0)) right / 2.5rem 100%
+        no-repeat local,
+      radial-gradient(farthest-side at 0 50%, rgba(15, 29, 53, 0.14), rgba(15, 29, 53, 0)) left /
+        0.875rem 100% no-repeat scroll,
+      radial-gradient(farthest-side at 100% 50%, rgba(15, 29, 53, 0.14), rgba(15, 29, 53, 0))
+        right / 0.875rem 100% no-repeat scroll;
+  }
+
+  .scroll:focus-visible {
+    outline-offset: 4px;
+  }
+
+  table {
+    width: 100%;
+    min-width: var(--table-min);
+    border-collapse: collapse;
+    font-size: var(--t-sm);
+    line-height: 1.55;
+  }
+
+  th,
+  td {
+    padding: var(--space-3) var(--space-5) var(--space-3) 0;
+    border-bottom: 1px solid var(--rule-soft);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  :is(th, td):last-child {
+    padding-right: 0;
+  }
+
+  thead th {
+    padding-block: 0 var(--space-2);
+    border-bottom-color: var(--rule);
+    font-family: var(--font-label);
+    font-size: var(--t-xs);
+    font-weight: var(--w-semibold);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  @media (max-width: 640px) {
+    th,
+    td {
+      padding-right: var(--space-4);
+    }
+  }
+
+  tbody th {
+    font-weight: var(--w-semibold);
+    color: var(--ink-strong);
+  }
+
+  td {
+    color: var(--ink-body);
+  }
+
+  .short {
+    white-space: nowrap;
+  }
+
+  a {
+    font-weight: var(--w-medium);
+    color: var(--blue);
+    white-space: nowrap;
+  }
+
+  a:hover {
+    color: var(--blue-strong);
+  }
+
+  .note {
+    margin: var(--space-3) 0 0;
+    font-size: var(--t-sm);
+    line-height: 1.55;
+    color: var(--ink-muted);
+  }
+</style>

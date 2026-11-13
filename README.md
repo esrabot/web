@@ -61,7 +61,7 @@ src/
     projects/         curated project pages
     docs/             field guides
     boms/             bills of materials
-    partners.yaml     affiliated clubs
+    partners.yaml     partner clubs and schools
     programs.yaml     the roadmap: H1, Q1 and the manipulator projects
     events.yaml       featured events on /events
     pathways.yaml     the "Get involved" cards and their pop-ups
@@ -144,10 +144,10 @@ pull request gets a preview URL.
 
 Configuration lives in [`vercel.json`](./vercel.json). Secrets needed:
 
-| Secret                      | Where               | Why                                       |
-| --------------------------- | ------------------- | ----------------------------------------- |
-| `VERCEL_DEPLOY_HOOK`        | GitHub repo secret  | Lets the scheduled job trigger a rebuild  |
-| `GITHUB_TOKEN`              | provided by Actions | Authenticated API rate limit during build |
+| Secret               | Where               | Why                                       |
+| -------------------- | ------------------- | ----------------------------------------- |
+| `VERCEL_DEPLOY_HOOK` | GitHub repo secret  | Lets the scheduled job trigger a rebuild  |
+| `GITHUB_TOKEN`       | provided by Actions | Authenticated API rate limit during build |
 
 The site degrades rather than fails when these are absent: no deploy hook
 means no scheduled refresh.

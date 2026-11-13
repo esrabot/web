@@ -10,7 +10,9 @@
 #               roadmap actually commits to (a month or a season).
 #
 # Only state what is decided. A programme with no dates yet simply has no
-# `timeframe` and no `milestones`.
+# `timeframe` and no `milestones`. Where a date is still between two
+# candidates, `when` says the season and `starts` takes the later date, so
+# the "now" marker never runs ahead of what has happened.
 
 - id: h1
   order: 1
@@ -20,40 +22,46 @@
   level: Flagship
   flagship: true
   status: active
-  timeframe: Nov 2026 – Jun 2027
+  # TODO(confirm): H1 completes in May/June or in July 2027. "mid-2027" covers both.
+  timeframe: Oct 2026 – mid-2027
   summary: A full-scale humanoid, built across campuses.
   description: >-
-    H1 brings mechanical structures, actuators, electronics, sensing, and
-    control software together in one robot — designed, built, and tested by
+    H1 brings mechanical structures, actuators, electronics, sensing and
+    control software together in one robot, designed, built and tested by
     teams at different universities.
   focus:
-    - Structure
-    - Actuators
+    - Mechanical
+    - Actuation
     - Electronics
-    - Sensing
-    - Control
+    - Embedded software
+    - Controls
+    - Perception
+    - Simulation
   outputs:
-    - Technical papers
+    - Technical papers and reports
     - Engineering videos
     - Progress reports
-    - Open-source code and build documentation
+    - Open-source code and build guides
   milestones:
-    - starts: 2026-11-01
-      when: Nov 2026
-      title: Hardware development
-      body: Teams start building H1 subsystems at their home institutions.
-    - starts: 2026-12-15
-      when: Winter
-      title: Integration workshop
-      body: The people behind each subsystem meet to assemble and test together.
-    - starts: 2027-03-01
-      when: Spring 2027
-      title: Joint testing
-      body: Further periods of integrated testing across campuses.
-    - starts: 2027-05-01
-      when: May–Jun 2027
+    - starts: 2026-10-15
+      when: Oct–Nov 2026
+      title: Launch and baseline
+      body: Teams split the work and agree a shared technical baseline.
+    - starts: 2026-11-11
+      when: Winter 2026–27
+      title: Subsystem development
+      # TODO(confirm): the online winter workshop is in December 2026 or on Jan 3–10, 2027.
+      body: Each team builds and tests its subsystem at home. Online winter workshop.
+    # TODO(confirm): February or April 2027. "Early 2027" covers both.
+    - starts: 2027-04-01
+      when: Early 2027
+      title: First integration session
+      body: 'Two weeks in person: assemble the full robot, tune it, test it, collect data.'
+    # TODO(confirm): May or July 2027. "Mid-2027" covers both.
+    - starts: 2027-07-01
+      when: Mid-2027
       title: H1 complete
-      body: A full-scale humanoid — plus the papers, videos, and code to show how.
+      body: Final integration session, demonstrations, and the open release.
 
 - id: q1
   order: 2
@@ -62,7 +70,10 @@
   kind: Quadruped
   level: Legged
   status: planned
-  summary: A four-legged robot on the 2026–27 roadmap, alongside H1.
+  timeframe: From Feb 2027
+  summary: >-
+    A four-legged robot that builds on ESRA’s Q0 prototype, developed by a
+    separate group of universities.
 
 - id: teleoperation-arm
   order: 3
@@ -70,14 +81,16 @@
   kind: Manipulator
   level: Beginner
   status: planned
+  timeframe: Feb – Apr 2027
   summary: >-
-    A robotic arm driven by a human operator — the entry point for newer
-    participants.
+    A robot arm driven by a human operator: the starting project for new
+    members, guided by senior members.
 
 - id: precision-manipulation
   order: 4
-  title: Precision manipulation
+  title: Precision manipulator
   kind: Manipulator
   level: Advanced
   status: planned
-  summary: An advanced project focused on precise, controlled manipulation.
+  timeframe: From May 2027
+  summary: A high-payload arm that keeps high precision. Open to partners.

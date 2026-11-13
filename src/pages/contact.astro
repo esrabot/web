@@ -14,6 +14,12 @@ import Section from '../components/ui/Section.astro';
 import SectionHead from '../components/ui/SectionHead.astro';
 import { CONTACTS, JOIN_HREF } from '../data/site';
 import { ORGS, PLATFORM_META } from '../data/orgs';
+
+// An address may only break before its "@", never inside a word.
+const mailboxes = CONTACTS.map((c) => {
+  const at = c.address.indexOf('@');
+  return { ...c, local: c.address.slice(0, at), domain: c.address.slice(at) };
+});
 ---
 
 <BaseLayout title="Contact" description="How to reach ESRA — email, and where we post.">
@@ -34,13 +40,17 @@ import { ORGS, PLATFORM_META } from '../data/orgs';
     <SectionHead eyebrow="Email" title="Write to the right inbox" />
     <div class="mailboxes">
       {
-        CONTACTS.map((c, i) => (
+        mailboxes.map((c, i) => (
           <a class="mailbox card lift" href={`mailto:${c.address}`} data-reveal style={`--i: ${i}`}>
             <span class="mb-icon" aria-hidden="true">
               <Icon name="lucide:mail" />
             </span>
             <span class="mb-label">{c.label}</span>
-            <span class="mb-addr">{c.address}</span>
+            <span class="mb-addr">
+              {c.local}
+              <wbr />
+              {c.domain}
+            </span>
             <span class="mb-note">{c.note}</span>
           </a>
         ))
@@ -84,10 +94,24 @@ import { ORGS, PLATFORM_META } from '../data/orgs';
 </BaseLayout>
 
 <style>
+  /* Four inboxes: one row of four, two rows of two, then one column, so
+     no inbox is ever left alone on a row. */
   .mailboxes {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-5);
+  }
+
+  @media (max-width: 1180px) {
+    .mailboxes {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .mailboxes {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 
   .mailbox {
@@ -141,7 +165,7 @@ import { ORGS, PLATFORM_META } from '../data/orgs';
   .mb-addr {
     margin-top: var(--space-1);
     font-family: var(--font-display);
-    font-size: var(--t-xl);
+    font-size: var(--t-lg);
     font-weight: 560;
     letter-spacing: var(--track-tight);
     overflow-wrap: anywhere;

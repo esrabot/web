@@ -8,6 +8,11 @@
 #   start/end   sort the event and decide whether it reads as upcoming,
 #               happening now, or past. Readers see `when`, so an event
 #               without a fixed day can say "November 2026".
+#   tentative   true while the date is not final: the card shows `when`
+#               ("Winter 2026–27") in place of the month and year, adds a
+#               "Date to be confirmed" chip, and the event always reads as
+#               upcoming. Set `start` to the later candidate date; it then
+#               only sorts the event.
 #   image       optional photo, as a path under src/assets
 #               (e.g. uploads/workshop.jpg), with `imageAlt`
 #   links       buttons on the card; the first is the primary one
@@ -25,15 +30,75 @@
   location: At each team's home campus
   summary: >-
     The build starts here. Teams across the network begin developing H1's
-    subsystems — structure, actuators, electronics, sensing, and control —
-    at their home institutions, each working to the interfaces agreed
-    between them.
+    subsystems at their home institutions, each working to the interfaces
+    agreed between them.
   highlights:
     - Each team develops and tests its own subsystem on its own campus
-    - 'Next up: a winter workshop to assemble and test everything together'
-    - 'The target: a complete full-scale humanoid by May–June 2027'
+    # TODO(confirm): the first integration session is in February or early April 2027.
+    - 'Next up: an online winter workshop, then the first in-person integration session in early 2027'
+    # TODO(confirm): H1 completes in May/June or in July 2027.
+    - 'The target: a complete full-scale humanoid by mid-2027'
   links:
     - label: Meet H1
       url: /#h1
     - label: Join the build
       url: /#join
+
+- id: winter-workshop
+  title: Winter workshop
+  kicker: Online · with a research lab or company
+  # TODO(confirm): December 2026 or Jan 3–10, 2027. `start` takes the later date.
+  when: Winter 2026–27
+  start: 2027-01-03
+  tentative: true
+  format: Online workshop
+  location: Online
+  summary: >-
+    A hands-on session on choosing and integrating actuators: selection,
+    communications, power, bench testing and performance evaluation.
+  highlights:
+    - A practical exercise and technical notes for every participant
+    - Helps every H1 team test components the same way
+    - Run with a research lab or company (to be announced)
+
+- id: h1-integration-1
+  title: H1 integration session
+  kicker: H1 humanoid · In person
+  # TODO(confirm): February or early April 2027. `start` takes the later date.
+  when: Early 2027
+  start: 2027-04-01
+  tentative: true
+  format: Two-week build session
+  location: To be announced
+  summary: >-
+    Every team brings its hardware. Two weeks to assemble the full robot,
+    tune it, test it and collect data.
+
+- id: esra-event-2027
+  title: ESRA event
+  kicker: Keynotes · Competitions · Demos
+  when: March 2027
+  start: 2027-03-01
+  end: 2027-03-31
+  format: Conference and competition
+  location: To be announced
+  summary: >-
+    Keynotes from research labs, technical competitions, live demos, and
+    time for students to meet companies.
+  highlights:
+    - Competitions in teleoperation, perception, control and manipulation
+    - Student teams, research labs and companies in one place
+    - Speakers and partners to be announced
+
+- id: h1-integration-2
+  title: H1 final integration session
+  kicker: H1 humanoid · In person
+  # TODO(confirm): May or July 2027. `start` takes the later date.
+  when: Mid-2027
+  start: 2027-07-01
+  tentative: true
+  format: Build session and demos
+  location: To be announced
+  summary: >-
+    Endurance and reliability trials, final demonstrations and benchmark
+    datasets: the session that completes H1.
