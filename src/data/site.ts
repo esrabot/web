@@ -60,11 +60,13 @@ export const CONTACTS: { address: string; label: string; note: string }[] = [
  * Primary navigation, in the order it reads across the header. Search and
  * the "Get involved" button sit after it and are not part of this list.
  */
-export const NAV: { label: string; href: string }[] = [
+/** `accent` keeps a link's text blue at all times, not just on hover. */
+export const NAV: { label: string; href: string; accent?: boolean }[] = [
   { label: 'Projects', href: '/projects' },
   { label: 'Events', href: '/events' },
   { label: 'Guides', href: '/docs' },
   { label: 'Members', href: '/members' },
+  { label: 'Contact', href: '/contact', accent: true },
 ];
 
 /** Where every "Get involved" button points: the ways-in section on Home. */

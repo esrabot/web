@@ -7,7 +7,9 @@
  *          one section apart from its neighbours; `white` is a lifted,
  *          paper-white band.
  *   pad    vertical room. `flush-top` / `flush-bottom` drop one side, for a
- *          section that continues the one beside it.
+ *          section that continues the one beside it. An anchor link to the
+ *          section skips its top padding, so the heading lands under the
+ *          header rather than the band's edge.
  *   width  the content measure: the default, `narrow` for reading, `wide`
  *          for wide grids.
  */
@@ -30,8 +32,12 @@ const { id, tone = 'plain', pad = 'normal', width = 'default', class: className 
 
 <style>
   .section {
+    --pad-top: var(--section-y);
+    --pad-bottom: var(--section-y);
     position: relative;
-    padding-block: var(--section-y);
+    padding-block: var(--pad-top) var(--pad-bottom);
+    /* An anchor link lands on the section's heading, not on its top padding. */
+    scroll-margin-top: calc(-1 * var(--pad-top));
   }
 
   .tone-sand {
@@ -44,14 +50,16 @@ const { id, tone = 'plain', pad = 'normal', width = 'default', class: className 
   }
 
   .pad-tight {
-    padding-block: calc(var(--section-y) * 0.6);
+    --pad-top: calc(var(--section-y) * 0.6);
+    --pad-bottom: calc(var(--section-y) * 0.6);
   }
 
+  /* 0px, not 0: the scroll margin multiplies it and needs a length. */
   .pad-flush-top {
-    padding-top: 0;
+    --pad-top: 0px;
   }
 
   .pad-flush-bottom {
-    padding-bottom: 0;
+    --pad-bottom: 0px;
   }
 </style>

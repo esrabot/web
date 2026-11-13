@@ -85,10 +85,6 @@ const { width = 'measure', class: className } = Astro.props;
     margin-bottom: 0;
   }
 
-  .prose :where(h2, h3, h4) {
-    scroll-margin-top: calc(var(--header-h) + var(--space-5));
-  }
-
   /* Links an author wrote. A link with a class is a component's. */
   .prose :where(a:not([class])) {
     color: var(--blue);
