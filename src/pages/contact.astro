@@ -73,15 +73,11 @@ const mailboxes = CONTACTS.map((c) => {
             <ul>
               {org.links.map((link) => (
                 <li>
-                  <a
-                    href={link.url}
-                    rel="noopener"
-                    target={link.platform === 'email' ? undefined : '_blank'}
-                  >
+                  {/* Off-site links get their new tab from src/middleware.ts. */}
+                  <a href={link.url}>
                     <Icon name={PLATFORM_META[link.platform].icon} aria-hidden="true" />
                     <span class="ch-label">{PLATFORM_META[link.platform].label}</span>
                     {link.handle && <span class="ch-handle">{link.handle}</span>}
-                    {link.platform !== 'email' && <span class="sr-only">(opens in a new tab)</span>}
                   </a>
                 </li>
               ))}
