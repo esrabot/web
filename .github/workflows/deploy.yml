@@ -25,7 +25,7 @@ on:
   push:
     branches: [main]
   pull_request:
-  # Scheduled rebuild so build-time data (repo stats, videos) stays fresh
+  # Scheduled rebuild so build-time data (repo stats) stays fresh
   # without a push. Replaces refresh.yml while the token path is in use.
   schedule:
     - cron: '0 */6 * * *'

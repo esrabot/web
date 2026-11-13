@@ -14,8 +14,8 @@ A statically generated [Astro](https://astro.build) site. Every page is
 prerendered to HTML at build time and served from a CDN — there is no
 server rendering, no database, and no client-side data fetching.
 
-External data (repository statistics, video listings) is fetched **during
-the build** and baked into the HTML. A scheduled job rebuilds the site so
+External data (repository statistics) is fetched **during the build**
+and baked into the HTML. A scheduled job rebuilds the site so
 that data stays current without anyone running a build by hand.
 
 ```
@@ -23,7 +23,6 @@ push to main   ─┐
 cron, 6h       ─┼─→ GitHub Action ─→ astro build ─→ Vercel
 org repo push  ─┘         │
                           ├─ GitHub API      (repos, stars, commits)
-                          ├─ YouTube feed    (ESRA's channel)
                           └─ src/content/    (markdown, YAML)
 ```
 
@@ -75,7 +74,6 @@ src/
     search/           the search box, dialog and page
   lib/
     github.ts         repo data, cached, degrades gracefully
-    youtube.ts        channel feeds
     search-index.ts   builds /search-index.json from the collections
   scripts/
     search.ts         search in the browser (no service behind it)
