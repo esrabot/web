@@ -3,7 +3,7 @@
  *
  * Search runs entirely in the browser against one small JSON file, built
  * here at build time from the same content collections the pages render.
- * A page, guide, event or person therefore becomes searchable the moment
+ * A page, project, event or person therefore becomes searchable the moment
  * it exists — there is no separate list to keep in step, and no search
  * service to run.
  *
@@ -23,7 +23,6 @@ export const SEARCH_KINDS = [
   'Page',
   'Project',
   'Event',
-  'Guide',
   'Member',
   'Partner',
   'Repository',
@@ -156,10 +155,17 @@ function staticEntries(): SearchEntry[] {
       w: 'google calendar ical ics subscribe schedule dates meetings',
     },
     {
+      t: 'Industry Research Alliance',
+      u: '/ira',
+      k: 'Page',
+      d: 'Coming soon. A company brings a research question; research labs and ESRA students take it on together.',
+      w: 'ira industry research alliance company companies labs students joint research question',
+    },
+    {
       t: 'Guides',
       u: '/docs',
       k: 'Page',
-      d: 'Build notes and procedures you can follow from outside the group.',
+      d: 'Build notes and procedures you can follow from outside the group. Coming soon.',
       w: 'docs documentation field guides how to tutorial instructions build',
     },
     {
@@ -197,8 +203,7 @@ function staticEntries(): SearchEntry[] {
 }
 
 export async function buildSearchIndex(): Promise<SearchEntry[]> {
-  const [docs, projects, programs, events, members, partners, repos] = await Promise.all([
-    getCollection('docs'),
+  const [projects, programs, events, members, partners, repos] = await Promise.all([
     getCollection('projects'),
     getCollection('programs'),
     getCollection('events'),
@@ -250,16 +255,6 @@ export async function buildSearchIndex(): Promise<SearchEntry[]> {
       k: 'Event',
       d: words(e.when, e.location && `· ${e.location}`),
       w: words(e.kicker, e.format, e.summary, e.highlights.join(' ')),
-    });
-  }
-
-  for (const doc of docs.filter((d) => !d.data.draft)) {
-    entries.push({
-      t: doc.data.title,
-      u: `/docs/${doc.id}`,
-      k: 'Guide',
-      d: doc.data.description ?? 'Field guide',
-      w: words(doc.data.duration, plainText(doc.body)),
     });
   }
 

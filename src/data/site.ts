@@ -82,6 +82,7 @@ export const CONTACTS: { address: string; label: string; note: string }[] = [
 export const NAV: { label: string; href: string; accent?: boolean }[] = [
   { label: 'Projects', href: '/projects' },
   { label: 'Events', href: '/events' },
+  { label: 'IRA', href: '/ira' },
   { label: 'Guides', href: '/docs' },
   { label: 'Members', href: '/members' },
   { label: 'Contact', href: '/contact', accent: true },

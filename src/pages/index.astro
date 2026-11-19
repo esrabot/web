@@ -266,29 +266,6 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
             )
           }
         </div>
-
-        <dl class="hero-facts" data-reveal style="--i: 4">
-          <div>
-            <dt>Partners</dt>
-            <dd>{partners.length}</dd>
-          </div>
-          <div>
-            <dt>Schools</dt>
-            <dd>{schoolCount}</dd>
-          </div>
-          <div>
-            <dt>Robots on the roadmap</dt>
-            <dd>{programs.length}</dd>
-          </div>
-          <div>
-            <dt>Since</dt>
-            <dd class="text">{SITE.established}</dd>
-          </div>
-          <div>
-            <dt>Nonprofit status</dt>
-            <dd class="text">{SITE.taxStatus}</dd>
-          </div>
-        </dl>
       </div>
     </div>
 
@@ -961,47 +938,6 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     justify-content: center;
     gap: var(--space-3);
     margin-top: var(--space-6);
-  }
-
-  /* Five facts in one row where they fit. Where they don't, they wrap
-     into centred rows, so a fact left over never sits stranded at one
-     side. */
-  .hero-facts {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--space-4) var(--space-7);
-    margin: var(--space-7) 0 0;
-    padding-top: var(--space-5);
-    border-top: 1px solid var(--rule);
-  }
-
-  .hero-facts div {
-    display: flex;
-    flex-direction: column-reverse;
-    gap: 0.125rem;
-  }
-
-  .hero-facts dt {
-    font-size: var(--t-sm);
-    color: var(--ink-muted);
-  }
-
-  .hero-facts dd {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: 2rem;
-    font-weight: 500;
-    line-height: 1.1;
-    letter-spacing: var(--track-tight);
-    color: var(--ink-strong);
-    font-variant-numeric: lining-nums;
-  }
-
-  /* A name, not a number: set a little smaller so it sits on the same line. */
-  .hero-facts dd.text {
-    font-size: 1.375rem;
-    line-height: 1.6;
   }
 
   /* --- the partners, under the fold line --------------------------- */
@@ -2226,15 +2162,6 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   @media (max-width: 640px) {
-    /* Two facts a row; the fifth centres on a row of its own. */
-    .hero-facts {
-      gap: var(--space-4) var(--space-5);
-    }
-
-    .hero-facts div {
-      flex: 0 0 calc((100% - var(--space-5)) / 2);
-    }
-
     .ways,
     .reasons {
       grid-template-columns: minmax(0, 1fr);

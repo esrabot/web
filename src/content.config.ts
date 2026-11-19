@@ -1,4 +1,4 @@
-import { defineCollection, reference, z } from 'astro:content';
+import { defineCollection, z } from 'astro:content';
 import { glob, file } from 'astro/loaders';
 import type { ZodType } from 'astro/zod';
 
@@ -23,8 +23,8 @@ const members = defineCollection({
       order: z.number().default(100),
 
       /**
-       * Vanity URL. `handle: willcforte` publishes the record at
-       * esra.bot/willcforte rather than esra.bot/will-forte.
+       * Vanity URL. `handle: your-handle` publishes the record at
+       * esra.bot/your-handle rather than esra.bot/<file-name>.
        *
        * Deliberately NOT called `slug`: that is a reserved frontmatter key
        * in Astro content collections and silently overrides the entry id,
@@ -108,8 +108,6 @@ const projects = defineCollection({
       /** Hardware revision, e.g. "rev D". */
       revision: z.string().optional(),
       links: z.array(z.object({ label: z.string(), url: z.string() })).default([]),
-      /** Bill of materials, by BOM collection ID. */
-      bom: reference('boms').optional(),
       order: z.number().default(100),
       draft: z.boolean().default(false),
     }),
@@ -373,24 +371,11 @@ const pathways = defineCollection({
   }),
 });
 
-const docs = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/docs' }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string().optional(),
-    order: z.number().default(100),
-    /** Estimated reading/working time, e.g. "14 min". */
-    duration: z.string().optional(),
-    draft: z.boolean().default(false),
-  }),
-});
-
 export const collections = {
   members,
   projects,
   partners,
   boms,
-  docs,
   featured,
   programs,
   events,

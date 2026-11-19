@@ -114,6 +114,8 @@
   start: Email us your club, your school, and what your team builds.
   cta: Join as a club
   subject: Partner club
+  # TODO(confirm): partnerships@ must exist in Zoho. If it doesn't yet, use info@esra.bot.
+  email: partnerships@esra.bot
 
 - id: partner-lab
   order: 3

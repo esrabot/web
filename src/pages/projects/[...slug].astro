@@ -39,7 +39,7 @@ const repoFacts = repo
     )
   : [];
 
-const hasLinks = Boolean(repo) || project.data.links.length > 0 || Boolean(project.data.bom);
+const hasLinks = Boolean(repo) || project.data.links.length > 0;
 ---
 
 <BaseLayout title={project.data.title} description={project.data.summary}>
@@ -58,9 +58,6 @@ const hasLinks = Boolean(repo) || project.data.links.length > 0 || Boolean(proje
               {project.data.links.map((l) => (
                 <LinkChip href={l.url} label={l.label} />
               ))}
-              {project.data.bom && (
-                <LinkChip href={`/docs/${project.data.bom.id}`} label="Bill of materials" />
-              )}
             </div>
           )}
           {(project.data.domains.length > 0 || repoFacts.length > 0) && (

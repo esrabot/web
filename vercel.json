@@ -28,6 +28,7 @@
       "destination": "/docs",
       "permanent": true
     },
+    { "source": "/docs/leg-test-stand", "destination": "/docs", "permanent": false },
     {
       "source": "/calendar",
       "destination": "/events",
@@ -37,6 +38,15 @@
     { "source": "/blog/:path*", "destination": "/", "permanent": true },
     { "source": "/gallery", "destination": "/", "permanent": true },
     { "source": "/gallery/:path*", "destination": "/", "permanent": true },
+    { "source": "/willcforte", "destination": "/", "permanent": true },
+    { "source": "/ryanrudes", "destination": "/", "permanent": true },
+    { "source": "/hyuncat", "destination": "/", "permanent": true },
+    { "source": "/alex-tong", "destination": "/", "permanent": true },
+    { "source": "/donny-lu", "destination": "/", "permanent": true },
+    { "source": "/gonzalo-ramos", "destination": "/", "permanent": true },
+    { "source": "/luis-serrano-laguna", "destination": "/", "permanent": true },
+    { "source": "/maxx-ibarra", "destination": "/", "permanent": true },
+    { "source": "/nikhil-vijay", "destination": "/", "permanent": true },
     { "source": "/rss.xml", "destination": "/", "permanent": true },
     { "source": "/rss", "destination": "/", "permanent": true },
     { "source": "/feed", "destination": "/", "permanent": true },

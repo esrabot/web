@@ -11,6 +11,7 @@ export const RESERVED_ROUTES = new Set([
   'projects',
   'docs',
   'events',
+  'ira',
   'search',
   'contact',
   'colophon',

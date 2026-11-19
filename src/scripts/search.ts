@@ -37,7 +37,7 @@ interface Prepared extends Entry {
 }
 
 /** Tie-break order between kinds. Mirrors SEARCH_KINDS in lib/search-index.ts. */
-const KIND_ORDER = ['Page', 'Project', 'Event', 'Guide', 'Member', 'Partner', 'Repository'];
+const KIND_ORDER = ['Page', 'Project', 'Event', 'Member', 'Partner', 'Repository'];
 
 const MAX_TOKENS = 8;
 

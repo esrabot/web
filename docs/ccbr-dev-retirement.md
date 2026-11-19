@@ -22,11 +22,11 @@ site; the few renamed or removed paths are handled in `vercel.json`.
 | `/blog`, `/blog/*`       | `/`                      | **removed** — redirected home in `vercel.json`            |
 | `/gallery`               | `/`                      | **removed** — redirected home in `vercel.json`            |
 | `/team`                  | `/members`               | **renamed** — already handled in `vercel.json`            |
-| `/docs`                  | `/docs`                  | was an empty stub; now a real section                     |
+| `/docs`                  | `/docs`                  | was an empty stub; now a "coming soon" page               |
 | anything else            | `/`                      | catch-all                                                 |
 
 Individual member pages did not exist on the old site, so nothing points at
-them. They now live at the site root (`/willcforte`) with the roster at
+them. They now live at the site root (`/your-handle`) with the roster at
 `/members`.
 
 ## Assets

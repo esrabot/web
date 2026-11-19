@@ -1,7 +1,7 @@
 /**
  * Route reservation.
  *
- * Member pages publish at the site root (esra.bot/willcforte), which means
+ * Member pages publish at the site root (esra.bot/your-handle), which means
  * a member slug shares a namespace with every real route. If someone ever
  * took the slug `blog`, their page and the blog index would fight over the
  * same URL and one would silently win.

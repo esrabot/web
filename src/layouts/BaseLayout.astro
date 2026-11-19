@@ -19,12 +19,12 @@ interface Props {
   description?: string;
   /** OG image URL. Falls back to the default card. */
   image?: string;
-  /** `article` for guides and write-ups, else `website`. */
+  /** `article` for write-ups, else `website`. */
   type?: 'website' | 'article';
   publishedAt?: Date;
   /**
    * Which nav item to mark as current, when the URL does not say. Member
-   * pages live at the site root (/willcforte) but belong under Members.
+   * pages live at the site root (/your-handle) but belong under Members.
    */
   nav?: string;
   /** Drop the footer's call-to-action band. */

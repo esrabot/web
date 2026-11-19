@@ -109,7 +109,7 @@ for (const file of memberFiles) {
     }
   }
 
-  // Member pages are served from the site root (esra.bot/willcforte), so a
+  // Member pages are served from the site root (esra.bot/your-handle), so a
   // slug shares a namespace with every real route. Catch clashes here,
   // where the message can explain the problem.
   const slug =
@@ -132,7 +132,7 @@ for (const file of memberFiles) {
     fail(
       file,
       `has an invalid \`handle\`: "${data.handle}"`,
-      'Use lowercase letters, numbers and hyphens only, e.g.  handle: willcforte'
+      'Use lowercase letters, numbers and hyphens only, e.g.  handle: your-handle'
     );
   }
 

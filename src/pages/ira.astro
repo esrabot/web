@@ -1,0 +1,171 @@
+---
+/**
+ * The Industry Research Alliance.
+ *
+ * It isn't running yet, so this page introduces it and says it is coming.
+ * The copy is limited to what esra-site-copy.md says about it; add detail
+ * here only once it is confirmed.
+ */
+import { Icon } from 'astro-icon/components';
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/ui/PageHero.astro';
+import Section from '../components/ui/Section.astro';
+import SectionHead from '../components/ui/SectionHead.astro';
+import { CONTACTS } from '../data/site';
+
+const STEPS = [
+  { who: 'The company', what: 'Brings a research question.' },
+  { who: 'Research labs', what: 'Carry out the work.' },
+  { who: 'ESRA students', what: 'Qualified students are involved from the start.' },
+];
+
+const partnerships = CONTACTS.find((c) => c.label === 'Partnerships') ?? CONTACTS[0];
+const mailto = `mailto:${partnerships.address}?subject=${encodeURIComponent('Industry Research Alliance')}`;
+---
+
+<BaseLayout
+  title="Industry Research Alliance"
+  description="Coming soon: a company brings a research question, and research labs and ESRA students take it on together."
+>
+  <PageHero
+    eyebrow="IRA · Coming soon"
+    title="Industry Research Alliance."
+    lede="A company brings a research question. Research labs carry out the work, with qualified ESRA students involved from the start."
+  >
+    <Fragment slot="title">Industry Research <em>Alliance.</em></Fragment>
+  </PageHero>
+
+  <Section pad="flush-top">
+    <SectionHead eyebrow="How it will work" title="A question, taken on together.">
+      <Fragment slot="title">A question, taken on <em>together.</em></Fragment>
+    </SectionHead>
+
+    <ol class="steps">
+      {
+        STEPS.map((s, i) => (
+          <li class="step card" data-reveal style={`--i: ${i}`}>
+            <span class="step-no" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <h3>{s.who}</h3>
+            <p>{s.what}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <aside class="note" data-reveal aria-labelledby="note-label">
+      <p class="note-label" id="note-label">Good to know</p>
+      <p>The alliance is separate from H1 and its public releases.</p>
+    </aside>
+
+    <div class="ask" data-reveal>
+      <p>Interested in the alliance?</p>
+      <a class="btn" href={mailto}>
+        <Icon name="lucide:mail" aria-hidden="true" />
+        Email {partnerships.address}
+      </a>
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  /* Three across, joined by a short rule in each gap; one column on
+     narrower screens. Same card as "How a joint build works" on Home. */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-5);
+  }
+
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 3rem;
+    right: calc(-1 * var(--space-5));
+    width: var(--space-5);
+    height: 1px;
+    background: var(--rule-strong);
+  }
+
+  .step-no {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1;
+    color: var(--blue);
+  }
+
+  .step h3 {
+    margin-top: var(--space-4);
+    font-size: var(--t-xl);
+  }
+
+  .step p {
+    margin: var(--space-2) 0 0;
+    font-size: var(--t-base);
+    color: var(--ink-body);
+  }
+
+  /* Set apart on beige, like the alliance's note on /projects. */
+  .note {
+    margin-top: var(--space-6);
+    padding: var(--space-5) var(--space-6);
+    border: 1px solid var(--sand-deep);
+    border-radius: var(--r-lg);
+    background: var(--sand);
+  }
+
+  .note-label {
+    margin: 0;
+    font-family: var(--font-label);
+    font-size: var(--t-xs);
+    font-weight: var(--w-semibold);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--sand-ink);
+  }
+
+  .note p:last-child {
+    max-width: var(--measure);
+    margin: var(--space-2) 0 0;
+    color: var(--ink-body);
+  }
+
+  .ask {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-5);
+    margin-top: var(--space-7);
+  }
+
+  .ask p {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--t-xl);
+    color: var(--ink-strong);
+  }
+
+  @media (max-width: 1000px) {
+    .steps {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .step:not(:last-child)::after {
+      display: none;
+    }
+  }
+</style>

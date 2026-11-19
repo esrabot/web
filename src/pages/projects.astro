@@ -12,7 +12,7 @@
  *   4. From the workshop — builds written up in full, each with a page of
  *      its own (src/content/projects/*.md).
  *   5. Open documentation — what every release includes, the reports,
- *      and the Industry Research Alliance to come.
+ *      and the Industry Research Alliance to come (its own page is /ira).
  *   6. Repositories — generated from the org's real repositories, so the
  *      list stays current with no hand-maintenance. It shows the first
  *      eight; a button brings in the rest.
@@ -429,6 +429,9 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
         A company brings a research question. Research labs carry out the work, with qualified ESRA
         students involved from the start. Separate from H1 and its public releases.
       </p>
+      <a class="link-arrow" href="/ira">
+        More about the alliance <Icon name="lucide:arrow-right" aria-hidden="true" />
+      </a>
     </aside>
   </Section>
 
@@ -954,10 +957,14 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     font-size: var(--t-xl);
   }
 
-  .ira p:last-child {
+  .ira h3 + p {
     max-width: var(--measure);
     margin: var(--space-2) 0 0;
     color: var(--ink-body);
+  }
+
+  .ira .link-arrow {
+    margin-top: var(--space-3);
   }
 
   /* ================================================================

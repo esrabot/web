@@ -58,7 +58,6 @@ src/
   content/          ← the site's actual content
     members/          one file per person
     projects/         curated project pages
-    docs/             field guides
     boms/             bills of materials
     partners.yaml     partner clubs and schools
     programs.yaml     the roadmap: H1, Q1 and the manipulator projects
@@ -70,7 +69,7 @@ src/
     site.ts           site constants, navigation, the events calendar
   components/
     ui/               design-system primitives
-    blog/             the MDX authoring vocabulary (guides, projects)
+    blog/             the MDX authoring vocabulary (projects)
     search/           the search box, dialog and page
   lib/
     github.ts         repo data, cached, degrades gracefully
