@@ -16,14 +16,14 @@ site; the few renamed or removed paths are handled in `vercel.json`.
 
 ## Full URL map
 
-| ccbr.dev                 | esra.bot                 | Notes                                                     |
-| ------------------------ | ------------------------ | --------------------------------------------------------- |
-| `/`                      | `/`                      | Rebuilt, not migrated — the old landing page was Nuxt MDC |
-| `/blog`, `/blog/*`       | `/`                      | **removed** — redirected home in `vercel.json`            |
-| `/gallery`               | `/`                      | **removed** — redirected home in `vercel.json`            |
-| `/team`                  | `/members`               | **renamed** — already handled in `vercel.json`            |
-| `/docs`                  | `/docs`                  | was an empty stub; now a "coming soon" page               |
-| anything else            | `/`                      | catch-all                                                 |
+| ccbr.dev           | esra.bot   | Notes                                                     |
+| ------------------ | ---------- | --------------------------------------------------------- |
+| `/`                | `/`        | Rebuilt, not migrated — the old landing page was Nuxt MDC |
+| `/blog`, `/blog/*` | `/`        | **removed** — redirected home in `vercel.json`            |
+| `/gallery`         | `/`        | **removed** — redirected home in `vercel.json`            |
+| `/team`            | `/members` | **renamed** — already handled in `vercel.json`            |
+| `/docs`            | `/docs`    | was an empty stub; now a "coming soon" page               |
+| anything else      | `/`        | catch-all                                                 |
 
 Individual member pages did not exist on the old site, so nothing points at
 them. They now live at the site root (`/your-handle`) with the roster at
