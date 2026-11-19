@@ -2,9 +2,11 @@
 /**
  * Site header.
  *
- * Wordmark, the primary nav, search, and the one call to action. Sticky
- * on a translucent page tone with a backdrop blur; it gains a hairline
- * and a soft shadow once the page has scrolled under it.
+ * Wordmark, the primary nav, search, and the one call to action. Sticky.
+ * At the very top it is clear, so the page's opening wash runs up behind
+ * it unbroken. Once the page scrolls under it, it turns to frosted glass:
+ * a translucent page tone over a moderate backdrop blur, with a hairline
+ * edge and a soft shadow.
  *
  * Below the breakpoint the nav folds into a panel behind a menu button.
  * That needs JS, so without it the nav stays a horizontally scrollable
@@ -93,9 +95,11 @@ const isActive = (href: string) =>
     top: 0;
     z-index: var(--z-sticky);
     background: var(--bg-glass);
-    backdrop-filter: saturate(1.4) blur(14px);
-    -webkit-backdrop-filter: saturate(1.4) blur(14px);
-    border-bottom: 1px solid transparent;
+    backdrop-filter: saturate(1.5) blur(12px);
+    -webkit-backdrop-filter: saturate(1.5) blur(12px);
+    border-bottom: 1px solid var(--rule-soft);
+    /* A light catch along the top edge, as on a pane of glass. */
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
     transition:
       background-color var(--dur-slow) var(--ease),
       border-color var(--dur-slow) var(--ease),
@@ -109,19 +113,28 @@ const isActive = (href: string) =>
     }
   }
 
-  .site-header:global([data-scrolled]) {
-    border-bottom-color: var(--rule-soft);
-    box-shadow: 0 6px 24px rgba(15, 29, 53, 0.06);
+  /* For anyone who has asked their system for less transparency. */
+  @media (prefers-reduced-transparency: reduce) {
+    .site-header {
+      background: var(--bg);
+    }
   }
 
-  /* At the very top there is nothing under the bar yet, so it is clear and
-     the page's opening wash runs up behind it unbroken; the glass comes in
-     with the first scroll. Only where the script that tracks scrolling is
-     running — without it the bar keeps its glass throughout. */
+  .site-header:global([data-scrolled]) {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      0 6px 24px rgba(15, 29, 53, 0.06);
+  }
+
+  /* At the very top only the page's opening wash is under the bar, and blur
+     does nothing visible to a soft gradient, so the tint and edges would only
+     cut the wash off. The bar stays clear there and frosts over as content
+     scrolls under it. Only where the scroll script runs; without it the bar
+     keeps its glass throughout. */
   :global(.js) .site-header:not([data-scrolled]):not([data-open]) {
-    background: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    background-color: transparent;
+    border-bottom-color: transparent;
+    box-shadow: none;
   }
 
   .bar {

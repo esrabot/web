@@ -19,7 +19,7 @@
   --sand: #f3ebdc; /* beige bands and wells */
   --sand-deep: #e6d8bd; /* beige borders, the footer's keyline */
   --navy: #0f1d35; /* the darkest ink, and the modal scrim's hue */
-  --bg-glass: rgba(251, 248, 242, 0.82); /* --bg, translucent: sticky header */
+  --bg-glass: rgba(251, 248, 242, 0.7); /* --bg, translucent: sticky header */
 
   /* ---------------------------------------------------------------
    * Ink. Ratios are enforced in scripts/check-contrast.mjs.
