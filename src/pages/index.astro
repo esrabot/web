@@ -57,6 +57,10 @@ const fills = milestones.map((m, i) => {
   return Math.min(1, Math.max(0, (now.getTime() - m.starts.getTime()) / span));
 });
 
+// The schedule's year range, from when its first and last milestones start.
+const firstYear = milestones[0]?.starts.getUTCFullYear();
+const lastYear = milestones.at(-1)?.starts.getUTCFullYear();
+
 const firstWhen = milestones[0]?.when;
 const lastWhen = milestones.at(-1)?.when;
 const programStatus =
@@ -155,20 +159,12 @@ const general = CONTACTS[0].address;
 const mailto = (address: string, subject: string) =>
   `mailto:${address}?subject=${encodeURIComponent(subject)}`;
 
-const WAY_ICON = {
-  student: 'lucide:graduation-cap',
-  club: 'lucide:users',
-  lab: 'lucide:flask-conical',
-  company: 'lucide:building-2',
-} as const;
-
 const ways = [...allPathways]
   .sort((a, b) => a.data.order - b.data.order)
   .map((w) => ({
     ...w.data,
     id: w.id,
     dialogId: `way-${w.id}`,
-    iconName: WAY_ICON[w.data.icon],
     href: mailto(w.data.email ?? general, w.data.subject),
     secondaryHref: w.data.secondary && mailto(w.data.secondary.email, w.data.secondary.subject),
     // A four-column table needs more room than the standard pop-up gives.
@@ -233,9 +229,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
        Hero
        ============================================================ -->
   <section class="hero">
-    <div class="hero-wash" aria-hidden="true"></div>
-
-    <div class="container hero-grid">
+    <div class="container">
       <div class="hero-copy">
         <p class="eyebrow">{SITE.fullName}</p>
 
@@ -259,33 +253,31 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
             )
           }
         </div>
-
-        <dl class="hero-facts">
-          <div>
-            <dt>Partners</dt>
-            <dd>{partners.length}</dd>
-          </div>
-          <div>
-            <dt>Schools</dt>
-            <dd>{schoolCount}</dd>
-          </div>
-          <div>
-            <dt>Robots on the roadmap</dt>
-            <dd>{programs.length}</dd>
-          </div>
-          <div>
-            <dt>Since</dt>
-            <dd class="text">{SITE.established}</dd>
-          </div>
-          <div>
-            <dt>Nonprofit status</dt>
-            <dd class="text">{SITE.taxStatus}</dd>
-          </div>
-        </dl>
       </div>
-    </div>
 
-    <div class="container">
+      <dl class="hero-facts">
+        <div>
+          <dt>Partners</dt>
+          <dd>{partners.length}</dd>
+        </div>
+        <div>
+          <dt>Schools</dt>
+          <dd>{schoolCount}</dd>
+        </div>
+        <div>
+          <dt>Robots on the roadmap</dt>
+          <dd>{programs.length}</dd>
+        </div>
+        <div>
+          <dt>Since</dt>
+          <dd>{SITE.established}</dd>
+        </div>
+        <div>
+          <dt>Nonprofit status</dt>
+          <dd>{SITE.taxStatus}</dd>
+        </div>
+      </dl>
+
       <div class="trust">
         <p class="trust-label">Built with teams at</p>
         <ul class="trust-list">
@@ -293,7 +285,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
             partners.map((p) => (
               <li>
                 <a href={p.data.url} rel="noopener" target="_blank">
-                  <PartnerMark partner={p} height={34} maxWidth={84} decorative />
+                  <PartnerMark partner={p} height={28} maxWidth={72} decorative />
                   <span class="trust-name">{p.data.name}</span>
                   <span class="sr-only"> (opens in a new tab)</span>
                 </a>
@@ -301,9 +293,6 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
             ))
           }
         </ul>
-        <a class="link-arrow trust-all" href="#partners">
-          All {partners.length} partners <Icon name="lucide:arrow-down" aria-hidden="true" />
-        </a>
       </div>
     </div>
   </section>
@@ -311,15 +300,11 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   <!-- ============================================================
        Why ESRA
        ============================================================ -->
-  <Section id="why">
+  <Section id="why" tone="white">
     <div class="why">
-      <div class="why-copy">
-        <SectionHead
-          eyebrow="Why ESRA"
-          title="Every campus debugging the same robot alone."
-          align="center"
-        />
+      <SectionHead eyebrow="Why ESRA" title="Every campus debugging the same robot alone." />
 
+      <div class="why-text">
         <div class="why-body">
           <p>
             Today, one team spends a semester working out joint control while another works through
@@ -345,16 +330,10 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     </div>
 
     <div class="model">
-      <SectionHead
-        as="h3"
-        size="sm"
-        align="center"
-        eyebrow="The model"
-        title="Why the model works"
-      />
+      <SectionHead as="h3" size="sm" title="Why the model works" />
       <ul class="reasons">
         {
-          reasons.map((r, i) => (
+          reasons.map((r) => (
             <li class="reason">
               <h4>{r.title}</h4>
               <p>{r.body}</p>
@@ -365,12 +344,12 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     </div>
 
     <div class="roles">
-      <SectionHead as="h3" size="sm" align="center" eyebrow="The network" title="Who does what" />
+      <SectionHead as="h3" size="sm" title="Who does what" />
       <figure class="roles-figure">
         <ul class="supports" aria-label="Supporting the teams">
           {
             supportRoles.map((r) => (
-              <li class="role card">
+              <li class="role">
                 <h4>{r.title}</h4>
                 <p>{r.body}</p>
               </li>
@@ -378,7 +357,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
           }
         </ul>
         <div class="role-bus" aria-hidden="true"></div>
-        <div class="role card teams">
+        <div class="role teams">
           <h4>{teamsRole.title}</h4>
           <p>{teamsRole.body}</p>
         </div>
@@ -389,26 +368,19 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     </div>
 
     <div class="process">
-      <SectionHead
-        as="h3"
-        size="sm"
-        align="center"
-        eyebrow="The method"
-        title="How a joint build works"
-      />
+      <SectionHead as="h3" size="sm" title="How a joint build works" />
       <ol class="steps">
         {
           steps.map((s, i) => (
-            <li class="step card">
+            <li class="step">
               <span class="step-no" aria-hidden="true">
                 {String(i + 1).padStart(2, '0')}
               </span>
               <h4>{s.title}</h4>
               <p>{s.body}</p>
-              <span class="chip">
-                <Icon name="lucide:arrow-right" aria-hidden="true" />
-                {s.output}
-              </span>
+              <p class="step-out">
+                <span>Output:</span> {s.output}
+              </p>
             </li>
           ))
         }
@@ -488,7 +460,15 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
         {milestones.length > 0 && (
           <div class="schedule">
-            <SectionHead as="h3" size="sm" eyebrow="2026–27 roadmap" title="The schedule" />
+            <SectionHead as="h3" size="sm" title="The schedule">
+              {firstYear && lastYear && (
+                <span slot="aside">
+                  {firstYear === lastYear
+                    ? firstYear
+                    : `${firstYear}–${String(lastYear).slice(-2)}`}
+                </span>
+              )}
+            </SectionHead>
             <ol class="timeline" style={`--stops: ${milestones.length}`}>
               {milestones.map((m, i) => (
                 <li
@@ -514,13 +494,13 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
         {otherPrograms.length > 0 && (
           <div class="also">
-            <SectionHead as="h3" size="sm" eyebrow="Beyond H1" title="Also on the roadmap">
+            <SectionHead as="h3" size="sm" title="Also on the roadmap">
               <a slot="aside" class="link-arrow" href="/projects#roadmap">
                 See the roadmap <Icon name="lucide:arrow-right" aria-hidden="true" />
               </a>
             </SectionHead>
             <div class="also-grid">
-              {otherPrograms.map((p, i) => (
+              {otherPrograms.map((p) => (
                 <article class="track card lift">
                   <p class="track-kind">
                     {p.data.kind}
@@ -556,20 +536,14 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
     <div class="ways">
       {
-        ways.map((w, i) => (
+        ways.map((w) => (
           <article class="way card lift">
-            <span class="way-icon" aria-hidden="true">
-              <Icon name={w.iconName} />
-            </span>
             <p class="way-who">{w.audience}</p>
             <h3>{w.title}</h3>
             <p class="way-lede">{w.lede}</p>
             <ul class="way-points">
               {w.points.map((p) => (
-                <li>
-                  <Icon name="lucide:check" aria-hidden="true" />
-                  <span>{p}</span>
-                </li>
+                <li>{p}</li>
               ))}
             </ul>
             <button
@@ -578,10 +552,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
               data-modal-open={w.dialogId}
               aria-haspopup="dialog"
             >
-              <span>
-                See what’s involved<span class="sr-only">: {w.title}</span>
-              </span>
-              <Icon name="lucide:arrow-up-right" aria-hidden="true" />
+              See what’s involved<span class="sr-only">: {w.title}</span>
             </button>
           </article>
         ))
@@ -607,14 +578,9 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
         <div class="modal-scroll">
           <header class="wm-head">
-            <span class="way-icon" aria-hidden="true">
-              <Icon name={w.iconName} />
-            </span>
-            <div>
-              <p class="eyebrow plain">{w.audience}</p>
-              <h2 id={`${w.dialogId}-title`}>{w.title}</h2>
-              <p class="wm-lede">{w.lede}</p>
-            </div>
+            <p class="eyebrow">{w.audience}</p>
+            <h2 id={`${w.dialogId}-title`}>{w.title}</h2>
+            <p class="wm-lede">{w.lede}</p>
           </header>
 
           <div class="wm-body">
@@ -629,10 +595,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
                   {s.items && (
                     <ul>
                       {s.items.map((item) => (
-                        <li>
-                          <Icon name="lucide:check" aria-hidden="true" />
-                          <span>{item}</span>
-                        </li>
+                        <li>{item}</li>
                       ))}
                     </ul>
                   )}
@@ -724,7 +687,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
     <div class="roster">
       {
-        partners.map((p, i) => (
+        partners.map((p) => (
           <a class="tile card lift" href={p.data.url} rel="noopener" target="_blank">
             <span class="tile-top">
               <span class="chip">{KIND_LABEL[p.data.kind]}</span>
@@ -764,67 +727,48 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
    * Hero
    * ============================================================== */
   .hero {
-    position: relative;
-    padding-block: clamp(3rem, 7vw, 6rem) 0;
-    isolation: isolate;
+    padding-block: clamp(3rem, 6vw, 5rem) var(--space-7);
   }
 
-  /* A cool light from one corner and a warm one from the other, fading
-     into the page. It runs up behind the translucent header. */
-  .hero-wash {
-    position: absolute;
-    inset: calc(-1 * var(--header-h)) 0 0;
-    z-index: -1;
-    background:
-      radial-gradient(60rem 34rem at 92% 6%, var(--blue-soft), transparent 62%),
-      radial-gradient(48rem 30rem at 0% 0%, var(--band), transparent 64%);
-    -webkit-mask-image: linear-gradient(#000 60%, transparent);
-    mask-image: linear-gradient(#000 60%, transparent);
-    pointer-events: none;
-  }
-
-  .hero-grid {
-    max-width: 52rem;
-    text-align: center;
+  .hero-copy {
+    max-width: 46rem;
   }
 
   .hero h1 {
-    margin-top: var(--space-5);
+    margin-top: var(--space-4);
     font-size: var(--t-hero);
-    font-weight: var(--w-semibold);
-    line-height: 1;
+    line-height: var(--lh-tight);
     letter-spacing: var(--track-display);
   }
 
   .hero .lede {
-    margin: var(--space-5) auto 0;
-    max-width: 34rem;
+    margin-top: var(--space-5);
+    max-width: 38rem;
   }
 
   .hero-actions {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: var(--space-3);
     margin-top: var(--space-6);
   }
 
-  /* Five facts in one row where they fit. Where they don't, they wrap
-     into centred rows, so a fact left over never sits stranded at one
-     side. */
+  /* The key facts, in one row between two hairlines. Each value sits
+     above its label; the markup keeps label-then-value for screen
+     readers. */
   .hero-facts {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--space-4) var(--space-7);
-    margin: var(--space-7) 0 0;
-    padding-top: var(--space-5);
-    border-top: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-4) var(--space-5);
+    margin: clamp(2.5rem, 5vw, 4rem) 0 0;
+    padding-block: var(--space-5);
+    border-block: 1px solid var(--rule);
   }
 
   .hero-facts div {
     display: flex;
     flex-direction: column-reverse;
+    justify-content: flex-end;
     gap: 0.125rem;
   }
 
@@ -835,33 +779,21 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
   .hero-facts dd {
     margin: 0;
-    font-family: var(--font-display);
-    font-size: 2rem;
+    font-size: var(--t-xl);
     font-weight: var(--w-semibold);
-    line-height: 1.1;
+    line-height: 1.3;
     letter-spacing: var(--track-tight);
     color: var(--ink-strong);
     font-variant-numeric: lining-nums;
   }
 
-  /* A name, not a number: set a little smaller so it sits on the same line. */
-  .hero-facts dd.text {
-    font-size: 1.375rem;
-    line-height: 1.6;
-  }
-
-  /* --- the partners, under the fold line --------------------------- */
+  /* The partner teams, in one quiet row under the facts. */
   .trust {
     display: flex;
     align-items: center;
-    gap: var(--space-5) var(--space-7);
     flex-wrap: wrap;
-    margin-top: clamp(3rem, 7vw, 5.5rem);
-    padding: var(--space-5) var(--space-6);
-    border: 1px solid var(--rule-soft);
-    border-radius: var(--r-lg);
-    background: var(--surface);
-    box-shadow: var(--shadow-sm);
+    gap: var(--space-3) var(--space-6);
+    margin-top: var(--space-5);
   }
 
   .trust-label {
@@ -875,59 +807,60 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     color: var(--ink-muted);
   }
 
+  /* Wide enough a basis that, on a narrow screen, the list drops below
+     its label instead of squeezing in beside it. */
   .trust-list {
     display: flex;
     align-items: center;
-    flex: 1;
+    flex: 1 1 24rem;
     flex-wrap: wrap;
-    gap: var(--space-4) var(--space-7);
+    gap: var(--space-3) var(--space-6);
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  /* Every mark takes its colour from the link, so they all print in the
-     same ink and all turn blue the same way. */
+  /* Every mark takes its color from the link, so they all print in the
+     same gray and darken together. */
   .trust-list a {
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    height: 2.5rem;
+    min-height: 2.5rem;
     color: var(--ink-muted);
     text-decoration: none;
     transition: color var(--dur) var(--ease);
+  }
+
+  .trust-list a:hover {
+    color: var(--ink-strong);
   }
 
   .trust-name {
     font-size: var(--t-sm);
     font-weight: var(--w-semibold);
     line-height: 1.2;
-    white-space: nowrap;
-  }
-
-  .trust-list a:hover {
-    color: var(--blue);
-  }
-
-  .trust-all {
-    flex: none;
-    font-size: var(--t-sm);
   }
 
   /* ================================================================
    * Why
    * ============================================================== */
-  .why-copy {
-    text-align: center;
+
+  /* The heading on the left, the argument on the right. */
+  .why {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: start;
+    gap: var(--space-5) var(--space-8);
   }
 
-  .why-copy :global(.section-head) {
-    margin-bottom: var(--space-5);
+  .why :global(.section-head) {
+    margin-bottom: 0;
   }
 
   .why-body p {
     max-width: var(--measure);
-    margin: 0 auto;
+    margin: 0;
     font-size: var(--t-md);
   }
 
@@ -935,15 +868,12 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     margin-top: var(--space-4);
   }
 
-  /* Centred under the copy, so the accent rule runs along the top
-     rather than down one side. */
   .example {
     max-width: var(--measure);
-    margin: var(--space-6) auto 0;
+    margin-top: var(--space-6);
     padding: var(--space-4) var(--space-5);
-    border-top: 3px solid var(--blue);
-    border-radius: 0 0 var(--r-md) var(--r-md);
-    background: var(--blue-wash);
+    border-left: 2px solid var(--rule-strong);
+    background: var(--band);
   }
 
   .example p {
@@ -959,7 +889,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     font-weight: var(--w-semibold);
     letter-spacing: var(--track-label);
     text-transform: uppercase;
-    color: var(--blue-strong);
+    color: var(--ink-muted);
   }
 
   .model,
@@ -968,29 +898,66 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     margin-top: var(--space-9);
   }
 
-  /* --- why the model works ---------------------------------------- */
-  .reasons {
+  /* --- why the model works, and how a joint build works -------------
+     Both are rows of short items, each under a hairline. The rows wrap
+     cleanly at any width. */
+  .reasons,
+  .steps {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-6) var(--space-5);
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .reason {
+  .reasons {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .steps {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .reason,
+  .step {
     padding-top: var(--space-4);
-    border-top: 2px solid var(--blue);
+    border-top: 1px solid var(--rule-strong);
   }
 
-  .reason h4 {
-    font-size: var(--t-xl);
+  .reason h4,
+  .step h4 {
+    font-size: var(--t-lg);
   }
 
-  .reason p {
+  .reason p,
+  .step p {
     margin: var(--space-2) 0 0;
     font-size: var(--t-base);
     color: var(--ink-body);
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .step h4 {
+    margin-top: var(--space-3);
+  }
+
+  .step p {
+    flex: 1;
+  }
+
+  .step .step-out {
+    flex: none;
+    margin-top: var(--space-4);
+    font-size: var(--t-sm);
+    color: var(--ink-muted);
+  }
+
+  .step-out span {
+    font-weight: var(--w-semibold);
   }
 
   /* --- who does what ------------------------------------------------
@@ -1013,7 +980,11 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   .role {
+    position: relative;
     padding: var(--space-5);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    background: var(--surface);
   }
 
   .role h4 {
@@ -1042,7 +1013,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     height: var(--drop);
   }
 
-  /* The bar runs from the first card's centre to the last one's: a sixth
+  /* The bar runs from the first card's center to the last one's: a sixth
      of the row (less its gaps) in from either side. */
   .role-bus {
     position: relative;
@@ -1062,26 +1033,12 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   .teams {
     max-width: 34rem;
     margin: var(--drop) auto 0;
-    border-color: var(--blue-soft);
-    background: var(--blue-wash);
-  }
-
-  /* Where the line arrives. */
-  .teams::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: -0.3125rem;
-    width: 0.625rem;
-    height: 0.625rem;
-    margin-left: -0.3125rem;
-    border-radius: 50%;
-    background: var(--blue);
+    border-color: var(--rule-strong);
+    background: var(--band);
   }
 
   .teams h4 {
     font-size: var(--t-xl);
-    color: var(--blue-strong);
   }
 
   .teams p {
@@ -1093,61 +1050,6 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     margin: var(--space-5) auto 0;
     font-size: var(--t-base);
     color: var(--ink-muted);
-  }
-
-  /* --- how a joint build works --------------------------------------
-     Five across on a wide screen. Narrower, a row of three with the
-     last two centred beneath it, on six tracks; then one column. */
-  .steps {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: var(--space-5);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    counter-reset: step;
-  }
-
-  .step {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: var(--space-5);
-  }
-
-  .step .chip {
-    white-space: normal;
-  }
-
-  /* An arrow in the gap, from each step to the next. */
-  .step:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    top: 3rem;
-    right: calc(-1 * var(--space-5));
-    width: var(--space-5);
-    height: 1px;
-    background: var(--rule-strong);
-  }
-
-  .step-no {
-    font-size: var(--t-sm);
-    font-weight: var(--w-semibold);
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-    color: var(--ink-muted);
-  }
-
-  .step h4 {
-    margin-top: var(--space-4);
-    font-size: var(--t-xl);
-  }
-
-  .step p {
-    flex: 1;
-    margin: var(--space-2) 0 var(--space-5);
-    font-size: var(--t-base);
-    color: var(--ink-body);
   }
 
   /* ================================================================
@@ -1165,7 +1067,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   .flagship-copy :global(.title) {
-    max-width: 16ch;
+    max-width: 20ch;
   }
 
   /* "H1": the program's name, set as the first line of its heading. */
@@ -1189,7 +1091,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   .focus .chip.outline {
-    background: var(--bg);
+    background: var(--surface);
     color: var(--ink-body);
   }
 
@@ -1238,26 +1140,24 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
   .stop {
     position: relative;
-    padding: 2.75rem var(--space-5) 0 0;
+    padding: 2.25rem var(--space-5) 0 0;
   }
 
   /* The run from this milestone to the next: a track, and the part of
      it that has already elapsed. */
   .stop-line {
     position: absolute;
-    left: 0.5rem;
-    right: -0.5rem;
-    top: 0.5rem;
+    left: 0.4375rem;
+    right: -0.4375rem;
+    top: 0.4375rem;
     height: 2px;
     margin-top: -1px;
-    background: var(--band-edge);
+    background: var(--rule);
   }
 
-  /* The last run has no milestone to arrive at; it tails off. */
+  /* The last run has no milestone to arrive at; it is not drawn. */
   .stop:last-child .stop-line {
-    right: 0;
-    -webkit-mask-image: linear-gradient(90deg, #000, transparent);
-    mask-image: linear-gradient(90deg, #000, transparent);
+    display: none;
   }
 
   .stop-fill {
@@ -1272,9 +1172,9 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     position: absolute;
     left: 0;
     top: 0;
-    width: 1rem;
-    height: 1rem;
-    border: 2px solid var(--band-edge);
+    width: 0.875rem;
+    height: 0.875rem;
+    border: 2px solid var(--rule-strong);
     border-radius: 50%;
     background: var(--band);
   }
@@ -1287,7 +1187,6 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   .stop.current .stop-node {
     border-color: var(--blue);
     background: var(--surface);
-    box-shadow: 0 0 0 5px rgba(36, 80, 200, 0.16);
   }
 
   .stop-when {
@@ -1301,16 +1200,15 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   .stop.current .stop-when {
-    color: var(--blue-strong);
+    color: var(--ink-strong);
   }
 
   .stop strong {
     display: block;
     margin-top: var(--space-2);
-    font-family: var(--font-display);
-    font-size: var(--t-xl);
+    font-size: var(--t-lg);
     font-weight: var(--w-semibold);
-    line-height: 1.25;
+    line-height: 1.3;
     letter-spacing: var(--track-tight);
     color: var(--ink-strong);
   }
@@ -1333,7 +1231,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: var(--space-6);
+    padding: var(--space-5);
   }
 
   .track-kind {
@@ -1343,12 +1241,12 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     font-weight: var(--w-semibold);
     letter-spacing: var(--track-label);
     text-transform: uppercase;
-    color: var(--blue);
+    color: var(--ink-muted);
   }
 
   .track h4 {
-    margin-top: var(--space-3);
-    font-size: var(--t-xl);
+    margin-top: var(--space-2);
+    font-size: var(--t-lg);
   }
 
   .track h4 a {
@@ -1362,7 +1260,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
   .track-body {
     flex: 1;
-    margin: var(--space-2) 0 var(--space-5);
+    margin: var(--space-2) 0 var(--space-4);
     font-size: var(--t-base);
     color: var(--ink-body);
   }
@@ -1379,59 +1277,29 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   .way {
     display: flex;
     flex-direction: column;
-    padding: var(--space-6);
+    padding: var(--space-5);
   }
 
   /* Cards side by side share their rows, so a shorter lede on one card
-     does not lift its checklist above its neighbours'. Six rows: icon,
-     audience, title, lede, checklist, button. */
+     does not lift its list above its neighbors'. Five rows: audience,
+     title, lede, list, button. */
   @supports (grid-template-rows: subgrid) {
     .way {
       display: grid;
-      grid-row: span 6;
+      grid-row: span 5;
       grid-template-rows: subgrid;
       row-gap: 0;
     }
   }
 
-  .way-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: none;
-    width: 3rem;
-    height: 3rem;
-    border-radius: var(--r-md);
-    background: var(--blue-wash);
-    color: var(--blue);
-    transition:
-      background-color var(--dur-slow) var(--ease),
-      color var(--dur-slow) var(--ease);
-  }
-
-  .way-icon :global(svg) {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-
-  /* :focus-visible, not :focus-within: closing the pop-up hands focus back
-     to the button that opened it, and a mouse user would otherwise be left
-     with a lit icon long after the pointer has gone. Keyboard focus
-     still lights it. */
-  .way:hover .way-icon,
-  .way:has(:focus-visible) .way-icon {
-    background: var(--blue);
-    color: var(--ink-inverse);
-  }
-
   .way-who {
-    margin: var(--space-5) 0 0;
+    margin: 0;
     font-family: var(--font-label);
     font-size: var(--t-xs);
     font-weight: var(--w-semibold);
     letter-spacing: var(--track-label);
     text-transform: uppercase;
-    color: var(--blue);
+    color: var(--ink-muted);
   }
 
   .way h3 {
@@ -1441,86 +1309,70 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
   .way-lede {
     margin: var(--space-2) 0 0;
-    font-size: var(--t-md);
+    font-size: var(--t-base);
     color: var(--ink-body);
   }
 
+  /* Plain bulleted lists, on the cards and in their pop-ups. */
   .way-points,
   .wm-sections ul {
     display: grid;
+    align-content: start;
     gap: var(--space-2);
     margin: 0;
-    padding: 0;
-    list-style: none;
+    padding: 0 0 0 1.125rem;
   }
 
   .way-points {
     flex: 1;
-    align-content: start;
-    margin-top: var(--space-5);
-    padding-top: var(--space-5);
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
     border-top: 1px solid var(--rule-soft);
   }
 
   .way-points li,
   .wm-sections li {
-    display: grid;
-    grid-template-columns: 1.125rem minmax(0, 1fr);
-    gap: var(--space-3);
+    padding-left: 0.125rem;
     font-size: var(--t-sm);
     line-height: 1.55;
     color: var(--ink-body);
   }
 
-  .way-points :global(svg),
-  .wm-sections :global(svg) {
-    width: 1.125rem;
-    height: 1.125rem;
-    margin-top: 0.15rem;
-    color: var(--blue);
+  .way-points li::marker,
+  .wm-sections li::marker {
+    color: var(--ink-faint);
   }
 
   /* The button that opens the pop-up. It is stretched over the whole
      card (.stretch), so anywhere on the card opens it. */
   .way-open {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-3);
-    width: 100%;
-    margin-top: var(--space-6);
-    padding: var(--space-3) var(--space-4);
-    border: 1px solid var(--rule);
-    border-radius: var(--r-pill);
-    background: var(--bg);
+    justify-self: start;
+    align-self: end;
+    margin-top: var(--space-5);
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--rule-strong);
+    border-radius: var(--r-md);
+    background: var(--surface);
     font-size: var(--t-sm);
     font-weight: var(--w-semibold);
+    line-height: 1.3;
     color: var(--ink-strong);
     text-align: left;
     transition:
-      background-color var(--dur) var(--ease),
       border-color var(--dur) var(--ease),
       color var(--dur) var(--ease);
-  }
-
-  .way-open :global(svg) {
-    flex: none;
-    width: 1.125rem;
-    height: 1.125rem;
   }
 
   .way:hover .way-open,
   .way-open:focus-visible {
     border-color: var(--blue);
-    background: var(--blue);
-    color: var(--ink-inverse);
+    color: var(--blue);
   }
 
   .ways-note {
     margin: var(--space-6) 0 0;
     font-size: var(--t-base);
     color: var(--ink-muted);
-    text-align: center;
   }
 
   .ways-note a {
@@ -1543,24 +1395,13 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   .wm-head {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-5);
-    padding: var(--space-7) var(--space-7) var(--space-5);
-    padding-right: 4.5rem;
-    background: linear-gradient(var(--blue-wash), var(--surface));
-  }
-
-  .wm-head .way-icon {
-    width: 3.5rem;
-    height: 3.5rem;
-    background: var(--blue);
-    color: var(--ink-inverse);
+    padding: var(--space-6) 4.5rem var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--rule-soft);
   }
 
   .wm-head h2 {
-    margin-top: var(--space-1);
-    font-size: clamp(1.75rem, 1.4rem + 1.5vw, 2.25rem);
+    margin-top: var(--space-2);
+    font-size: var(--t-h2);
   }
 
   .wm-lede {
@@ -1570,7 +1411,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   .wm-body {
-    padding: var(--space-2) var(--space-7) var(--space-6);
+    padding: var(--space-5) var(--space-6) var(--space-6);
   }
 
   .wm-intro {
@@ -1638,9 +1479,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
   .wm-body h3 {
     margin-bottom: var(--space-3);
-    font-family: var(--font-sans);
     font-size: var(--t-base);
-    font-weight: var(--w-semibold);
     letter-spacing: 0;
     color: var(--ink-strong);
   }
@@ -1665,7 +1504,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     align-items: center;
     flex-wrap: wrap;
     gap: var(--space-3);
-    padding: var(--space-4) var(--space-7);
+    padding: var(--space-4) var(--space-6);
     border-top: 1px solid var(--rule-soft);
     background: var(--surface);
   }
@@ -1860,23 +1699,8 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
    * Narrower screens
    * ============================================================== */
   @media (max-width: 1180px) {
-    /* The steps: three, then two centred beneath them. A connector only
-       joins steps that sit side by side, so the third (end of the first
-       row) loses its own. */
     .steps {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-    }
-
-    .step {
-      grid-column: span 2;
-    }
-
-    .step:nth-child(4) {
-      grid-column: 2 / span 2;
-    }
-
-    .step:nth-child(3)::after {
-      display: none;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .ways {
@@ -1885,23 +1709,21 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   @media (max-width: 1000px) {
+    .why,
     .flagship {
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    .flagship {
       gap: var(--space-7);
     }
 
-    .steps,
+    .hero-facts {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
     .also-grid {
       grid-template-columns: minmax(0, 1fr);
-    }
-
-    .step,
-    .step:nth-child(4) {
-      grid-column: auto;
-    }
-
-    .step:not(:last-child)::after {
-      display: none;
     }
 
     .reasons {
@@ -1914,7 +1736,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     }
 
     .stop {
-      padding: 0 0 var(--space-6) 2.25rem;
+      padding: 0 0 var(--space-6) 2rem;
     }
 
     .stop:last-child {
@@ -1922,17 +1744,13 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     }
 
     .stop-line {
-      left: 0.5rem;
+      left: 0.4375rem;
       right: auto;
-      top: 0.5rem;
-      bottom: -0.5rem;
+      top: 0.4375rem;
+      bottom: -0.4375rem;
       width: 2px;
       height: auto;
       margin: 0 0 0 -1px;
-    }
-
-    .stop:last-child .stop-line {
-      display: none;
     }
 
     .stop-fill {
@@ -1979,31 +1797,18 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   @media (max-width: 640px) {
-    /* Two facts a row; the fifth centres on a row of its own. */
     .hero-facts {
-      gap: var(--space-4) var(--space-5);
-    }
-
-    .hero-facts div {
-      flex: 0 0 calc((100% - var(--space-5)) / 2);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .ways,
-    .reasons {
+    .reasons,
+    .steps {
       grid-template-columns: minmax(0, 1fr);
     }
 
     .hero-actions .btn {
       flex: 1 1 auto;
-    }
-
-    .trust {
-      padding: var(--space-5);
-    }
-
-    .trust-list {
-      flex-basis: 100%;
-      gap: var(--space-3) var(--space-6);
     }
 
     .spec {
@@ -2016,13 +1821,11 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     }
 
     .wm-head {
-      flex-direction: column;
-      gap: var(--space-4);
-      padding: var(--space-6) var(--space-5) var(--space-4);
+      padding: var(--space-5) 4rem var(--space-4) var(--space-5);
     }
 
     .wm-body {
-      padding: var(--space-2) var(--space-5) var(--space-5);
+      padding: var(--space-4) var(--space-5) var(--space-5);
     }
 
     .wm-foot {
