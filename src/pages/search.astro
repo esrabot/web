@@ -10,8 +10,6 @@
  * It runs on the same script and index as the dialog. Before a query —
  * and for anyone without JavaScript — it lists every section of the site.
  */
-import { Icon } from 'astro-icon/components';
-
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/ui/PageHero.astro';
 import Section from '../components/ui/Section.astro';
@@ -22,37 +20,31 @@ const sections = [
   {
     label: 'Projects',
     href: '/projects',
-    icon: 'lucide:layers',
     hint: 'The roadmap, workshop builds, and every repository.',
   },
   {
     label: 'Events',
     href: '/events',
-    icon: 'lucide:calendar-days',
     hint: 'Featured events and the calendar.',
   },
   {
     label: 'Guides',
     href: '/docs',
-    icon: 'lucide:book-open',
     hint: 'Build notes and procedures, with parts lists.',
   },
   {
     label: 'Members',
     href: '/members',
-    icon: 'lucide:users',
     hint: 'The people, and the partner clubs and schools.',
   },
   {
     label: 'Get involved',
     href: JOIN_HREF,
-    icon: 'lucide:handshake',
     hint: 'Four ways in, for students, clubs, labs and companies.',
   },
   {
     label: 'Contact',
     href: '/contact',
-    icon: 'lucide:mail',
     hint: 'Email addresses and where we post.',
   },
 ];
@@ -85,9 +77,6 @@ const sections = [
             sections.map((s) => (
               <li>
                 <a class="card lift" href={s.href}>
-                  <span class="b-icon" aria-hidden="true">
-                    <Icon name={s.icon} />
-                  </span>
                   <span class="b-text">
                     <strong>{s.label}</strong>
                     <span>{s.hint}</span>
@@ -107,19 +96,13 @@ const sections = [
   .search-page :global(.search-form) {
     padding: var(--space-4) var(--space-5);
     border: 1px solid var(--rule);
-    border-radius: var(--r-pill);
+    border-radius: var(--r-md);
     background: var(--surface);
-    box-shadow: var(--shadow-sm);
-    transition:
-      border-color var(--dur) var(--ease),
-      box-shadow var(--dur) var(--ease);
+    transition: border-color var(--dur) var(--ease);
   }
 
   .search-page :global(.search-form:focus-within) {
     border-color: var(--blue);
-    box-shadow:
-      0 0 0 4px var(--blue-wash),
-      var(--shadow-sm);
   }
 
   .search-page :global(.search-body) {
@@ -128,10 +111,9 @@ const sections = [
 
   .search-page :global(.search-results) {
     padding: var(--space-2);
-    border: 1px solid var(--rule-soft);
+    border: 1px solid var(--rule);
     border-radius: var(--r-lg);
     background: var(--surface);
-    box-shadow: var(--shadow-sm);
   }
 
   .search-page :global(.search-note) {
@@ -173,31 +155,6 @@ const sections = [
     padding: var(--space-5);
     color: var(--ink-strong);
     text-decoration: none;
-  }
-
-  .b-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: none;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: var(--r-md);
-    background: var(--blue-wash);
-    color: var(--blue);
-    transition:
-      background-color var(--dur-slow) var(--ease),
-      color var(--dur-slow) var(--ease);
-  }
-
-  .b-icon :global(svg) {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-
-  .browse a:hover .b-icon {
-    background: var(--blue);
-    color: var(--ink-inverse);
   }
 
   .b-text {

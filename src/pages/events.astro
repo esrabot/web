@@ -154,13 +154,12 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
                 {e.photo && (
                   <Image src={e.photo} alt={e.imageAlt ?? ''} width={720} class="feature-photo" />
                 )}
-                <span class="rings" aria-hidden="true" />
                 <span class="feature-chips">
-                  <span class:list={['chip', 'phase', e.phase]}>
+                  <span class:list={['chip', { solid: e.phase === 'now' }]}>
                     {e.phase === 'now' && <span class="pulse" aria-hidden="true" />}
                     {PHASE_LABEL[e.phase]}
                   </span>
-                  {e.tentative && <span class="chip phase">{DATE_TBC}</span>}
+                  {e.tentative && <span class="chip outline">{DATE_TBC}</span>}
                 </span>
                 <p class:list={['date-big', { tbc: e.tentative }]} aria-hidden="true">
                   <span class="date-month">{e.dateTop}</span>
@@ -172,43 +171,31 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
                 {e.kicker && <p class="eyebrow plain">{e.kicker}</p>}
                 <h3>{e.title}</h3>
 
-                <ul class="facts">
-                  <li>
-                    <Icon name="lucide:calendar" aria-hidden="true" />
-                    <span>
-                      <span class="sr-only">When: </span>
-                      {e.when}
-                    </span>
-                  </li>
+                <dl class="facts">
+                  <div>
+                    <dt>When</dt>
+                    <dd>{e.when}</dd>
+                  </div>
                   {e.location && (
-                    <li>
-                      <Icon name="lucide:map-pin" aria-hidden="true" />
-                      <span>
-                        <span class="sr-only">Where: </span>
-                        {e.location}
-                      </span>
-                    </li>
+                    <div>
+                      <dt>Where</dt>
+                      <dd>{e.location}</dd>
+                    </div>
                   )}
                   {e.format && (
-                    <li>
-                      <Icon name="lucide:flag" aria-hidden="true" />
-                      <span>
-                        <span class="sr-only">Format: </span>
-                        {e.format}
-                      </span>
-                    </li>
+                    <div>
+                      <dt>Format</dt>
+                      <dd>{e.format}</dd>
+                    </div>
                   )}
-                </ul>
+                </dl>
 
                 <p class="feature-summary">{e.summary}</p>
 
                 {e.highlights.length > 0 && (
                   <ul class="highlights">
                     {e.highlights.map((h) => (
-                      <li>
-                        <Icon name="lucide:check" aria-hidden="true" />
-                        <span>{h}</span>
-                      </li>
+                      <li>{h}</li>
                     ))}
                   </ul>
                 )}
@@ -259,10 +246,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
                   {e.highlights.length > 0 && (
                     <ul class="more-highlights">
                       {e.highlights.map((h) => (
-                        <li>
-                          <Icon name="lucide:check" aria-hidden="true" />
-                          <span>{h}</span>
-                        </li>
+                        <li>{h}</li>
                       ))}
                     </ul>
                   )}
@@ -327,12 +311,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
                     Now
                   </span>
                 )}
-                {i < currentMilestone && (
-                  <span class="chip">
-                    <Icon name="lucide:check" aria-hidden="true" />
-                    Done
-                  </span>
-                )}
+                {i < currentMilestone && <span class="chip">Done</span>}
               </p>
               <p class="stage-when">{m.when}</p>
               <h3>{m.title}</h3>
@@ -497,43 +476,27 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     display: grid;
     grid-template-columns: minmax(15rem, 0.8fr) minmax(0, 1.7fr);
     overflow: hidden;
-    transition:
-      box-shadow var(--dur-slow) var(--ease-out),
-      border-color var(--dur-slow) var(--ease);
-  }
-
-  @media (hover: hover) {
-    .feature:hover {
-      border-color: var(--blue-soft);
-      box-shadow: var(--shadow-md);
-    }
   }
 
   .feature:target,
   .more-item:target {
     border-color: var(--blue);
-    box-shadow:
-      0 0 0 4px var(--blue-soft),
-      var(--shadow-md);
+    box-shadow: 0 0 0 1px var(--blue);
   }
 
-  /* The date, set large on the site's one saturated block of blue. */
+  /* The date, set large on a gray panel. */
   .feature-date {
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-start;
-    gap: var(--space-8);
-    min-height: 18rem;
+    gap: var(--space-7);
+    min-height: 14rem;
     padding: var(--space-6);
-    background: linear-gradient(
-      150deg,
-      var(--blue) 0%,
-      var(--blue-strong) 55%,
-      var(--blue-deep) 100%
-    );
-    color: var(--ink-inverse);
+    border-right: 1px solid var(--rule);
+    background: var(--band);
+    color: var(--ink-strong);
     overflow: hidden;
     isolation: isolate;
   }
@@ -548,43 +511,17 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     object-fit: cover;
   }
 
-  /* Over a photo, a blue veil keeps the lettering legible. */
+  /* Over a photo, a dark veil keeps the lettering legible. */
+  .feature-date.has-photo {
+    color: var(--ink-inverse);
+  }
+
   .feature-date.has-photo::before {
     content: '';
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: linear-gradient(160deg, rgba(27, 62, 159, 0.72), rgba(19, 41, 95, 0.9));
-  }
-
-  /* Rings going out from the lower corner. */
-  .rings {
-    position: absolute;
-    right: -7rem;
-    bottom: -7rem;
-    z-index: -1;
-    width: 22rem;
-    height: 22rem;
-    border-radius: 50%;
-    background: repeating-radial-gradient(
-      circle,
-      transparent 0 1.6rem,
-      rgba(255, 255, 255, 0.1) 1.6rem calc(1.6rem + 1px)
-    );
-    -webkit-mask-image: radial-gradient(circle, #000 20%, transparent 70%);
-    mask-image: radial-gradient(circle, #000 20%, transparent 70%);
-  }
-
-  .phase {
-    background: rgba(255, 255, 255, 0.16);
-    color: var(--ink-inverse);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-  }
-
-  .phase.now {
-    background: var(--surface);
-    color: var(--blue-strong);
+    background: rgba(15, 29, 53, 0.62);
   }
 
   .feature-chips {
@@ -597,7 +534,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     display: grid;
     margin: 0;
     font-family: var(--font-display);
-    line-height: 0.95;
+    line-height: 1;
     letter-spacing: var(--track-display);
   }
 
@@ -607,15 +544,16 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
   }
 
   .date-year {
-    font-size: var(--t-h3);
+    margin-top: var(--space-1);
+    font-size: var(--t-xl);
     font-weight: var(--w-semibold);
     letter-spacing: 0;
-    color: var(--blue-on-dark);
+    opacity: 0.72;
   }
 
   /* A season is a longer word than a month: set it a step smaller. */
   .date-big.tbc .date-month {
-    font-size: clamp(2.75rem, 2rem + 2.5vw, 4rem);
+    font-size: clamp(2.25rem, 1.8rem + 1.8vw, 3rem);
   }
 
   .feature-body {
@@ -631,29 +569,28 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     margin-top: 0;
   }
 
+  /* When, where and in what format, each under a small label. */
   .facts {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-2) var(--space-5);
+    gap: var(--space-3) var(--space-6);
     margin: var(--space-4) 0 0;
-    padding: 0;
-    list-style: none;
   }
 
-  .facts li {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
+  .facts dt {
+    font-family: var(--font-label);
+    font-size: var(--t-xs);
+    font-weight: var(--w-semibold);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .facts dd {
+    margin: 0;
     font-size: var(--t-sm);
     font-weight: var(--w-medium);
     color: var(--ink-strong);
-  }
-
-  .facts :global(svg) {
-    flex: none;
-    width: 1rem;
-    height: 1rem;
-    color: var(--blue);
   }
 
   .feature-summary {
@@ -663,27 +600,24 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     color: var(--ink-body);
   }
 
-  .highlights {
+  .highlights,
+  .more-highlights {
     display: grid;
     gap: var(--space-2);
     margin: var(--space-5) 0 0;
-    padding: 0;
-    list-style: none;
+    padding: 0 0 0 1.125rem;
   }
 
-  .highlights li {
-    display: grid;
-    grid-template-columns: 1.125rem minmax(0, 1fr);
-    gap: var(--space-3);
+  .highlights li,
+  .more-highlights li {
+    padding-left: 0.125rem;
     font-size: var(--t-base);
     color: var(--ink-body);
   }
 
-  .highlights :global(svg) {
-    width: 1.125rem;
-    height: 1.125rem;
-    margin-top: 0.25rem;
-    color: var(--blue);
+  .highlights li::marker,
+  .more-highlights li::marker {
+    color: var(--ink-faint);
   }
 
   .feature-actions {
@@ -723,9 +657,6 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     align-items: start;
     gap: var(--space-5);
     padding: var(--space-5);
-    transition:
-      box-shadow var(--dur-slow) var(--ease-out),
-      border-color var(--dur-slow) var(--ease);
   }
 
   .more-date {
@@ -733,15 +664,17 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     justify-items: center;
     margin: 0;
     padding: var(--space-3) 0;
+    border: 1px solid var(--band-edge);
     border-radius: var(--r-md);
-    background: var(--blue-wash);
-    color: var(--blue-strong);
+    background: var(--band);
+    color: var(--ink-strong);
     line-height: 1.15;
   }
 
   .more-date span:first-child {
     font-family: var(--font-display);
     font-size: var(--t-xl);
+    font-weight: var(--w-semibold);
   }
 
   .more-date span:last-child {
@@ -752,7 +685,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
   /* Not a fixed date yet: the badge is drawn in dashes, and the season
      ("Winter") is set a step smaller than a month would be, to fit. */
   .more-date.tbc {
-    border: 1px dashed var(--blue);
+    border: 1px dashed var(--rule-strong);
     background: var(--surface);
   }
 
@@ -761,27 +694,13 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
   }
 
   .more-highlights {
-    display: grid;
     gap: var(--space-1);
-    margin: var(--space-3) 0 0;
-    padding: 0;
-    list-style: none;
+    margin-top: var(--space-3);
   }
 
   .more-highlights li {
-    display: grid;
-    grid-template-columns: 1rem minmax(0, 1fr);
-    gap: var(--space-2);
     font-size: var(--t-sm);
     line-height: 1.55;
-    color: var(--ink-body);
-  }
-
-  .more-highlights :global(svg) {
-    width: 1rem;
-    height: 1rem;
-    margin-top: 0.2rem;
-    color: var(--blue);
   }
 
   .more-chips {
@@ -795,7 +714,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     margin: 0;
     font-size: var(--t-sm);
     font-weight: var(--w-semibold);
-    color: var(--blue);
+    color: var(--ink-muted);
   }
 
   .more-item h4 {
@@ -840,9 +759,6 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
 
   .stage.current {
     border-color: var(--blue);
-    box-shadow:
-      0 0 0 4px var(--blue-wash),
-      var(--shadow-sm);
   }
 
   .stage-top {
@@ -861,16 +777,15 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     color: var(--ink-muted);
   }
 
-  .stage.done .stage-no,
   .stage.current .stage-no {
-    color: var(--blue);
+    color: var(--ink-strong);
   }
 
   .stage-when {
     margin: var(--space-5) 0 0;
     font-size: var(--t-sm);
     font-weight: var(--w-semibold);
-    color: var(--blue);
+    color: var(--ink-muted);
   }
 
   .stage h3 {
@@ -990,7 +905,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
   .ical-row {
     display: flex;
     border: 1px solid var(--rule);
-    border-radius: var(--r-pill);
+    border-radius: var(--r-md);
     background: var(--bg);
     overflow: hidden;
     transition:
@@ -1000,7 +915,6 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
 
   .ical-row:focus-within {
     border-color: var(--blue);
-    box-shadow: 0 0 0 4px var(--blue-wash);
   }
 
   .ical-row input {
@@ -1044,7 +958,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
 
   .copy:focus-visible {
     outline-offset: -3px;
-    border-radius: var(--r-pill);
+    border-radius: var(--r-md);
   }
 
   .copy span {
@@ -1100,7 +1014,6 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
   .host {
     margin: var(--space-6) 0 0;
     color: var(--ink-muted);
-    text-align: center;
   }
 
   .host a {
@@ -1128,6 +1041,8 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
       align-items: flex-end;
       gap: var(--space-4);
       min-height: 0;
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
     }
 
     /* Date first, status after it, on one line. */

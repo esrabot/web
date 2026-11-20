@@ -1,6 +1,6 @@
 ---
 /**
- * An aside: a tinted block with a small label.
+ * An aside: a gray block with a small label.
  *
  * Usage in markdown:
  *   <Callout kind="warn" title="Mind the enamel">
@@ -22,23 +22,23 @@ const defaultTitle = { note: 'Note', warn: 'Caution', spec: 'Spec' }[kind];
 </aside>
 
 <style>
+  /* Neutral throughout: a note is gray, a caution gets the darkest edge,
+     and a spec sheet sits on white. */
   .callout {
     padding: var(--space-4) var(--space-5);
-    border: 1px solid var(--blue-soft);
-    border-left: 4px solid var(--blue);
+    border: 1px solid var(--band-edge);
+    border-left: 3px solid var(--rule-strong);
     border-radius: var(--r-md);
-    background: var(--blue-wash);
+    background: var(--band);
   }
 
   .callout.warn {
-    border-color: var(--band-edge);
-    border-left-color: var(--ink-muted);
-    background: var(--band);
+    border-left-color: var(--ink-strong);
   }
 
   .callout.spec {
     border-color: var(--rule);
-    border-left-color: var(--ink-strong);
+    border-left-color: var(--ink-muted);
     background: var(--surface);
   }
 
@@ -50,15 +50,11 @@ const defaultTitle = { note: 'Note', warn: 'Caution', spec: 'Spec' }[kind];
     line-height: var(--lh-snug);
     letter-spacing: var(--track-label);
     text-transform: uppercase;
-    color: var(--blue-strong);
+    color: var(--ink-muted);
   }
 
   .warn .label {
-    color: var(--ink-muted);
-  }
-
-  .spec .label {
-    color: var(--ink-muted);
+    color: var(--ink-strong);
   }
 
   .body {

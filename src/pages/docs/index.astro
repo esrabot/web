@@ -53,9 +53,6 @@ const docs = (await getCollection('docs'))
                     {doc.data.duration}
                   </span>
                 )}
-                <span class="guide-go" aria-hidden="true">
-                  <Icon name="lucide:arrow-right" />
-                </span>
               </div>
             </li>
           ))}
@@ -120,30 +117,6 @@ const docs = (await getCollection('docs'))
     gap: var(--space-4);
   }
 
-  .guide-go {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    background: var(--blue-wash);
-    color: var(--blue);
-    transition:
-      background-color var(--dur) var(--ease),
-      color var(--dur) var(--ease);
-  }
-
-  .guide-go :global(svg) {
-    width: 1.125rem;
-    height: 1.125rem;
-  }
-
-  .guide:hover .guide-go {
-    background: var(--blue);
-    color: var(--ink-inverse);
-  }
-
   .empty {
     max-width: var(--measure);
     margin: 0;
@@ -170,7 +143,6 @@ const docs = (await getCollection('docs'))
 
     .guide-no {
       grid-column: 1 / -1;
-      font-size: 1.75rem;
     }
 
     .guide-end .chip {

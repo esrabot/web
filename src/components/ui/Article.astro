@@ -34,8 +34,6 @@ const { eyebrow, title, lede, back } = Astro.props;
 ---
 
 <article class="article">
-  <div class="article-wash" aria-hidden="true"></div>
-
   <div class="article-shell">
     <a class="article-back" href={back.href}>
       <Icon name="lucide:arrow-left" aria-hidden="true" />
@@ -78,19 +76,6 @@ const { eyebrow, title, lede, back } = Astro.props;
     position: relative;
     padding-block: clamp(2.5rem, 6vw, 4.5rem) 0;
     isolation: isolate;
-  }
-
-  .article-wash {
-    position: absolute;
-    inset: calc(-1 * var(--header-h)) 0 auto;
-    z-index: -1;
-    height: 34rem;
-    background:
-      radial-gradient(52rem 26rem at 88% 0%, var(--blue-soft), transparent 62%),
-      radial-gradient(44rem 24rem at 4% 8%, var(--band), transparent 64%);
-    -webkit-mask-image: linear-gradient(#000 45%, transparent);
-    mask-image: linear-gradient(#000 45%, transparent);
-    pointer-events: none;
   }
 
   .article-shell {
@@ -156,9 +141,8 @@ const { eyebrow, title, lede, back } = Astro.props;
     max-width: 100%;
     height: auto;
     max-height: min(40rem, 78vh);
-    border-radius: var(--r-xl);
+    border-radius: var(--r-lg);
     background: var(--band);
-    box-shadow: var(--shadow-md);
   }
 
   .article-body {

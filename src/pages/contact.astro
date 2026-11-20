@@ -39,11 +39,8 @@ const mailboxes = CONTACTS.map((c) => {
     <SectionHead eyebrow="Email" title="Write to the right inbox" />
     <div class="mailboxes">
       {
-        mailboxes.map((c, i) => (
+        mailboxes.map((c) => (
           <a class="mailbox card lift" href={`mailto:${c.address}`}>
-            <span class="mb-icon" aria-hidden="true">
-              <Icon name="lucide:mail" />
-            </span>
             <span class="mb-label">{c.label}</span>
             <span class="mb-addr">
               {c.local}
@@ -112,7 +109,7 @@ const mailboxes = CONTACTS.map((c) => {
   .mailbox {
     display: flex;
     flex-direction: column;
-    padding: var(--space-6);
+    padding: var(--space-5);
     color: var(--ink-strong);
     text-decoration: none;
   }
@@ -121,38 +118,13 @@ const mailboxes = CONTACTS.map((c) => {
     color: var(--ink-strong);
   }
 
-  .mb-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: var(--r-md);
-    background: var(--blue-wash);
-    color: var(--blue);
-    transition:
-      background-color var(--dur-slow) var(--ease),
-      color var(--dur-slow) var(--ease);
-  }
-
-  .mb-icon :global(svg) {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-
-  .mailbox:hover .mb-icon {
-    background: var(--blue);
-    color: var(--ink-inverse);
-  }
-
   .mb-label {
-    margin-top: var(--space-5);
     font-family: var(--font-label);
     font-size: var(--t-xs);
     font-weight: var(--w-semibold);
     letter-spacing: var(--track-label);
     text-transform: uppercase;
-    color: var(--blue);
+    color: var(--ink-muted);
   }
 
   .mb-addr {
