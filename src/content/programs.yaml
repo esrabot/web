@@ -3,13 +3,13 @@
 # Shown on the home page and at the top of /projects.
 #
 #   status      active | planned | complete
-#   flagship    true for the one programme that gets the wide card
+#   flagship    true for the one program that gets the wide card
 #   milestones  feed the schedule on the home page and the "on the
 #               horizon" list on /events. `starts` only places the "now"
 #               marker — readers see `when`, so keep that to what the
 #               roadmap actually commits to (a month or a season).
 #
-# Only state what is decided. A programme with no dates yet simply has no
+# Only state what is decided. A program with no dates yet simply has no
 # `timeframe` and no `milestones`. Where a date is still between two
 # candidates, `when` says the season and `starts` takes the later date, so
 # the "now" marker never runs ahead of what has happened.
@@ -46,7 +46,7 @@
     - starts: 2026-10-15
       when: Oct–Nov 2026
       title: Launch and baseline
-      body: Teams split the work and agree a shared technical baseline.
+      body: Teams split the work and agree on a shared technical baseline.
     - starts: 2026-11-11
       when: Winter 2026–27
       title: Subsystem development

@@ -23,4 +23,4 @@ links:
 ---
 
 Software, from the Columbia University Robotics Club. Writes long-form on
-the build log about organisation structure and the summer's work.
+the build log about organization structure and the summer's work.

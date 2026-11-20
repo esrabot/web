@@ -27,7 +27,7 @@
   icon: student
   audience: Students
   title: Join the team
-  lede: Help build the robots, or the organisation behind them.
+  lede: Help build the robots, or the organization behind them.
   points:
     - Own a real part of a working robot
     - Work with students from other universities
@@ -211,7 +211,7 @@
           - cells:
               - Platinum
               - $12,500+
-              - A programme across several robots
+              - A program across several robots
               - Gold, plus priority recognition, a partnership announcement and year-round coverage
         note: Levels go by the agreed practical value of a contribution, not list price.
     - heading: Where your support is seen

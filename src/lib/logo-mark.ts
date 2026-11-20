@@ -202,7 +202,7 @@ export async function renderLogoMark(
       .map((v) => v / corners.length) as RGB;
 
     const ink = dominantTone(data, (r, g, b) => dist([r, g, b], background) > TONE_GAP);
-    if (!ink) throw new Error(`logo-mark: "${path}" is a single flat colour.`);
+    if (!ink) throw new Error(`logo-mark: "${path}" is a single flat color.`);
 
     coverage = (p) => {
       const t = between(p, background, ink.tone);

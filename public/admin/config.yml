@@ -84,7 +84,7 @@ collections:
         widget: list
         required: false
         fields:
-          - { name: org, label: Organisation, widget: select, options: [esra, rutgers-dynamics] }
+          - { name: org, label: Organization, widget: select, options: [esra, rutgers-dynamics] }
           - {
               name: title,
               label: Title,
@@ -233,8 +233,8 @@ collections:
         description: 'Shown on the home page and at the top of /projects. Only state what is decided.'
         fields:
           - name: programs
-            label: Programmes
-            label_singular: programme
+            label: Programs
+            label_singular: program
             widget: list
             root: true
             summary: '{{fields.title}} ({{fields.status}})'

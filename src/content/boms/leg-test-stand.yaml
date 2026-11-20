@@ -102,7 +102,7 @@ lines:
     purchased: false
 
   - vendor: Amazon
-    item: 26 AWG enamelled copper wire
+    item: 26 AWG enameled copper wire
     qty: 1
     unitPrice: 27.98
     unitQty: 1
