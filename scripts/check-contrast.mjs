@@ -114,13 +114,6 @@ const REQUIRED = [
   { fg: '--blue-strong', bg: '--blue-soft', min: 4.5, note: 'text on the tinted fill' },
   { fg: '--ink-inverse', bg: '--blue', min: 4.5, note: 'button text' },
   { fg: '--ink-inverse', bg: '--blue-strong', min: 4.5, note: 'button text, hovered' },
-  {
-    fg: '--ink-inverse',
-    bg: '--blue-deep',
-    min: 4.5,
-    note: 'text at the dark end of the blue band',
-  },
-  { fg: '--blue-on-dark', bg: '--blue', min: 4.5, note: 'accent text on the blue band' },
 ];
 
 let failed = 0;

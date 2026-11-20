@@ -85,7 +85,7 @@ const structuredData = [
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#fbf8f2" />
+    <meta name="theme-color" content="#ffffff" />
     <link rel="canonical" href={canonical} />
 
     <title>{pageTitle}</title>
@@ -131,19 +131,10 @@ const structuredData = [
       (function () {
         var doc = document;
 
-        /* --- Header: a hairline once the page scrolls under it -------- */
+        /* --- Header: the folded menu ---------------------------------- */
         var header = doc.querySelector('[data-header]');
         var toggle = doc.querySelector('[data-menu-toggle]');
 
-        if (header) {
-          var onScroll = function () {
-            header.toggleAttribute('data-scrolled', window.scrollY > 8);
-          };
-          onScroll();
-          window.addEventListener('scroll', onScroll, { passive: true });
-        }
-
-        /* --- Header: the folded menu ---------------------------------- */
         var setMenu = function (open) {
           if (!header || !toggle) return;
           header.toggleAttribute('data-open', open);

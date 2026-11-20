@@ -327,27 +327,6 @@ kbd {
   --btn-border-hover: transparent;
 }
 
-/* On a dark band: a white button, and an outlined companion. */
-.btn.on-blue {
-  --btn-bg: var(--surface);
-  --btn-bg-hover: var(--blue-wash);
-  --btn-fg: var(--blue-strong);
-  --btn-border: var(--surface);
-  --btn-border-hover: var(--blue-wash);
-}
-
-.btn.on-blue.outline {
-  --btn-bg: transparent;
-  --btn-bg-hover: rgba(255, 255, 255, 0.12);
-  --btn-fg: var(--ink-inverse);
-  --btn-border: rgba(255, 255, 255, 0.6);
-  --btn-border-hover: var(--ink-inverse);
-}
-
-.btn.on-blue:focus-visible {
-  outline-color: var(--ink-inverse);
-}
-
 .btn.sm {
   min-height: 2.25rem;
   padding: 0 0.875rem;

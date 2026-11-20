@@ -2,22 +2,18 @@
 /**
  * Site footer.
  *
- * Opens with the closing call to action — one blue band, the only large
- * block of saturated colour on a page — then the link columns on beige,
- * a last line of legal and build facts, and to close, the ESRA
- * wordmark set solid across the full width.
+ * Opens with a plain closing call to action on white, then the link
+ * columns on gray, and a last line of legal and build facts.
  *
  * Channel columns come from the org registry, so an account appears here
  * or does not exist.
  */
-import { Icon } from 'astro-icon/components';
-
 import Logo from '../ui/Logo.astro';
 import { CONTACTS, JOIN_HREF, NAV, SITE, buildInfo } from '../../data/site';
 import { ORGS, PLATFORM_META } from '../../data/orgs';
 
 interface Props {
-  /** Drop the call-to-action band (pages that end on their own). */
+  /** Drop the closing call to action (pages that end on their own). */
   cta?: boolean;
 }
 
@@ -31,38 +27,34 @@ const year = new Date().getFullYear();
 <footer class="footer">
   {
     cta && (
-      <div class="container cta-wrap">
-        <section class="cta-band" aria-labelledby="footer-cta">
-          <div class="cta-glow" aria-hidden="true" />
+      <section class="cta" aria-labelledby="footer-cta">
+        <div class="container cta-row">
           <div class="cta-copy">
             <p class="eyebrow">Get involved</p>
             <h2 id="footer-cta">Robots no single campus could build alone.</h2>
           </div>
           <div class="cta-actions">
-            <a class="btn lg on-blue" href={JOIN_HREF}>
-              Get involved <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
+            <a class="btn" href={JOIN_HREF}>
+              Get involved
             </a>
-            <a class="btn lg on-blue outline" href="/contact">
+            <a class="btn secondary" href="/contact">
               Contact us
             </a>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     )
   }
 
-  <div class:list={['base', { 'has-cta': cta }]}>
+  <div class="base">
     <div class="container">
       <div class="cols">
         <div class="about">
           <a href="/" class="brand" aria-label={`${SITE.name} home`}>
-            <Logo height={26} label={null} />
+            <Logo height={24} label={null} />
           </a>
           <p class="blurb">{SITE.description}</p>
-          <a class="mail" href={`mailto:${general.address}`}>
-            <Icon name="lucide:mail" aria-hidden="true" />
-            {general.address}
-          </a>
+          <a class="mail" href={`mailto:${general.address}`}>{general.address}</a>
         </div>
 
         <nav class="col" aria-label="Site">
@@ -124,10 +116,6 @@ const year = new Date().getFullYear();
           }
         </p>
       </div>
-
-      <div class="wordmark" aria-hidden="true">
-        <Logo label={null} tight />
-      </div>
     </div>
   </div>
 </footer>
@@ -137,42 +125,24 @@ const year = new Date().getFullYear();
     margin-top: var(--section-y);
   }
 
-  /* --- the call to action --------------------------------------- */
-  .cta-wrap {
-    position: relative;
-    z-index: 1;
+  /* A page that ends on a gray band already has its break: no white gap
+     between the band and the closing section. */
+  :global(main:has(> .tone-band:last-child)) + .footer {
+    margin-top: 0;
   }
 
-  .cta-band {
-    position: relative;
+  /* --- the closing call to action ---------------------------------- */
+  .cta {
+    border-top: 1px solid var(--rule);
+  }
+
+  .cta-row {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
-    gap: var(--space-6) var(--space-7);
     flex-wrap: wrap;
-    padding: clamp(2.25rem, 6vw, 4.5rem);
-    border-radius: var(--r-xl);
-    background: linear-gradient(
-      125deg,
-      var(--blue) 0%,
-      var(--blue-strong) 55%,
-      var(--blue-deep) 100%
-    );
-    color: var(--ink-inverse);
-    box-shadow: var(--shadow-blue);
-    overflow: hidden;
-    isolation: isolate;
-  }
-
-  /* Two soft lights behind the copy: one warm, one cool. */
-  .cta-glow {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background:
-      radial-gradient(38rem 22rem at 100% 0%, rgba(243, 235, 220, 0.3), transparent 60%),
-      radial-gradient(30rem 20rem at 0% 100%, rgba(185, 205, 251, 0.28), transparent 60%);
-    pointer-events: none;
+    gap: var(--space-5) var(--space-7);
+    padding-block: var(--space-8);
   }
 
   .cta-copy {
@@ -180,19 +150,10 @@ const year = new Date().getFullYear();
     min-width: 0;
   }
 
-  .cta-band .eyebrow {
-    color: var(--blue-on-dark);
-  }
-
-  .cta-band h2 {
-    margin-top: var(--space-4);
-    max-width: 18ch;
+  .cta h2 {
+    margin-top: var(--space-3);
+    max-width: 24ch;
     font-size: var(--t-h2);
-    color: var(--ink-inverse);
-  }
-
-  .cta-band h2 em {
-    color: var(--band);
   }
 
   .cta-actions {
@@ -208,12 +169,6 @@ const year = new Date().getFullYear();
     padding-block: var(--space-8) var(--space-6);
   }
 
-  /* The band straddles the top edge of the beige. */
-  .base.has-cta {
-    margin-top: calc(-1 * clamp(3rem, 8vw, 5.5rem));
-    padding-top: calc(clamp(3rem, 8vw, 5.5rem) + var(--space-8));
-  }
-
   .cols {
     display: grid;
     grid-template-columns: minmax(0, 1.7fr) repeat(3, minmax(0, 1fr));
@@ -224,11 +179,6 @@ const year = new Date().getFullYear();
     display: inline-flex;
     color: var(--ink-strong);
     text-decoration: none;
-    transition: color var(--dur) var(--ease);
-  }
-
-  .brand:hover {
-    color: var(--blue);
   }
 
   .blurb {
@@ -240,23 +190,15 @@ const year = new Date().getFullYear();
   }
 
   .mail {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
+    display: inline-block;
     margin-top: var(--space-4);
     font-size: var(--t-sm);
     font-weight: var(--w-semibold);
     color: var(--ink-strong);
-    text-decoration: none;
   }
 
   .mail:hover {
     color: var(--blue);
-  }
-
-  .mail :global(svg) {
-    width: 1rem;
-    height: 1rem;
   }
 
   .col-head {
@@ -279,22 +221,17 @@ const year = new Date().getFullYear();
     list-style: none;
   }
 
-  /* The underline is ruled in from the left under the pointer. */
   .col a {
     display: inline-block;
     padding: 0.25rem 0;
     font-size: var(--t-sm);
     color: var(--ink-body);
     text-decoration: none;
-    background: linear-gradient(currentColor, currentColor) no-repeat 0 calc(100% - 0.2rem) / 0 1px;
-    transition:
-      color var(--dur) var(--ease),
-      background-size var(--dur-slow) var(--ease-out);
   }
 
   .col a:hover {
     color: var(--blue);
-    background-size: 100% 1px;
+    text-decoration: underline;
   }
 
   /* --- last line ------------------------------------------------- */
@@ -322,19 +259,6 @@ const year = new Date().getFullYear();
     color: var(--blue);
   }
 
-  /* --- the wordmark ---------------------------------------------- */
-  /* Last thing on the page: the wordmark set solid, edge to edge
-     across the columns. */
-  .wordmark {
-    margin-top: var(--space-7);
-    color: var(--ink-strong);
-  }
-
-  .wordmark :global(svg) {
-    width: 100%;
-    height: auto;
-  }
-
   @media (max-width: 1000px) {
     .cols {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -346,6 +270,10 @@ const year = new Date().getFullYear();
   }
 
   @media (max-width: 640px) {
+    .cta-row {
+      padding-block: var(--space-7);
+    }
+
     .cols {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: var(--space-6) var(--space-5);
