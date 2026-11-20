@@ -1,19 +1,23 @@
 ---
 /**
- * A partner's logo, printed in the site's ink.
+ * A partner's logo, in gray, fitted to a box of a given height and
+ * maximum width, so every partner's mark reads at the same size.
  *
- * The logo is not shown as an image. Its shape is used as a CSS mask over
- * a block of `currentColor`, so every partner's mark takes the colour of
- * the text around it — and follows hover states and themes for free. The
- * mask itself is generated at build time from the partner's own file (see
- * src/lib/logo-mark.ts).
+ * By default the logo is not shown as an image. Its shape is used as a
+ * CSS mask over a block of `currentColor`, so every partner's mark takes
+ * the color of the text around it (a mid gray on the partner wall) and
+ * follows hover states for free. The mask is generated at build time from
+ * the partner's own file (see src/lib/logo-mark.ts).
  *
- * A partner with no logo file gets a lettered mark — its abbreviation in
- * bold capitals — sized to sit in the same row as the drawn ones.
+ * A logo with detail one ink would lose can set `logoMode: grayscale`: it
+ * is then shown as the image itself, in gray.
+ *
+ * A partner with no logo file yet gets a placeholder: its initials in a
+ * dashed box, so it is plainly a stand-in and not a logo.
  */
 import type { CollectionEntry } from 'astro:content';
 
-import { getPartnerMark } from '../../lib/logo-mark';
+import { getPartnerLogoGray, getPartnerMark } from '../../lib/logo-mark';
 
 interface Props {
   partner: CollectionEntry<'partners'>;
@@ -33,17 +37,22 @@ const {
   decorative = false,
   class: className,
 } = Astro.props;
-const { name, abbr, logo, logoInvert } = partner.data;
+const { name, abbr, logo, logoInvert, logoMode } = partner.data;
 
-const mark = logo ? await getPartnerMark(logo, { invert: logoInvert }) : null;
+const gray = Boolean(logo) && logoMode === 'grayscale';
+const mark = logo
+  ? await (gray ? getPartnerLogoGray(logo) : getPartnerMark(logo, { invert: logoInvert }))
+  : null;
 
 // Fit the mark inside height x maxWidth, keeping its proportions.
 const scale = mark ? Math.min(height / mark.height, maxWidth / mark.width) : 1;
 const w = mark ? Math.round(mark.width * scale) : 0;
 const h = mark ? Math.round(mark.height * scale) : height;
 
-// Lettered fallback: the abbreviation, or the capitals of the name.
+// Placeholder: the abbreviation, or the capitals of the name.
 const letters = (abbr ?? name.replace(/[^A-Z]/g, '')).slice(0, 5) || name.slice(0, 2).toUpperCase();
+// A box wide enough for the letters, never wider than a real logo may be.
+const boxWidth = Math.min(maxWidth, Math.round(height * 1.75));
 
 const a11y = decorative
   ? ({ 'aria-hidden': 'true' } as const)
@@ -51,7 +60,17 @@ const a11y = decorative
 ---
 
 {
-  mark ? (
+  mark && gray ? (
+    <img
+      class:list={['mark-img', className]}
+      src={`/logos/${partner.id}.png`}
+      width={w}
+      height={h}
+      alt={decorative ? '' : `${name} logo`}
+      loading="lazy"
+      decoding="async"
+    />
+  ) : mark ? (
     <span
       class:list={['mark', className]}
       style={`--mark: url('/logos/${partner.id}.png'); width: ${w}px; height: ${h}px;`}
@@ -59,8 +78,9 @@ const a11y = decorative
     />
   ) : (
     <span
-      class:list={['mark', 'lettered', className]}
-      style={`height: ${height}px; font-size: ${Math.round(height * 0.5)}px;`}
+      class:list={['mark', 'placeholder', className]}
+      style={`width: ${boxWidth}px; height: ${height}px; font-size: ${Math.max(10, Math.round(height * 0.3))}px;`}
+      title={`${name}: logo to come`}
       {...a11y}
     >
       {letters}
@@ -78,22 +98,42 @@ const a11y = decorative
     mask: var(--mark) center / contain no-repeat;
   }
 
-  .mark.lettered {
+  /* A grayscale logo, toned to sit with the one-ink marks around it. */
+  .mark-img {
+    display: block;
+    flex: none;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    opacity: 0.8;
+    transition: opacity var(--dur) var(--ease);
+  }
+
+  :global(a:hover) > .mark-img,
+  :global(a:hover) .mark-img {
+    opacity: 1;
+  }
+
+  /* No logo file yet: initials in a dashed box, plainly a stand-in. */
+  .mark.placeholder {
     display: flex;
     align-items: center;
+    justify-content: center;
+    border: 1px dashed currentColor;
+    border-radius: var(--r-sm);
     background: none;
     -webkit-mask: none;
     mask: none;
     font-family: var(--font-sans);
-    font-weight: var(--w-bold);
+    font-weight: var(--w-semibold);
     line-height: 1;
-    letter-spacing: -0.03em;
+    letter-spacing: 0.04em;
     white-space: nowrap;
   }
 
-  /* Forced colours drop backgrounds, which would erase a masked mark. */
+  /* Forced colors drop backgrounds, which would erase a masked mark. */
   @media (forced-colors: active) {
-    .mark:not(.lettered) {
+    .mark:not(.placeholder) {
       forced-color-adjust: none;
       background: CanvasText;
     }

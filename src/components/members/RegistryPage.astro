@@ -283,19 +283,19 @@ const KIND_LABEL = {
     color: var(--blue);
   }
 
-  /* The mark takes its colour from here: navy, blue under the pointer. */
+  /* The mark takes its color from here: gray, darker under the pointer. */
   .club-mark {
     display: flex;
     align-items: center;
     flex: 1;
     min-height: 5rem;
     padding-block: var(--space-4);
-    color: var(--ink-strong);
+    color: var(--ink-muted);
     transition: color var(--dur-slow) var(--ease);
   }
 
   .club:hover .club-mark {
-    color: var(--blue);
+    color: var(--ink-strong);
   }
 
   .club-name {

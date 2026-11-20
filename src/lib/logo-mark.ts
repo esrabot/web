@@ -18,7 +18,9 @@
  *     background, everything else is ink.
  *
  * If a logo comes out as its own negative, set `logoInvert: true` on the
- * partner record to swap ink and knockout.
+ * partner record to swap ink and knockout. If it loses its detail as a
+ * one-ink mark, set `logoMode: grayscale` to show the logo itself in gray
+ * instead (see getPartnerLogoGray).
  *
  * Build-time only. src/pages/logos/[id].png.ts serves the PNG;
  * PartnerMark.astro reads its size to lay the mark out.
@@ -105,6 +107,37 @@ export function getPartnerMark(logo: string, options: LogoMarkOptions = {}): Pro
     cache.set(key, mark);
   }
   return mark;
+}
+
+const grayCache = new Map<string, Promise<LogoMark>>();
+
+/**
+ * The logo itself, in grayscale: for a partner whose logo does not
+ * survive being reduced to one ink (fine detail, shading, a photograph).
+ * Set `logoMode: grayscale` on the partner record to use it.
+ */
+export function getPartnerLogoGray(logo: string): Promise<LogoMark> {
+  let gray = grayCache.get(logo);
+  if (!gray) {
+    gray = renderLogoGray(join(process.cwd(), LOGO_DIR, logo));
+    grayCache.set(logo, gray);
+  }
+  return gray;
+}
+
+async function renderLogoGray(path: string): Promise<LogoMark> {
+  const meta = await sharp(path).metadata();
+  const longEdge = Math.max(meta.width ?? SIZE, meta.height ?? SIZE);
+  const density =
+    meta.format === 'svg' ? Math.min(2400, Math.ceil((72 * SIZE * 1.5) / longEdge)) : undefined;
+
+  const { data: png, info } = await sharp(path, density ? { density } : undefined)
+    .resize(SIZE, SIZE, { fit: 'inside' })
+    .grayscale()
+    .png({ compressionLevel: 9 })
+    .toBuffer({ resolveWithObject: true });
+
+  return { png, width: info.width, height: info.height };
 }
 
 /** Reduce the logo at `path` to a white-on-transparent PNG mark. */

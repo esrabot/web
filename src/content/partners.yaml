@@ -1,19 +1,30 @@
 # Partners: the clubs, schools, companies and organizations ESRA works
 # with. Each one appears on the home page's partner wall and on /members.
 #
-#   kind   club (default) | school | company | organization
-#   logo   file name under src/assets/logos — any format, any colours.
-#          The site redraws it in its own ink, so logos never clash with
-#          the page or each other. If one comes out as a negative, add
-#          `logoInvert: true`.
+#   kind      club (default) | school | company | organization
+#             Clubs and schools are listed first. Companies and
+#             organizations (sponsors among them) get a group of their own
+#             on the home page, which appears as soon as there is one.
+#   logo      file name under src/assets/logos: SVG preferred, or a PNG at
+#             least 400px wide. Any colors. Every logo is shown in the same
+#             gray and fitted to the same size box, so none outshouts
+#             another. Until a file is added, the wall shows the partner's
+#             initials in a dashed box: a placeholder, not a logo.
+#   logoMode  silhouette (default): the logo redrawn in one gray ink.
+#             grayscale: the logo itself in gray, for one with detail a
+#             single ink would lose (shading, a photo, a crest).
+#   logoInvert  true if a silhouette comes out as its own negative.
+#
+# Only add a partner who has agreed to be listed, with a logo they have
+# given permission to use.
 #
 # Migrated from the old site's content/team/partners.yaml, with the CRT
 # URL upgraded to https (it was http) and the Rutgers Dynamics entry
 # pointed at the club's real site rather than its LinkedIn page.
 #
-# RMC and UC Berkeley have no logo asset yet — the old site pointed both
-# at ESRA's own mark, which misrepresented them, so the field is simply
-# omitted and the wall shows a lettered mark until a file is added.
+# TODO(confirm): RMC and UC Berkeley have no logo file yet, so both show
+# the initials placeholder. The old site pointed both at ESRA's own mark,
+# which misrepresented them. Add their files when the team has them.
 
 - id: crt
   name: Caltech Robotics Team

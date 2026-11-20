@@ -239,6 +239,22 @@ const KIND_LABEL = {
 };
 
 const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Complete' };
+
+/* ------------------------------------------------------------------
+ * The partner wall: clubs and schools, then companies and other
+ * organizations as a group of their own once there are any. A partner
+ * with no logo file yet shows a dashed initials placeholder.
+ * ---------------------------------------------------------------- */
+const network = partners.filter((p) => p.data.kind === 'club' || p.data.kind === 'school');
+const companies = partners.filter(
+  (p) => p.data.kind === 'company' || p.data.kind === 'organization'
+);
+
+// "Club · Caltech · Pasadena, CA": a school is not repeated as its own school.
+const partnerMeta = (p: (typeof partners)[number]) =>
+  [KIND_LABEL[p.data.kind], p.data.kind !== 'school' && p.data.school, p.data.location]
+    .filter(Boolean)
+    .join(' · ');
 ---
 
 <BaseLayout>
@@ -698,47 +714,60 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   <!-- ============================================================
-       Partners
+       Partners: clubs and schools, then companies once there are any
        ============================================================ -->
   <Section id="partners" pad="flush-bottom">
     <SectionHead eyebrow="Partners" title="The clubs and schools in the network.">
       <span slot="aside">{partners.length} partners · {schoolCount} schools</span>
     </SectionHead>
 
-    <div class="roster">
+    <ul class="logo-wall" aria-label="Clubs and schools">
       {
-        partners.map((p) => (
-          <a class="tile card lift" href={p.data.url} rel="noopener" target="_blank">
-            <span class="tile-top">
-              <span class="chip">{KIND_LABEL[p.data.kind]}</span>
-              <Icon name="lucide:arrow-up-right" class="tile-go" aria-hidden="true" />
-            </span>
-            <span class="tile-mark">
-              <PartnerMark partner={p} height={64} maxWidth={132} decorative />
-            </span>
-            <span class="tile-name">{p.data.name}</span>
-            <span class="tile-meta">
-              {[p.data.kind !== 'school' && p.data.school, p.data.location]
-                .filter(Boolean)
-                .join(' · ')}
-            </span>
-            <span class="sr-only">(opens in a new tab)</span>
-          </a>
+        network.map((p) => (
+          <li>
+            <a class="logo-cell" href={p.data.url} rel="noopener" target="_blank">
+              <span class="logo-box">
+                <PartnerMark partner={p} height={52} maxWidth={140} decorative />
+              </span>
+              <span class="logo-name">{p.data.name}</span>
+              <span class="logo-meta">{partnerMeta(p)}</span>
+              <span class="sr-only"> (opens in a new tab)</span>
+            </a>
+          </li>
         ))
       }
-      <a class="tile open" href="#join">
-        <span class="open-plus" aria-hidden="true">
-          <Icon name="lucide:plus" />
-        </span>
-        <span class="open-text">
-          <span class="tile-name">Your team here</span>
-          <span class="tile-meta">Clubs, labs and companies welcome</span>
-        </span>
-        <span class="link-arrow">
-          Get involved <Icon name="lucide:arrow-right" aria-hidden="true" />
-        </span>
-      </a>
-    </div>
+      <li class="open-cell">
+        <a class="open" href="#join">
+          <span class="open-name">Your team here</span>
+          <span class="open-meta">Clubs, labs and companies welcome</span>
+          <span class="link-arrow">
+            Get involved <Icon name="lucide:arrow-right" aria-hidden="true" />
+          </span>
+        </a>
+      </li>
+    </ul>
+
+    {
+      companies.length > 0 && (
+        <div class="companies">
+          <h3 class="companies-head">Companies and organizations</h3>
+          <ul class="logo-wall" aria-label="Companies and organizations">
+            {companies.map((p) => (
+              <li>
+                <a class="logo-cell" href={p.data.url} rel="noopener" target="_blank">
+                  <span class="logo-box">
+                    <PartnerMark partner={p} height={52} maxWidth={140} decorative />
+                  </span>
+                  <span class="logo-name">{p.data.name}</span>
+                  <span class="logo-meta">{partnerMeta(p)}</span>
+                  <span class="sr-only"> (opens in a new tab)</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
   </Section>
 </BaseLayout>
 
@@ -1587,126 +1616,100 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   /* ================================================================
    * Partners
    * ============================================================== */
-  .roster {
+  .logo-wall {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr));
-    gap: var(--space-5);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
-  .tile {
+  /* Every logo sits in a box of the same height, in one gray, with the
+     name in text beneath it. */
+  .logo-cell {
     display: flex;
     flex-direction: column;
-    min-height: 15rem;
+    height: 100%;
     padding: var(--space-5);
-    color: var(--ink-strong);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    color: var(--ink-muted);
     text-decoration: none;
+    transition:
+      border-color var(--dur) var(--ease),
+      color var(--dur) var(--ease);
   }
 
-  .tile:hover {
+  .logo-cell:hover {
+    border-color: var(--rule-strong);
     color: var(--ink-strong);
   }
 
-  .tile-top {
+  .logo-box {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    height: 4.25rem;
+    margin-bottom: var(--space-4);
   }
 
-  .tile-go {
-    width: 1.125rem;
-    height: 1.125rem;
-    color: var(--ink-faint);
-    transition: color var(--dur) var(--ease);
-  }
-
-  .tile:hover .tile-go {
-    color: var(--blue);
-  }
-
-  /* The mark prints in navy and turns blue with the tile. */
-  .tile-mark {
-    display: flex;
-    align-items: center;
-    flex: 1;
-    min-height: 5.5rem;
-    padding-block: var(--space-4);
-    color: var(--ink-strong);
-    transition: color var(--dur-slow) var(--ease);
-  }
-
-  .tile:hover .tile-mark {
-    color: var(--blue);
-  }
-
-  .tile-name {
-    font-family: var(--font-display);
-    font-size: var(--t-lg);
+  .logo-name {
+    font-size: var(--t-base);
     font-weight: var(--w-semibold);
-    line-height: 1.3;
-    letter-spacing: var(--track-tight);
+    line-height: 1.35;
+    color: var(--ink-strong);
   }
 
-  .tile-meta {
+  .logo-meta {
     margin-top: var(--space-1);
     font-size: var(--t-sm);
     line-height: 1.45;
     color: var(--ink-muted);
   }
 
-  /* The open place: not a card, an invitation. It takes a whole row of
-     its own, so it never ends up as a lone tile however many partners
-     there are. */
-  .tile.open {
+  /* The open place: a dashed row of its own after the partners. */
+  .open-cell {
     grid-column: 1 / -1;
-    flex-direction: row;
+  }
+
+  .open {
+    display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: var(--space-4) var(--space-5);
-    min-height: 0;
-    border: 1.5px dashed var(--rule-strong);
+    gap: var(--space-2) var(--space-5);
+    padding: var(--space-4) var(--space-5);
+    border: 1px dashed var(--rule-strong);
     border-radius: var(--r-lg);
-    transition:
-      border-color var(--dur) var(--ease),
-      background-color var(--dur) var(--ease);
+    color: var(--ink-strong);
+    text-decoration: none;
+    transition: border-color var(--dur) var(--ease);
   }
 
-  .tile.open:hover {
+  .open:hover {
     border-color: var(--blue);
-    background: var(--blue-wash);
   }
 
-  .open-plus {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: none;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 50%;
-    background: var(--band);
-    color: var(--ink-muted);
-    transition:
-      background-color var(--dur-slow) var(--ease),
-      color var(--dur-slow) var(--ease);
+  .open-name {
+    font-weight: var(--w-semibold);
   }
 
-  .open-plus :global(svg) {
-    width: 1.375rem;
-    height: 1.375rem;
-  }
-
-  .tile.open:hover .open-plus {
-    background: var(--blue);
-    color: var(--ink-inverse);
-  }
-
-  .open-text {
-    display: grid;
+  .open-meta {
     flex: 1 1 14rem;
+    font-size: var(--t-sm);
+    color: var(--ink-muted);
   }
 
-  .tile.open .link-arrow {
+  .open .link-arrow {
     font-size: var(--t-sm);
+  }
+
+  .companies {
+    margin-top: var(--space-7);
+  }
+
+  .companies-head {
+    margin-bottom: var(--space-4);
+    font-size: var(--t-h3);
   }
 
   /* ================================================================

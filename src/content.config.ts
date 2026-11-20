@@ -140,6 +140,12 @@ const partners = defineCollection({
     logo: z.string().optional(),
     /** Swap ink and knockout if the redrawn logo comes out as a negative. */
     logoInvert: z.boolean().default(false),
+    /**
+     * `silhouette` (default) redraws the logo in one gray ink. `grayscale`
+     * shows the logo itself in gray, for one with detail a single ink
+     * would lose. Either way every logo sits in the same size box.
+     */
+    logoMode: z.enum(['silhouette', 'grayscale']).default('silhouette'),
   }),
 });
 
