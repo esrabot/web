@@ -28,7 +28,6 @@ const mailboxes = CONTACTS.map((c) => {
     title="Say hello."
     lede="Email is best, and it is read by people rather than a bot. For build logs and day-to-day updates, the channels below are where they land first."
   >
-    <Fragment slot="title">Say <em>hello.</em></Fragment>
     <a class="btn" href={`mailto:${CONTACTS[0].address}`}>
       <Icon name="lucide:mail" aria-hidden="true" />
       {CONTACTS[0].address}

@@ -22,7 +22,6 @@ import Section from '../components/ui/Section.astro';
 import SectionHead from '../components/ui/SectionHead.astro';
 import PartnerMark from '../components/ui/PartnerMark.astro';
 import DataTable from '../components/ui/DataTable.astro';
-import Scratch from '../components/ui/Scratch.astro';
 import { CONTACTS, SITE } from '../data/site';
 import { getPublicRepos } from '../lib/github';
 
@@ -57,12 +56,6 @@ const fills = milestones.map((m, i) => {
   const span = next.starts.getTime() - m.starts.getTime();
   return Math.min(1, Math.max(0, (now.getTime() - m.starts.getTime()) / span));
 });
-
-// The flagship's one-line summary is the section's headline; its last
-// word takes the italic accent ("…built across *campuses.*").
-const summaryWords = (flagship?.data.summary ?? '').split(' ');
-const summaryLead = summaryWords.slice(0, -1).join(' ');
-const summaryTail = summaryWords.at(-1) ?? '';
 
 const firstWhen = milestones[0]?.when;
 const lastWhen = milestones.at(-1)?.when;
@@ -246,7 +239,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
       <div class="hero-copy">
         <p class="eyebrow">{SITE.fullName}</p>
 
-        <h1>One robot.<br /><em>Many campuses.</em></h1>
+        <h1>One robot.<br />Many campuses.</h1>
 
         <p class="lede">
           ESRA is a national nonprofit that connects university robotics teams, so they can share
@@ -325,11 +318,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
           eyebrow="Why ESRA"
           title="Every campus debugging the same robot alone."
           align="center"
-        >
-          <Fragment slot="title">
-            Every campus debugging the same robot <em><Scratch>alone</Scratch>.</em>
-          </Fragment>
-        </SectionHead>
+        />
 
         <div class="why-body">
           <p>
@@ -440,8 +429,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
                 {flagship.data.designation && (
                   <span class="designation">{flagship.data.designation}</span>
                 )}
-                {`${summaryLead} `}
-                <em>{summaryTail}</em>
+                {flagship.data.summary}
               </Fragment>
             </SectionHead>
 
@@ -564,9 +552,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
       eyebrow="Get involved"
       title="Four ways in. Start where you fit."
       lede="Whether you are a student, a club, a lab or a company, there is a place for you. Open a card to see what each involves."
-    >
-      <Fragment slot="title">Four ways in. Start where you <em>fit.</em></Fragment>
-    </SectionHead>
+    />
 
     <div class="ways">
       {
@@ -733,7 +719,6 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
        ============================================================ -->
   <Section id="partners" pad="flush-bottom">
     <SectionHead eyebrow="Partners" title="The clubs and schools in the network.">
-      <Fragment slot="title">The clubs and schools in the <em>network.</em></Fragment>
       <span slot="aside">{partners.length} partners · {schoolCount} schools</span>
     </SectionHead>
 
@@ -1146,12 +1131,11 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   .step-no {
-    font-family: var(--font-display);
-    font-size: 2.25rem;
-    font-weight: 400;
-    font-style: italic;
+    font-size: var(--t-sm);
+    font-weight: var(--w-semibold);
     line-height: 1;
-    color: var(--blue);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-muted);
   }
 
   .step h4 {
@@ -1184,16 +1168,9 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     max-width: 16ch;
   }
 
-  /* "H1", set large and in blue, ahead of the sentence it names. */
+  /* "H1": the program's name, set as the first line of its heading. */
   .designation {
     display: block;
-    margin-bottom: var(--space-2);
-    font-size: clamp(4rem, 3rem + 5vw, 7rem);
-    font-weight: 400;
-    font-style: italic;
-    line-height: 0.9;
-    letter-spacing: -0.04em;
-    color: var(--blue);
   }
 
   .flagship-body {

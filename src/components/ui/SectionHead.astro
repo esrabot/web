@@ -5,11 +5,9 @@
  * at the far end (a count, a link).
  *
  * The heading is a real heading element so the outline stays correct.
- * For a title with an italic accent word, use the `title` slot:
- *
- *   <SectionHead eyebrow="Get involved" title="Four ways in">
- *     <Fragment slot="title">Four ways in. Start where you <em>fit.</em></Fragment>
- *   </SectionHead>
+ * Headings are plain text, with no italic or colored accent words. The
+ * `title` slot is only for a heading that needs markup (a name on a line
+ * of its own); `title` stays the plain-text version.
  */
 interface Props {
   /** Plain-text title. Also the fallback when the `title` slot is unused. */

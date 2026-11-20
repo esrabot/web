@@ -168,9 +168,6 @@ const KIND_LABEL = {
           title="The people building it."
           lede="Students and engineers across affiliated clubs and schools, building in the open. Pick a name to read more and find them elsewhere."
         >
-          <Fragment slot="title">
-            The people <em>building it.</em>
-          </Fragment>
           <span class="chip sand">
             {`${members.length} ${members.length === 1 ? 'member' : 'members'}`}
           </span>
@@ -198,9 +195,6 @@ const KIND_LABEL = {
             title="The clubs and schools in the network."
             lede="The teams and institutions ESRA works with."
           >
-            <Fragment slot="title">
-              The clubs and schools in the <em>network.</em>
-            </Fragment>
             <span slot="aside">
               {partners.length} partners · {schoolCount} schools
             </span>

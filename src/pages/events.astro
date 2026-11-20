@@ -124,7 +124,6 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     title="Where the network meets."
     lede="Build milestones, integration sessions, and everything else on the ESRA calendar — with a feed you can add to your own."
   >
-    <Fragment slot="title">Where the network <em>meets.</em></Fragment>
     <a class="btn" href="#calendar">
       <Icon name="lucide:calendar-days" aria-hidden="true" />
       Open the calendar
@@ -370,9 +369,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
       eyebrow="Calendar"
       title="Every date, in one place."
       lede="Workshops, work sessions, and deadlines all land on the public ESRA calendar. Subscribe once and they show up in yours."
-    >
-      <Fragment slot="title">Every date, in one <em>place.</em></Fragment>
-    </SectionHead>
+    />
 
     <div class="cal">
       <div class="cal-frame card">
@@ -605,9 +602,8 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
   }
 
   .date-month {
-    font-size: clamp(3.5rem, 2.5rem + 3.5vw, 5.5rem);
-    font-weight: 400;
-    font-style: italic;
+    font-size: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+    font-weight: var(--w-semibold);
   }
 
   .date-year {
@@ -746,7 +742,6 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
   .more-date span:first-child {
     font-family: var(--font-display);
     font-size: var(--t-xl);
-    font-style: italic;
   }
 
   .more-date span:last-child {
@@ -859,11 +854,11 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
   }
 
   .stage-no {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    font-style: italic;
+    font-size: var(--t-sm);
+    font-weight: var(--w-semibold);
     line-height: 1;
-    color: var(--sand-deep);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-muted);
   }
 
   .stage.done .stage-no,
@@ -919,10 +914,9 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     margin: 0;
     font-family: var(--font-display);
     font-size: var(--t-xl);
-    font-style: italic;
     line-height: 1.25;
     letter-spacing: var(--track-tight);
-    color: var(--blue);
+    color: var(--ink-strong);
   }
 
   /* ================================================================

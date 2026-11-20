@@ -162,7 +162,6 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     title="Real robots, built in the open."
     lede="Humanoids, quadrupeds and manipulators, built by student teams across universities and documented well enough for others to rebuild."
   >
-    <Fragment slot="title">Real robots, built <em>in the open.</em></Fragment>
     <a class="btn" href="#roadmap">
       See the roadmap <Icon name="lucide:arrow-down" aria-hidden="true" />
     </a>
@@ -212,11 +211,6 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
               <span class="chip outline">{flagship.data.kind}</span>
             </div>
 
-            {flagship.data.designation && (
-              <p class="flag-designation" aria-hidden="true">
-                {flagship.data.designation}
-              </p>
-            )}
             <h3>{flagship.data.title}</h3>
             <p class="flag-summary">{flagship.data.summary}</p>
             {flagship.data.description && <p class="flag-body">{flagship.data.description}</p>}
@@ -399,9 +393,7 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
       eyebrow="Open source"
       title="Engineering others can rebuild."
       lede="Every project is published on GitHub, so other student teams can understand the design decisions, reproduce the work and build on it."
-    >
-      <Fragment slot="title">Engineering others can <em>rebuild.</em></Fragment>
-    </SectionHead>
+    />
 
     <div class="docs-grid">
       <section class="docs-card card" aria-labelledby="release-title">
@@ -602,17 +594,6 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
-  }
-
-  .flag-designation {
-    margin: var(--space-5) 0 0;
-    font-family: var(--font-display);
-    font-size: clamp(4.5rem, 3rem + 6vw, 7.5rem);
-    font-weight: 400;
-    font-style: italic;
-    line-height: 0.85;
-    letter-spacing: -0.04em;
-    color: var(--blue);
   }
 
   .flag h3 {
@@ -849,12 +830,11 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
   }
 
   .built-no {
-    font-family: var(--font-display);
-    font-size: 2.25rem;
-    font-weight: 400;
-    font-style: italic;
+    font-size: var(--t-sm);
+    font-weight: var(--w-semibold);
     line-height: 1;
-    color: var(--blue);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-muted);
   }
 
   .built-step p {

@@ -111,11 +111,12 @@ p {
   text-wrap: pretty;
 }
 
-/* The one flourish: an italic word in a headline, in blue. */
-:is(h1, h2, h3) em {
-  font-style: italic;
-  font-weight: 400;
-  color: var(--blue);
+/* Headings are set plainly. An <em> inside one is not turned into a
+   colored, italic accent word. */
+:is(h1, h2, h3, h4) em {
+  font-style: normal;
+  font-weight: inherit;
+  color: inherit;
 }
 
 a {
