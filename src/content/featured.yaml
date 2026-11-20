@@ -1,8 +1,8 @@
-# Home page showcase.
+# Recent activity, on the Projects page.
 #
-# Hand-picked items shown in "Recent activity" alongside the automatically
-# generated repo entries. Edit this file to change what's
-# featured — no code involved.
+# Hand-picked posts and links, listed under "Recent activity" above the
+# repositories on /projects (the list only appears once there is an entry
+# here). Edit this file to change what's featured — no code involved.
 #
 # To feature a LinkedIn post: open the post on LinkedIn, copy the number
 # out of its URL (the digits after `urn:li:activity:` or after

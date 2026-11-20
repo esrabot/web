@@ -13,9 +13,11 @@
  *      its own (src/content/projects/*.md).
  *   5. Open documentation — what every release includes, the reports,
  *      and the Industry Research Alliance to come.
- *   6. Repositories — generated from the org's real repositories, so the
- *      list stays current with no hand-maintenance. It shows the first
- *      eight; a button brings in the rest.
+ *   6. Recent activity — hand-picked posts and links from
+ *      src/content/featured.yaml, when there are any.
+ *   7. Repositories — generated from the org's real repositories, so the
+ *      list stays current with no hand-maintenance. Most recently updated
+ *      first; it shows the first eight, and a button brings in the rest.
  *
  * A markdown file in src/content/projects can also enrich a repository's
  * card (a better title or summary, discipline tags) by naming it in
@@ -102,11 +104,32 @@ const RELEASE = [
 const REPORTS =
   'Technical papers and reports document design decisions, methods, results and limitations. The final H1 report is a full build guide.';
 
-const [repos, curated, allPrograms] = await Promise.all([
+const [repos, curated, allPrograms, allFeatured] = await Promise.all([
   getPublicRepos(),
   getCollection('projects'),
   getCollection('programs'),
+  getCollection('featured'),
 ]);
+
+/* --- Recent activity: hand-picked posts and links -------------------
+ * From src/content/featured.yaml. Shown above the repositories, and only
+ * when there is something in it. The repositories themselves are listed
+ * most recently updated first, so the latest code activity leads that
+ * list already. */
+const FEATURED_KIND = { linkedin: 'LinkedIn', repo: 'Repo', link: 'Link' };
+const posts = allFeatured
+  .filter((f) => !f.data.draft)
+  .sort(
+    (a, b) =>
+      (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0) || a.data.order - b.data.order
+  )
+  .slice(0, 5);
+const postDate = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+  timeZone: 'UTC',
+});
 
 /* --- 1. The roadmap ------------------------------------------------ */
 const programs = [...allPrograms].sort((a, b) => a.data.order - b.data.order);
@@ -419,13 +442,40 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
   </Section>
 
   <!-- ============================================================
-       6 — Repositories
+       6 — Recent activity (only when featured.yaml has entries)
+       ============================================================ -->
+  {
+    posts.length > 0 && (
+      <Section id="activity" pad="flush-bottom">
+        <SectionHead size="sm" eyebrow="Elsewhere" title="Recent activity" />
+        <ul class="activity">
+          {posts.map((f) => (
+            <li>
+              <a href={f.data.url} rel="noopener" target="_blank">
+                <span class="act-kind">{FEATURED_KIND[f.data.type]}</span>
+                <span class="act-title">{f.data.title}</span>
+                {f.data.date && (
+                  <time class="act-date" datetime={f.data.date.toISOString()}>
+                    {postDate.format(f.data.date)}
+                  </time>
+                )}
+                <span class="sr-only"> (opens in a new tab)</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </Section>
+    )
+  }
+
+  <!-- ============================================================
+       7 — Repositories
        ============================================================ -->
   <Section id="repositories" pad="flush-bottom">
     <SectionHead
       eyebrow="On GitHub"
       title="Repositories"
-      lede="Everything here is public. The figures come straight from GitHub each time the site is built — none of it is maintained by hand."
+      lede="Everything here is public, most recently updated first. The figures come straight from GitHub each time the site is built — none of it is maintained by hand."
     >
       <a slot="aside" class="link-arrow out" href={SITE.orgUrl} rel="noopener" target="_blank">
         All repositories on GitHub <Icon name="lucide:arrow-up-right" aria-hidden="true" />
@@ -977,6 +1027,42 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     font-size: var(--t-xs);
     line-height: 1.5;
     color: var(--ink-muted);
+  }
+
+  /* ================================================================
+   * Recent activity
+   * ============================================================== */
+  .activity {
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--rule);
+    list-style: none;
+  }
+
+  .activity a {
+    display: grid;
+    grid-template-columns: 6rem minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--rule-soft);
+    color: var(--ink-strong);
+    text-decoration: none;
+  }
+
+  .activity a:hover .act-title {
+    color: var(--blue);
+    text-decoration: underline;
+  }
+
+  .act-kind,
+  .act-date {
+    font-size: var(--t-sm);
+    color: var(--ink-muted);
+  }
+
+  .act-title {
+    font-weight: var(--w-medium);
   }
 
   /* ================================================================

@@ -65,7 +65,7 @@ src/
     events.yaml       featured events on /events
     pathways.yaml     the "Get involved" cards, pop-ups and /partner
     media.yaml        photo and video slots, with what each one needs
-    featured.yaml     hand-picked links for the home page
+    featured.yaml     hand-picked links, under "Recent activity" on /projects
   data/
     orgs.ts           every social/org URL, defined once
     site.ts           site constants, navigation, the events calendar
