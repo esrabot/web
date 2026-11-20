@@ -148,7 +148,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
         </p>
       ) : (
         <div class="features">
-          {featured.map((e, i) => (
+          {featured.map((e) => (
             <article id={e.id} class="feature card">
               <div class:list={['feature-date', { 'has-photo': e.photo }]}>
                 {e.photo && (
@@ -229,7 +229,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
         <div class="more">
           <SectionHead as="h3" size="sm" eyebrow="Also" title="More events" />
           <ul class="more-list">
-            {others.map((e, i) => (
+            {others.map((e) => (
               <li id={e.id} class="more-item card">
                 <p class:list={['more-date', { tbc: e.tentative }]} aria-hidden="true">
                   <span>{e.dateTop}</span>
@@ -330,7 +330,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     <SectionHead size="sm" eyebrow="Updates" title="What we publish" />
     <dl class="publish">
       {
-        PUBLISH.map((p, i) => (
+        PUBLISH.map((p) => (
           <div class="pub card">
             <dt>{p.output}</dt>
             <dd>{p.often}</dd>

@@ -153,7 +153,7 @@ const KIND_LABEL = {
               </a>
             </SectionHead>
             <div class="wall">
-              {others.map((m, i) => (
+              {others.map((m) => (
                 <MemberCard member={m} />
               ))}
             </div>
@@ -179,7 +179,7 @@ const KIND_LABEL = {
         <Section pad="flush-top">
           <h2 class="sr-only">Everyone</h2>
           <div class="wall">
-            {members.map((m, i) => (
+            {members.map((m) => (
               <MemberCard member={m} />
             ))}
           </div>
@@ -200,7 +200,7 @@ const KIND_LABEL = {
           </SectionHead>
 
           <div class="clubs">
-            {partners.map((p, i) => (
+            {partners.map((p) => (
               <a class="club card lift" href={p.data.url} rel="noopener" target="_blank">
                 <span class="club-top">
                   <span class="chip">{KIND_LABEL[p.data.kind]}</span>

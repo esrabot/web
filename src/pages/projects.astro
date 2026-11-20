@@ -201,7 +201,7 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     <SectionHead size="sm" eyebrow="Project areas" title="What ESRA projects can involve" />
     <ul class="areas">
       {
-        AREAS.map((a, i) => (
+        AREAS.map((a) => (
           <li class="area card">
             <h3>{a.title}</h3>
             <p>{a.body}</p>
@@ -299,7 +299,7 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     {
       otherPrograms.length > 0 && (
         <div class="program-grid">
-          {otherPrograms.map((p, i) => (
+          {otherPrograms.map((p) => (
             <article id={p.id} class="program card">
               <div class="program-top">
                 <p class="program-kind">
@@ -377,7 +377,7 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
         />
 
         <div class="build-grid">
-          {builds.map((b, i) => (
+          {builds.map((b) => (
             <article class="build card lift">
               <div class="build-top">
                 <span class="chip">{BUILD_STATUS[b.data.status]}</span>
