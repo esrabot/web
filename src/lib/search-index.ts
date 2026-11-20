@@ -14,9 +14,7 @@
 import { getCollection } from 'astro:content';
 
 import { CONTACTS, JOIN_HREF, SITE } from '../data/site';
-import { getOrg } from '../data/orgs';
 import { getPublicRepos } from './github';
-import { memberPath } from './routes';
 
 /** Result groups, in the order they rank when scores tie. */
 export const SEARCH_KINDS = [
@@ -169,15 +167,8 @@ function staticEntries(): SearchEntry[] {
       w: 'docs documentation field guides how to tutorial instructions build',
     },
     {
-      t: 'Members',
-      u: '/members',
-      k: 'Page',
-      d: 'The people building ESRA, and the clubs and schools in the network.',
-      w: 'team people roster directory who staff directors partners clubs schools',
-    },
-    {
       t: 'Partners',
-      u: '/members#partners',
+      u: '/#partners',
       k: 'Page',
       d: 'The clubs and schools in the network.',
       w: 'clubs schools universities affiliated network companies organizations',
@@ -203,11 +194,12 @@ function staticEntries(): SearchEntry[] {
 }
 
 export async function buildSearchIndex(): Promise<SearchEntry[]> {
-  const [projects, programs, events, members, partners, repos] = await Promise.all([
+  // Members are hidden for now (see pages/members/_index.astro), so people
+  // are left out of search until their pages come back.
+  const [projects, programs, events, partners, repos] = await Promise.all([
     getCollection('projects'),
     getCollection('programs'),
     getCollection('events'),
-    getCollection('members'),
     getCollection('partners'),
     getPublicRepos(),
   ]);
@@ -255,21 +247,6 @@ export async function buildSearchIndex(): Promise<SearchEntry[]> {
       k: 'Event',
       d: words(e.when, e.location && `· ${e.location}`),
       w: words(e.kicker, e.format, e.summary, e.highlights.join(' ')),
-    });
-  }
-
-  for (const member of members.filter((m) => !m.data.inactive)) {
-    const m = member.data;
-    const roles = m.roles
-      .map((r) => words(r.title, getOrg(r.org)?.name ?? r.org))
-      .filter(Boolean)
-      .join(', ');
-    entries.push({
-      t: m.name,
-      u: memberPath(member),
-      k: 'Member',
-      d: words(m.affiliation) || roles || 'ESRA member',
-      w: words(m.discipline, roles, m.handle, plainText(member.body)),
     });
   }
 

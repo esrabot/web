@@ -7,6 +7,10 @@
  * that collides with a real route is rejected at build time here, and the
  * content validator reports the same clash in plain English before the
  * build even starts.
+ *
+ * HIDDEN FOR NOW, like /members: the leading underscore in the filename
+ * stops Astro from building these pages. See members/_index.astro for how
+ * to bring them back.
  */
 import { getCollection } from 'astro:content';
 

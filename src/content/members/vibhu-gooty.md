@@ -2,10 +2,11 @@
 name: Vibhu T. Gooty
 order: 9
 affiliation: ESRA
+avatar: ../../assets/avatars/vibhu-gooty.jpg
 roles:
   - org: esra
-    title: Co-director
+    title: Executive Director
 links: []
 ---
 
-Co-director of ESRA.
+Executive Director of ESRA.

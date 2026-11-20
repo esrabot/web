@@ -3,7 +3,13 @@
  * /members — everyone, and the partner clubs and schools.
  *
  * Individual pages live at the site root (/your-handle), see
- * src/pages/[member].astro.
+ * src/pages/_[member].astro.
+ *
+ * HIDDEN FOR NOW. The leading underscore in the filename stops Astro from
+ * building this page. To bring Members back, rename this file and
+ * _[member].astro back without the underscore, re-add Members to NAV in
+ * data/site.ts, to the search dialog and search page, and to the search
+ * index, and drop the temporary /members redirects in vercel.json.
  */
 import { getCollection } from 'astro:content';
 

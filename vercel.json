@@ -34,6 +34,9 @@
       "destination": "/events",
       "permanent": false
     },
+    { "source": "/members", "destination": "/", "permanent": false },
+    { "source": "/grace-wu", "destination": "/", "permanent": false },
+    { "source": "/vibhu-gooty", "destination": "/", "permanent": false },
     { "source": "/blog", "destination": "/", "permanent": true },
     { "source": "/blog/:path*", "destination": "/", "permanent": true },
     { "source": "/gallery", "destination": "/", "permanent": true },
