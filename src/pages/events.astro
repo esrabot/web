@@ -278,7 +278,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
                   )}
                 </div>
                 <div class="more-chips">
-                  <span class:list={['chip', e.phase === 'now' ? 'solid' : 'sand']}>
+                  <span class:list={['chip', { solid: e.phase === 'now' }]}>
                     {PHASE_LABEL[e.phase]}
                   </span>
                   {e.tentative && <span class="chip outline">{DATE_TBC}</span>}
@@ -328,7 +328,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
                   </span>
                 )}
                 {i < currentMilestone && (
-                  <span class="chip sand">
+                  <span class="chip">
                     <Icon name="lucide:check" aria-hidden="true" />
                     Done
                   </span>
@@ -364,7 +364,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
   <!-- ============================================================
        The calendar
        ============================================================ -->
-  <Section id="calendar" tone="sand">
+  <Section id="calendar" tone="band">
     <SectionHead
       eyebrow="Calendar"
       title="Every date, in one place."
@@ -598,7 +598,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     margin: 0;
     font-family: var(--font-display);
     line-height: 0.95;
-    letter-spacing: -0.03em;
+    letter-spacing: var(--track-display);
   }
 
   .date-month {
@@ -608,7 +608,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
 
   .date-year {
     font-size: var(--t-h3);
-    font-weight: 500;
+    font-weight: var(--w-semibold);
     letter-spacing: 0;
     color: var(--blue-on-dark);
   }
@@ -1099,7 +1099,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
 
   .host {
     margin: var(--space-6) 0 0;
-    color: var(--sand-ink);
+    color: var(--ink-muted);
     text-align: center;
   }
 

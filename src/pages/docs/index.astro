@@ -24,7 +24,7 @@ const docs = (await getCollection('docs'))
     title="Build it yourself."
     lede="Build notes and procedures, written so that someone outside the group can follow them — parts lists included."
   >
-    <span class="chip sand">{`${docs.length} ${docs.length === 1 ? 'guide' : 'guides'}`}</span>
+    <span class="chip">{`${docs.length} ${docs.length === 1 ? 'guide' : 'guides'}`}</span>
   </PageHero>
 
   <Section pad="flush-top">

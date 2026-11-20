@@ -101,18 +101,16 @@ const REQUIRED = [
   { fg: '--ink-strong', bg: '--surface', min: 4.5, note: 'headings on cards' },
   { fg: '--ink-body', bg: '--surface', min: 4.5, note: 'body copy on cards' },
   { fg: '--ink-muted', bg: '--surface', min: 4.5, note: 'captions and meta on cards' },
-  { fg: '--ink-strong', bg: '--sand', min: 4.5, note: 'headings on beige bands' },
-  { fg: '--ink-body', bg: '--sand', min: 4.5, note: 'body copy on beige bands' },
-  { fg: '--ink-muted', bg: '--sand', min: 4.5, note: 'captions on beige bands' },
-  { fg: '--sand-ink', bg: '--sand', min: 4.5, note: 'small labels on beige' },
-  { fg: '--sand-ink', bg: '--surface', min: 4.5, note: 'beige-ink labels on cards' },
+  { fg: '--ink-strong', bg: '--band', min: 4.5, note: 'headings on gray bands' },
+  { fg: '--ink-body', bg: '--band', min: 4.5, note: 'body copy on gray bands, tag text' },
+  { fg: '--ink-muted', bg: '--band', min: 4.5, note: 'captions and labels on gray bands' },
 
   // The accent, as text and as a fill.
-  { fg: '--blue', bg: '--bg', min: 4.5, note: 'links and eyebrows on the page' },
-  { fg: '--blue', bg: '--surface', min: 4.5, note: 'links and eyebrows on cards' },
-  { fg: '--blue', bg: '--sand', min: 4.5, note: 'links and eyebrows on beige' },
-  { fg: '--blue', bg: '--blue-wash', min: 4.5, note: 'icons and text on the lightest tint' },
-  { fg: '--blue-strong', bg: '--blue-wash', min: 4.5, note: 'chip text' },
+  { fg: '--blue', bg: '--bg', min: 4.5, note: 'links on the page' },
+  { fg: '--blue', bg: '--surface', min: 4.5, note: 'links on cards' },
+  { fg: '--blue', bg: '--band', min: 4.5, note: 'links on gray bands' },
+  { fg: '--blue', bg: '--blue-wash', min: 4.5, note: 'text on a hovered or selected row' },
+  { fg: '--blue-strong', bg: '--blue-wash', min: 4.5, note: 'hovered text on the lightest tint' },
   { fg: '--blue-strong', bg: '--blue-soft', min: 4.5, note: 'text on the tinted fill' },
   { fg: '--ink-inverse', bg: '--blue', min: 4.5, note: 'button text' },
   { fg: '--ink-inverse', bg: '--blue-strong', min: 4.5, note: 'button text, hovered' },
@@ -123,7 +121,6 @@ const REQUIRED = [
     note: 'text at the dark end of the blue band',
   },
   { fg: '--blue-on-dark', bg: '--blue', min: 4.5, note: 'accent text on the blue band' },
-  { fg: '--sand', bg: '--blue', min: 4.5, note: 'the italic accent on the blue band' },
 ];
 
 let failed = 0;

@@ -98,23 +98,20 @@ documents the measured contrast ratio of every text colour, and
 
 ## Design system
 
-A light, warm page: warm white and beige surfaces, deep navy ink, and a
-single blue for everything you can act on. Headlines are set in
-[Fraunces](https://fonts.google.com/specimen/Fraunces), a soft serif, with
-one italic word in blue; running text and the interface are in
-[Inter](https://rsms.me/inter/); code and table figures in IBM Plex Mono.
-All three are open-licence and self-hosted.
+A plain, institutional page: white, with light-gray bands, deep navy ink,
+and a single blue kept for links, buttons and focus. Headings and running
+text are set in [Inter](https://rsms.me/inter/), whose optical-size axis
+gives large headings Inter Display's tighter shapes; code and table
+figures are in IBM Plex Mono. Both are open-license and self-hosted.
+Headings are plain, with no italic or colored accent words.
 
 Everything lives as tokens in [tokens.css](./src/styles/tokens.css) —
-colours, type sizes, spacing, radii, shadows and motion — and the shared
-pieces (buttons, cards, chips, pop-up dialogs, scroll arrivals) are defined
-once in [global.css](./src/styles/global.css).
+colors, type sizes, spacing, radii, shadows and motion — and the shared
+pieces (buttons, cards, tags, pop-up dialogs) are defined once in [global.css](./src/styles/global.css).
 
-- **Motion.** Blocks rise into view once, cards lift under the pointer,
-  buttons sink when pressed, dialogs ease open, and pages cross-fade where
-  the browser supports it. All of it stands down under
-  `prefers-reduced-motion`, and nothing depends on it: without JavaScript
-  every block is simply visible.
+- **Motion.** Kept to a minimum. Nothing animates into view and nothing
+  moves on its own; hover states change color, borders and underlines
+  only, and even that stands down under `prefers-reduced-motion`.
 - **Contrast.** `pnpm check:contrast` measures every text-and-surface pair
   in the tokens against WCAG AA and fails CI below it.
 - **Partner logos** are redrawn in the page's own ink at build time

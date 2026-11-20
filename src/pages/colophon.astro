@@ -46,28 +46,26 @@ const build = buildInfo();
 
       <h2>Typography</h2>
       <p>
-        Headlines are set in{' '}
-        <a href="https://fonts.google.com/specimen/Fraunces" rel="noopener">Fraunces</a>, a soft
-        old-style serif with an optical-size axis that keeps large settings delicate. Running text
-        and the interface are in <a href="https://rsms.me/inter/" rel="noopener">Inter</a>; code and
-        figures in tables are in <a href="https://www.ibm.com/plex/" rel="noopener">IBM Plex Mono</a
-        >. All three are open-licence families, and all are served from this site rather than a font
-        service.
+        Headings and running text are set in{' '}
+        <a href="https://rsms.me/inter/" rel="noopener">Inter</a>, whose optical-size axis gives
+        large headings the tighter shapes of Inter Display. Code and figures in tables are in{' '}
+        <a href="https://www.ibm.com/plex/" rel="noopener">IBM Plex Mono</a>. Both are open-license
+        families, served from this site rather than a font service.
       </p>
 
-      <h2>Colour</h2>
+      <h2>Color</h2>
       <p>
-        A warm-white page with beige bands, deep navy ink, and a single blue for everything you can
-        act on. Partner logos are redrawn in that same ink at build time, so none of them clash with
-        the page or each other. Text contrast is enforced in CI: every text-and-surface pair is
-        measured against WCAG&nbsp;AA, and the build fails below it.
+        A white page with light-gray bands, deep navy ink, and a single blue kept for links and
+        buttons. Partner logos are redrawn in one ink at build time, so none of them clash with the
+        page or each other. Text contrast is enforced in CI: every text-and-surface pair is measured
+        against WCAG&nbsp;AA, and the build fails below it.
       </p>
 
       <h2>Motion</h2>
       <p>
-        Blocks rise into place the first time they scroll into view, cards lift toward the pointer,
-        and buttons sink when pressed. All of it stands down for anyone whose system asks for
-        reduced motion, and none of it is needed to read or use the site.
+        Kept to a minimum. Content is visible the moment it is on screen: nothing animates into view
+        or moves on its own. Hover states change color, borders and underlines only, and even that
+        stands down for anyone whose system asks for reduced motion.
       </p>
 
       <h2>This build</h2>

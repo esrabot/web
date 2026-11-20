@@ -40,7 +40,7 @@ const titled = roles
   </h3>
   {titled && <p class="role">{titled}</p>}
   {affiliation && <p class="affil">{affiliation}</p>}
-  {discipline && <span class="chip sand">{discipline}</span>}
+  {discipline && <span class="chip">{discipline}</span>}
 </article>
 
 <style>
@@ -59,14 +59,14 @@ const titled = roles
     height: 5rem;
     overflow: hidden;
     border-radius: 50%;
-    background: var(--sand);
+    background: var(--band);
     box-shadow:
       0 0 0 3px var(--surface),
       0 0 0 4px var(--rule);
     font-family: var(--font-display);
     font-size: 1.625rem;
-    font-weight: 500;
-    color: var(--sand-ink);
+    font-weight: var(--w-semibold);
+    color: var(--ink-muted);
     transition: box-shadow var(--dur-slow) var(--ease);
   }
 

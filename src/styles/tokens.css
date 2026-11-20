@@ -1,10 +1,12 @@
 /*
  * ESRA design tokens
  * ------------------
- * A light, warm page: paper white and beige surfaces, deep navy ink, and
- * one blue that marks everything you can act on. Headlines are set in a
- * soft serif, running text in a clean sans. Every colour, size, radius,
- * shadow and duration lives here; components reference tokens only.
+ * A plain, institutional page: white, with light-gray bands to set one
+ * section apart from the next, deep navy ink, and one blue reserved for
+ * links, buttons and focus. One typeface, Inter, for headings and text.
+ * Small radii, hairline borders instead of shadows. Every color, size,
+ * radius, shadow and duration lives here; components reference tokens
+ * only.
  */
 
 :root {
@@ -14,12 +16,13 @@
    * Surfaces
    * Load-bearing for scripts/check-contrast.mjs: literal values only.
    * ------------------------------------------------------------- */
-  --bg: #fbf8f2; /* the page — warm white */
+  --bg: #ffffff; /* the page */
   --surface: #ffffff; /* cards, dialogs, inputs */
-  --sand: #f3ebdc; /* beige bands and wells */
-  --sand-deep: #e6d8bd; /* beige borders, the footer's keyline */
+  --band: #f4f5f7; /* gray bands and wells, tags */
+  --band-edge: #dfe3e8; /* the band's solid border, the footer's keyline */
   --navy: #0f1d35; /* the darkest ink, and the modal scrim's hue */
-  --bg-glass: rgba(251, 248, 242, 0.82); /* --bg, translucent: sticky header */
+  /* Retired with the header's restyle; kept until then. */
+  --bg-glass: rgba(255, 255, 255, 0.92);
 
   /* ---------------------------------------------------------------
    * Ink. Ratios are enforced in scripts/check-contrast.mjs.
@@ -30,17 +33,17 @@
   --ink-muted: #586479;
   --ink-faint: #a3abb9;
   --ink-inverse: #ffffff;
-  --sand-ink: #6a5836; /* small labels set on beige */
 
   /* ---------------------------------------------------------------
-   * Blue — the single accent
+   * Blue: the single accent. Links, buttons, focus, and "now" markers.
+   * Not for headings, labels, icons or decoration.
    * ------------------------------------------------------------- */
   --blue: #2450c8;
   --blue-strong: #1b3e9f; /* hover, pressed */
-  --blue-deep: #13295f; /* a button's lower edge, the CTA band's far end */
-  --blue-soft: #dce6fb; /* tinted fills, focus halo */
-  --blue-wash: #eef3fd; /* the lightest tint: hover rows, icon badges */
-  --blue-on-dark: #d3e0fd; /* accent text on the blue band */
+  --blue-deep: #13295f; /* retired with the footer's blue band */
+  --blue-soft: #dce6fb; /* focus halo, text selection */
+  --blue-wash: #eef3fd; /* the lightest tint: a hovered or selected row */
+  --blue-on-dark: #d3e0fd; /* retired with the footer's blue band */
 
   /* ---------------------------------------------------------------
    * Rules
@@ -52,38 +55,41 @@
   /* ---------------------------------------------------------------
    * Typography
    *
-   *   Fraunces  — headlines. A soft, old-style serif with an optical
-   *               size axis, so large settings stay delicate.
-   *   Inter     — everything read as sentences, and the interface.
+   *   Inter     — headings, running text and the interface. The
+   *               variable font's optical-size axis gives large
+   *               headings Inter Display's tighter shapes on its own.
    *   Plex Mono — code, figures in tables, repository names.
+   *
+   * --font-display names the role (headings), not a second family.
    * ------------------------------------------------------------- */
-  --font-display: 'Fraunces Variable', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
   --font-sans:
     'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+  --font-display: var(--font-sans);
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  /* The small tracked labels. One token, so the lettering can be swapped
-     without touching a component. */
+  /* The small uppercase labels. */
   --font-label: var(--font-sans);
 
+  /* One scale. Components pick from it rather than setting sizes of
+     their own. */
   --t-xs: 0.75rem; /* 12 */
   --t-sm: 0.875rem; /* 14 */
   --t-base: 1rem; /* 16 */
   --t-md: 1.0625rem; /* 17 */
-  --t-lg: 1.1875rem; /* 19 */
-  --t-xl: 1.375rem; /* 22 */
-  --t-h3: clamp(1.375rem, 1.1rem + 0.9vw, 1.625rem);
-  --t-h2: clamp(1.875rem, 1.3rem + 2.4vw, 2.875rem);
-  --t-h1: clamp(2.375rem, 1.5rem + 3.8vw, 4rem);
-  --t-hero: clamp(2.75rem, 1.4rem + 6vw, 5.5rem);
+  --t-lg: 1.125rem; /* 18 */
+  --t-xl: 1.25rem; /* 20 */
+  --t-h3: clamp(1.125rem, 1rem + 0.5vw, 1.375rem); /* 18–22 */
+  --t-h2: clamp(1.625rem, 1.3rem + 1.3vw, 2.125rem); /* 26–34 */
+  --t-h1: clamp(2rem, 1.5rem + 2vw, 2.75rem); /* 32–44 */
+  --t-hero: clamp(2.25rem, 1.6rem + 2.8vw, 3.5rem); /* 36–56 */
 
-  --lh-tight: 1.05;
-  --lh-heading: 1.15;
+  --lh-tight: 1.1;
+  --lh-heading: 1.2;
   --lh-snug: 1.4;
-  --lh-body: 1.65;
+  --lh-body: 1.6;
 
-  --track-display: -0.025em;
-  --track-tight: -0.015em;
-  --track-label: 0.14em;
+  --track-display: -0.022em;
+  --track-tight: -0.012em;
+  --track-label: 0.06em;
 
   --w-regular: 400;
   --w-medium: 500;
@@ -101,7 +107,7 @@
   --space-6: 2rem; /* 32 */
   --space-7: 3rem; /* 48 */
   --space-8: 4rem; /* 64 */
-  --space-9: 6rem; /* 96 */
+  --space-9: 5rem; /* 80 */
 
   /* ---------------------------------------------------------------
    * Layout
@@ -110,8 +116,8 @@
   --container-narrow: 46rem; /* 736: articles */
   --container-wide: 85rem; /* 1360: wide sections */
   --gutter: clamp(1.25rem, 5vw, 3rem);
-  --section-y: clamp(4rem, 9vw, 7.5rem);
-  --header-h: 4.5rem;
+  --section-y: clamp(3.5rem, 7vw, 6rem);
+  --header-h: 4rem;
   --measure: 40rem; /* a comfortable line of running text */
   /* The side-note column beside an article, and the room it needs. */
   --margin-col: 15rem;
@@ -119,18 +125,22 @@
 
   /* ---------------------------------------------------------------
    * Shape and depth
+   *
+   * Small, consistent corners. Cards and panels are drawn with a
+   * hairline border, not a shadow; shadows are kept for things that
+   * float above the page (menus, dialogs).
    * ------------------------------------------------------------- */
-  --r-sm: 0.5rem;
-  --r-md: 0.875rem;
-  --r-lg: 1.25rem;
-  --r-xl: 1.75rem;
-  --r-pill: 999px;
+  --r-sm: 0.25rem; /* 4: tags, inputs */
+  --r-md: 0.375rem; /* 6: buttons, small panels */
+  --r-lg: 0.5rem; /* 8: cards */
+  --r-xl: 0.625rem; /* 10: dialogs */
+  --r-pill: 999px; /* dots and round avatars only */
 
-  --shadow-xs: 0 1px 2px rgba(15, 29, 53, 0.06);
-  --shadow-sm: 0 1px 2px rgba(15, 29, 53, 0.05), 0 4px 14px rgba(15, 29, 53, 0.05);
-  --shadow-md: 0 2px 4px rgba(15, 29, 53, 0.04), 0 14px 32px rgba(15, 29, 53, 0.1);
-  --shadow-lg: 0 4px 8px rgba(15, 29, 53, 0.04), 0 28px 64px rgba(15, 29, 53, 0.16);
-  --shadow-blue: 0 10px 24px rgba(36, 80, 200, 0.28);
+  --shadow-xs: 0 1px 2px rgba(15, 29, 53, 0.05);
+  --shadow-sm: 0 1px 2px rgba(15, 29, 53, 0.05);
+  --shadow-md: 0 4px 16px rgba(15, 29, 53, 0.08);
+  --shadow-lg: 0 12px 40px rgba(15, 29, 53, 0.16);
+  --shadow-blue: none; /* retired with the footer's blue band */
   --scrim: rgba(15, 29, 53, 0.48);
 
   /* ---------------------------------------------------------------
@@ -153,7 +163,7 @@
 
 @media (max-width: 720px) {
   :root {
-    --header-h: 4rem;
+    --header-h: 3.75rem;
   }
 }
 
@@ -175,7 +185,7 @@
   }
 }
 
-/* Forced colours: let the OS palette through. */
+/* Forced colors: let the OS palette through. */
 @media (forced-colors: active) {
   :root {
     --rule: CanvasText;

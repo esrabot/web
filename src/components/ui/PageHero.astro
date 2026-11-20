@@ -53,7 +53,7 @@ const { eyebrow, title, lede, narrow = false } = Astro.props;
     z-index: -1;
     background:
       radial-gradient(52rem 26rem at 88% 0%, var(--blue-soft), transparent 62%),
-      radial-gradient(44rem 24rem at 4% 8%, var(--sand), transparent 64%);
+      radial-gradient(44rem 24rem at 4% 8%, var(--band), transparent 64%);
     -webkit-mask-image: linear-gradient(#000 55%, transparent);
     mask-image: linear-gradient(#000 55%, transparent);
     pointer-events: none;
@@ -63,7 +63,7 @@ const { eyebrow, title, lede, narrow = false } = Astro.props;
     margin-top: var(--space-4);
     max-width: 18ch;
     font-size: var(--t-h1);
-    font-weight: 480;
+    font-weight: var(--w-semibold);
     line-height: var(--lh-tight);
     letter-spacing: var(--track-display);
   }

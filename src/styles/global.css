@@ -3,10 +3,10 @@
  * Token definitions live in tokens.css — this file only applies them.
  */
 
-/* Self-hosted faces. See tokens.css for which role each one plays. */
-@import '@fontsource-variable/fraunces/opsz.css';
-@import '@fontsource-variable/fraunces/opsz-italic.css';
-@import '@fontsource-variable/inter/wght.css';
+/* Self-hosted faces. See tokens.css for which role each one plays. The
+   italic face is only downloaded where italic text actually appears. */
+@import '@fontsource-variable/inter/opsz.css';
+@import '@fontsource-variable/inter/opsz-italic.css';
 @import '@fontsource/ibm-plex-mono/400.css';
 @import '@fontsource/ibm-plex-mono/500.css';
 
@@ -46,6 +46,7 @@ body {
   background: var(--bg);
   color: var(--ink-body);
   font-family: var(--font-sans);
+  font-optical-sizing: auto;
   font-size: var(--t-base);
   line-height: var(--lh-body);
   -webkit-font-smoothing: antialiased;
@@ -100,7 +101,7 @@ h4 {
   margin: 0;
   font-family: var(--font-display);
   font-optical-sizing: auto;
-  font-weight: 500;
+  font-weight: var(--w-semibold);
   line-height: var(--lh-heading);
   letter-spacing: var(--track-tight);
   color: var(--ink-strong);
@@ -152,8 +153,7 @@ kbd {
   min-height: 1.375rem;
   padding: 0 0.375rem;
   border: 1px solid var(--rule);
-  border-bottom-width: 2px;
-  border-radius: 0.375rem;
+  border-radius: var(--r-sm);
   background: var(--surface);
   font-family: var(--font-sans);
   font-size: 0.6875rem;
@@ -169,7 +169,7 @@ kbd {
   top: 0;
   z-index: calc(var(--z-overlay) + 1);
   padding: var(--space-3) var(--space-5);
-  border-radius: var(--r-pill);
+  border-radius: var(--r-md);
   background: var(--blue);
   color: var(--ink-inverse);
   font-weight: var(--w-semibold);
@@ -214,11 +214,10 @@ kbd {
  * Type helpers
  * ---------------------------------------------------------------- */
 
-/* The small tracked label above a heading, led by a short rule. */
+/* The small uppercase label above a section heading. Gray, not blue:
+   it orients the reader and should not compete with the heading. */
 .eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.625rem;
+  display: block;
   margin: 0;
   font-family: var(--font-label);
   font-size: var(--t-xs);
@@ -226,20 +225,7 @@ kbd {
   line-height: var(--lh-snug);
   letter-spacing: var(--track-label);
   text-transform: uppercase;
-  color: var(--blue);
-}
-
-.eyebrow::before {
-  content: '';
-  flex: none;
-  width: 1.5rem;
-  height: 1px;
-  background: currentColor;
-  opacity: 0.55;
-}
-
-.eyebrow.plain::before {
-  display: none;
+  color: var(--ink-muted);
 }
 
 .lede {
@@ -275,30 +261,30 @@ kbd {
 /* ------------------------------------------------------------------
  * Buttons
  *
- * A pill you can press: it sits on a darker lower edge. Hover changes
- * only its color; nothing moves.
+ * Flat, with a small radius. The primary button is the one solid blue
+ * thing in a block; a secondary button is outlined. Hover changes color
+ * only; nothing moves.
  * ---------------------------------------------------------------- */
 .btn {
   --btn-bg: var(--blue);
   --btn-bg-hover: var(--blue-strong);
   --btn-fg: var(--ink-inverse);
-  --btn-edge: var(--blue-deep);
-  --btn-glow: rgba(36, 80, 200, 0.24);
-  --btn-ring: transparent;
+  --btn-fg-hover: var(--btn-fg);
+  --btn-border: var(--btn-bg);
+  --btn-border-hover: var(--btn-bg-hover);
 
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  min-height: 3rem;
-  padding: 0 1.375rem;
-  border: 0;
-  border-radius: var(--r-pill);
+  min-height: 2.75rem;
+  padding: 0 1.125rem;
+  border: 1px solid var(--btn-border);
+  border-radius: var(--r-md);
   background: var(--btn-bg);
   color: var(--btn-fg);
   font-family: var(--font-sans);
-  font-size: var(--t-base);
+  font-size: 0.9375rem;
   font-weight: var(--w-semibold);
   line-height: 1;
   text-decoration: none;
@@ -306,38 +292,30 @@ kbd {
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  box-shadow:
-    inset 0 0 0 1px var(--btn-ring),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 2px 0 var(--btn-edge),
-    0 6px 16px var(--btn-glow);
   transition:
     background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
     color var(--dur) var(--ease);
 }
 
 .btn:hover {
   background: var(--btn-bg-hover);
-  color: var(--btn-fg);
+  border-color: var(--btn-border-hover);
+  color: var(--btn-fg-hover);
 }
 
 .btn:focus-visible {
-  outline-offset: 4px;
-  border-radius: var(--r-pill);
+  outline-offset: 3px;
+  border-radius: var(--r-md);
 }
 
 .btn.secondary {
   --btn-bg: var(--surface);
   --btn-bg-hover: var(--surface);
   --btn-fg: var(--ink-strong);
-  --btn-edge: var(--sand-deep);
-  --btn-glow: rgba(15, 29, 53, 0.07);
-  --btn-ring: var(--rule);
-}
-
-.btn.secondary:hover {
-  --btn-fg: var(--blue);
-  --btn-ring: var(--blue);
+  --btn-fg-hover: var(--blue);
+  --btn-border: var(--rule-strong);
+  --btn-border-hover: var(--blue);
 }
 
 /* No pad at all: a quiet text button for secondary actions. */
@@ -345,30 +323,25 @@ kbd {
   --btn-bg: transparent;
   --btn-bg-hover: var(--blue-wash);
   --btn-fg: var(--blue);
-  box-shadow: none;
+  --btn-border: transparent;
+  --btn-border-hover: transparent;
 }
 
-.btn.quiet:hover,
-.btn.quiet:active {
-  box-shadow: none;
-}
-
-/* On the blue band: a white pad, and an outlined companion. */
+/* On a dark band: a white button, and an outlined companion. */
 .btn.on-blue {
   --btn-bg: var(--surface);
-  --btn-bg-hover: var(--surface);
+  --btn-bg-hover: var(--blue-wash);
   --btn-fg: var(--blue-strong);
-  --btn-edge: rgba(8, 18, 46, 0.45);
-  --btn-glow: rgba(8, 18, 46, 0.25);
+  --btn-border: var(--surface);
+  --btn-border-hover: var(--blue-wash);
 }
 
 .btn.on-blue.outline {
   --btn-bg: transparent;
   --btn-bg-hover: rgba(255, 255, 255, 0.12);
   --btn-fg: var(--ink-inverse);
-  --btn-edge: transparent;
-  --btn-glow: transparent;
-  --btn-ring: rgba(255, 255, 255, 0.55);
+  --btn-border: rgba(255, 255, 255, 0.6);
+  --btn-border-hover: var(--ink-inverse);
 }
 
 .btn.on-blue:focus-visible {
@@ -376,53 +349,50 @@ kbd {
 }
 
 .btn.sm {
-  min-height: 2.5rem;
-  padding: 0 1.125rem;
+  min-height: 2.25rem;
+  padding: 0 0.875rem;
   font-size: var(--t-sm);
 }
 
 .btn.lg {
-  min-height: 3.5rem;
-  padding: 0 1.75rem;
-  font-size: var(--t-md);
+  min-height: 3rem;
+  padding: 0 1.375rem;
+  font-size: var(--t-base);
 }
 
 .btn svg {
-  width: 1.125em;
-  height: 1.125em;
+  width: 1em;
+  height: 1em;
   flex: none;
 }
 
 /* ------------------------------------------------------------------
- * Chips: small pills for status, type and tags
+ * Tags: small labels for status and type. Neutral by default; solid
+ * blue only for the one thing that is happening now.
  * ---------------------------------------------------------------- */
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.25rem 0.625rem;
-  border-radius: var(--r-pill);
-  background: var(--blue-wash);
-  color: var(--blue-strong);
+  gap: 0.375rem;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--r-sm);
+  background: var(--band);
+  color: var(--ink-body);
   font-size: var(--t-xs);
   font-weight: var(--w-semibold);
-  line-height: 1.4;
-  letter-spacing: 0.01em;
+  line-height: 1.5;
   white-space: nowrap;
 }
 
-.chip.sand {
-  background: var(--sand);
-  color: var(--sand-ink);
-}
-
 .chip.outline {
+  border-color: var(--rule);
   background: transparent;
-  box-shadow: inset 0 0 0 1px var(--rule);
   color: var(--ink-muted);
 }
 
 .chip.solid {
+  border-color: var(--blue);
   background: var(--blue);
   color: var(--ink-inverse);
 }
@@ -448,14 +418,13 @@ kbd {
 }
 
 /* ------------------------------------------------------------------
- * Cards
+ * Cards: a hairline border on white. No shadow.
  * ---------------------------------------------------------------- */
 .card {
   position: relative;
-  border: 1px solid var(--rule-soft);
+  border: 1px solid var(--rule);
   border-radius: var(--r-lg);
   background: var(--surface);
-  box-shadow: var(--shadow-sm);
 }
 
 /* A card that is itself a destination: its border darkens under the
@@ -528,31 +497,31 @@ dialog.modal::backdrop {
   overscroll-behavior: contain;
 }
 
-/* The round close button in a dialog's corner. */
+/* The close button in a dialog's corner. */
 .modal-close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex: none;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
   padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: var(--sand);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
   color: var(--ink-strong);
   transition:
     background-color var(--dur) var(--ease),
-    color var(--dur) var(--ease);
+    border-color var(--dur) var(--ease);
 }
 
 .modal-close:hover {
-  background: var(--blue);
-  color: var(--ink-inverse);
+  border-color: var(--rule-strong);
+  background: var(--band);
 }
 
 .modal-close:focus-visible {
-  border-radius: 50%;
+  border-radius: var(--r-md);
 }
 
 .modal-close svg {

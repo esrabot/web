@@ -1,11 +1,11 @@
 ---
 /**
- * A full-bleed horizontal band whose content centres on the page measure.
+ * A full-bleed horizontal band whose content centers on the page measure.
  * Pairs with SectionHead for the heading block.
  *
- *   tone   `plain` sits on the page; `sand` is the beige band used to set
- *          one section apart from its neighbours; `white` is a lifted,
- *          paper-white band.
+ *   tone   `plain` sits on the page; `band` is the light-gray band used to
+ *          set one section apart from its neighbors; `white` is a plain
+ *          section with a hairline above and below.
  *   pad    vertical room. `flush-top` / `flush-bottom` drop one side, for a
  *          section that continues the one beside it. An anchor link to the
  *          section skips its top padding, so the heading lands under the
@@ -15,7 +15,7 @@
  */
 interface Props {
   id?: string;
-  tone?: 'plain' | 'sand' | 'white';
+  tone?: 'plain' | 'band' | 'white';
   pad?: 'normal' | 'tight' | 'flush-top' | 'flush-bottom';
   width?: 'default' | 'narrow' | 'wide';
   class?: string;
@@ -40,8 +40,8 @@ const { id, tone = 'plain', pad = 'normal', width = 'default', class: className 
     scroll-margin-top: calc(-1 * var(--pad-top));
   }
 
-  .tone-sand {
-    background: var(--sand);
+  .tone-band {
+    background: var(--band);
   }
 
   .tone-white {
