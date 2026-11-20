@@ -35,7 +35,7 @@ const docs = (await getCollection('docs'))
       ) : (
         <ol class="guides">
           {docs.map((doc, i) => (
-            <li class="guide card lift" data-reveal style={`--i: ${i % 4}`}>
+            <li class="guide card lift">
               <span class="guide-no" aria-hidden="true">
                 {String(i + 1).padStart(2, '0')}
               </span>
@@ -64,7 +64,7 @@ const docs = (await getCollection('docs'))
       )
     }
 
-    <p class="contribute" data-reveal>
+    <p class="contribute">
       Built something worth writing down? Guides are plain Markdown files in{' '}
       <a href={SITE.repoUrl} rel="noopener">the site’s repository</a>.
     </p>
@@ -132,8 +132,7 @@ const docs = (await getCollection('docs'))
     color: var(--blue);
     transition:
       background-color var(--dur) var(--ease),
-      color var(--dur) var(--ease),
-      transform var(--dur-slow) var(--ease-out);
+      color var(--dur) var(--ease);
   }
 
   .guide-go :global(svg) {
@@ -144,7 +143,6 @@ const docs = (await getCollection('docs'))
   .guide:hover .guide-go {
     background: var(--blue);
     color: var(--ink-inverse);
-    transform: translateX(4px);
   }
 
   .empty {

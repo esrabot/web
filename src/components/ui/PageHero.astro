@@ -24,20 +24,14 @@ const { eyebrow, title, lede, narrow = false } = Astro.props;
 <section class="page-hero">
   <div class="wash" aria-hidden="true"></div>
   <div class:list={['container', { narrow }]}>
-    <p class="eyebrow" data-reveal>{eyebrow}</p>
-    <h1 data-reveal style="--i: 1">
+    <p class="eyebrow">{eyebrow}</p>
+    <h1>
       {Astro.slots.has('title') ? <slot name="title" /> : title}
     </h1>
-    {
-      lede && (
-        <p class="lede" data-reveal style="--i: 2">
-          {lede}
-        </p>
-      )
-    }
+    {lede && <p class="lede">{lede}</p>}
     {
       Astro.slots.has('default') && (
-        <div class="extra" data-reveal style="--i: 3">
+        <div class="extra">
           <slot />
         </div>
       )

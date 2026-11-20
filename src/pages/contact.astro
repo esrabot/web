@@ -41,7 +41,7 @@ const mailboxes = CONTACTS.map((c) => {
     <div class="mailboxes">
       {
         mailboxes.map((c, i) => (
-          <a class="mailbox card lift" href={`mailto:${c.address}`} data-reveal style={`--i: ${i}`}>
+          <a class="mailbox card lift" href={`mailto:${c.address}`}>
             <span class="mb-icon" aria-hidden="true">
               <Icon name="lucide:mail" />
             </span>
@@ -67,7 +67,7 @@ const mailboxes = CONTACTS.map((c) => {
     <div class="orgs">
       {
         ORGS.map((org, i) => (
-          <section class="org card" data-reveal style={`--i: ${i}`}>
+          <section class="org card">
             <h3>{org.name}</h3>
             {org.blurb && <p class="org-blurb">{org.blurb}</p>}
             <ul>
@@ -133,8 +133,7 @@ const mailboxes = CONTACTS.map((c) => {
     color: var(--blue);
     transition:
       background-color var(--dur-slow) var(--ease),
-      color var(--dur-slow) var(--ease),
-      transform var(--dur-slow) var(--ease-spring);
+      color var(--dur-slow) var(--ease);
   }
 
   .mb-icon :global(svg) {
@@ -145,7 +144,6 @@ const mailboxes = CONTACTS.map((c) => {
   .mailbox:hover .mb-icon {
     background: var(--blue);
     color: var(--ink-inverse);
-    transform: rotate(-6deg) scale(1.06);
   }
 
   .mb-label {

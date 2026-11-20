@@ -75,12 +75,12 @@ const KIND_LABEL = {
         <section class="profile-wrap">
           <div class="wash" aria-hidden="true" />
           <div class="container">
-            <a class="back" href="/members" data-reveal="fade">
+            <a class="back" href="/members">
               <Icon name="lucide:arrow-left" aria-hidden="true" />
               All members
             </a>
 
-            <article class="profile card" data-reveal>
+            <article class="profile card">
               <div class="portrait">
                 {selected.data.avatar ? (
                   <Image src={selected.data.avatar} alt="" width={192} height={192} />
@@ -155,7 +155,7 @@ const KIND_LABEL = {
             </SectionHead>
             <div class="wall">
               {others.map((m, i) => (
-                <MemberCard member={m} index={i} />
+                <MemberCard member={m} />
               ))}
             </div>
           </Section>
@@ -184,10 +184,10 @@ const KIND_LABEL = {
           <h2 class="sr-only">Everyone</h2>
           <div class="wall">
             {members.map((m, i) => (
-              <MemberCard member={m} index={i} />
+              <MemberCard member={m} />
             ))}
           </div>
-          <p class="order-note" data-reveal>
+          <p class="order-note">
             The order is shuffled on every deploy, so no one is permanently first.
           </p>
         </Section>
@@ -208,14 +208,7 @@ const KIND_LABEL = {
 
           <div class="clubs">
             {partners.map((p, i) => (
-              <a
-                class="club card lift"
-                href={p.data.url}
-                rel="noopener"
-                target="_blank"
-                data-reveal
-                style={`--i: ${i % 4}`}
-              >
+              <a class="club card lift" href={p.data.url} rel="noopener" target="_blank">
                 <span class="club-top">
                   <span class="chip sand">{KIND_LABEL[p.data.kind]}</span>
                   <Icon name="lucide:arrow-up-right" class="club-go" aria-hidden="true" />
@@ -234,7 +227,7 @@ const KIND_LABEL = {
             ))}
           </div>
 
-          <p class="join-note" data-reveal>
+          <p class="join-note">
             Is your club or lab missing from this list?{' '}
             <a class="link-arrow" href={JOIN_HREF}>
               Get involved <Icon name="lucide:arrow-right" aria-hidden="true" />
@@ -290,14 +283,11 @@ const KIND_LABEL = {
     width: 1.125rem;
     height: 1.125rem;
     color: var(--ink-faint);
-    transition:
-      color var(--dur) var(--ease),
-      transform var(--dur) var(--ease-out);
+    transition: color var(--dur) var(--ease);
   }
 
   .club:hover .club-go {
     color: var(--blue);
-    transform: translate(2px, -2px);
   }
 
   /* The mark takes its colour from here: navy, blue under the pointer. */
@@ -373,15 +363,10 @@ const KIND_LABEL = {
   .back :global(svg) {
     width: 1rem;
     height: 1rem;
-    transition: transform var(--dur) var(--ease-out);
   }
 
   .back:hover {
     color: var(--blue);
-  }
-
-  .back:hover :global(svg) {
-    transform: translateX(-3px);
   }
 
   .profile {

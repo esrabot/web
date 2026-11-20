@@ -147,11 +147,6 @@ const isPage = variant === 'page';
     border: 0;
     border-radius: var(--r-sm);
     background: none;
-    transition: transform var(--dur-fast) var(--ease);
-  }
-
-  .search-esc:active {
-    transform: scale(0.92);
   }
 
   .search-esc:hover kbd {
@@ -245,16 +240,12 @@ const isPage = variant === 'page';
   .sr-go {
     color: var(--blue);
     opacity: 0;
-    translate: -0.25rem 0;
-    transition:
-      opacity var(--dur) var(--ease),
-      translate var(--dur) var(--ease-out);
+    transition: opacity var(--dur) var(--ease);
   }
 
   .search-result.active .sr-go,
   .search-result a:focus-visible .sr-go {
     opacity: 1;
-    translate: 0 0;
   }
 
   .search-note {

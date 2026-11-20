@@ -38,7 +38,7 @@ const {
 } = Astro.props;
 ---
 
-<header class:list={['section-head', `size-${size}`, `align-${align}`, className]} data-reveal>
+<header class:list={['section-head', `size-${size}`, `align-${align}`, className]}>
   <div class="text">
     {eyebrow && <p class="eyebrow">{eyebrow}</p>}
     <Tag class="title" id={headingId}>

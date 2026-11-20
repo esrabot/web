@@ -65,21 +65,12 @@ const description = summary ?? repo?.description ?? null;
     box-shadow: var(--shadow-xs);
     color: var(--ink-strong);
     text-decoration: none;
-    transition:
-      border-color var(--dur) var(--ease),
-      box-shadow var(--dur-slow) var(--ease-out),
-      transform var(--dur-slow) var(--ease-out);
+    transition: border-color var(--dur) var(--ease);
   }
 
   .repo:hover {
     border-color: var(--blue);
-    box-shadow: var(--shadow-md);
     color: var(--ink-strong);
-    transform: translateY(-2px);
-  }
-
-  .repo:active {
-    transform: translateY(0);
   }
 
   .top {
@@ -117,14 +108,11 @@ const description = summary ?? repo?.description ?? null;
     height: 1rem;
     margin-left: auto;
     color: var(--ink-faint);
-    transition:
-      color var(--dur) var(--ease),
-      transform var(--dur) var(--ease-out);
+    transition: color var(--dur) var(--ease);
   }
 
   .repo:hover .out {
     color: var(--blue);
-    transform: translate(2px, -2px);
   }
 
   .desc {

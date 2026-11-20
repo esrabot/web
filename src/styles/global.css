@@ -249,7 +249,7 @@ kbd {
   color: var(--ink-body);
 }
 
-/* A text link that carries an arrow; the arrow leans in on hover. */
+/* A text link that carries an arrow. */
 .link-arrow {
   display: inline-flex;
   align-items: center;
@@ -263,26 +263,19 @@ kbd {
   width: 1em;
   height: 1em;
   flex: none;
-  transition: transform var(--dur) var(--ease-out);
 }
 
 .link-arrow:hover {
   color: var(--blue-strong);
-}
-
-.link-arrow:hover svg {
-  transform: translateX(3px);
-}
-
-.link-arrow.out:hover svg {
-  transform: translate(2px, -2px);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
 }
 
 /* ------------------------------------------------------------------
  * Buttons
  *
- * A pill you can press: it sits on a darker lower edge, lifts a little
- * under the pointer, and sinks onto that edge when pressed.
+ * A pill you can press: it sits on a darker lower edge. Hover changes
+ * only its color; nothing moves.
  * ---------------------------------------------------------------- */
 .btn {
   --btn-bg: var(--blue);
@@ -318,8 +311,6 @@ kbd {
     0 2px 0 var(--btn-edge),
     0 6px 16px var(--btn-glow);
   transition:
-    transform var(--dur) var(--ease-out),
-    box-shadow var(--dur) var(--ease-out),
     background-color var(--dur) var(--ease),
     color var(--dur) var(--ease);
 }
@@ -327,22 +318,6 @@ kbd {
 .btn:hover {
   background: var(--btn-bg-hover);
   color: var(--btn-fg);
-  transform: translateY(-1px);
-  box-shadow:
-    inset 0 0 0 1px var(--btn-ring),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 3px 0 var(--btn-edge),
-    0 12px 24px var(--btn-glow);
-}
-
-.btn:active {
-  transform: translateY(2px);
-  box-shadow:
-    inset 0 0 0 1px var(--btn-ring),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 0 0 var(--btn-edge),
-    0 2px 6px var(--btn-glow);
-  transition-duration: 0.06s;
 }
 
 .btn:focus-visible {
@@ -374,7 +349,6 @@ kbd {
 
 .btn.quiet:hover,
 .btn.quiet:active {
-  transform: none;
   box-shadow: none;
 }
 
@@ -418,14 +392,6 @@ kbd {
   flex: none;
 }
 
-.btn .arrow {
-  transition: transform var(--dur) var(--ease-out);
-}
-
-.btn:hover .arrow {
-  transform: translateX(3px);
-}
-
 /* ------------------------------------------------------------------
  * Chips: small pills for status, type and tags
  * ---------------------------------------------------------------- */
@@ -466,7 +432,7 @@ kbd {
   flex: none;
 }
 
-/* The "live" lamp: a dot with a slow ring going out from it. */
+/* The "in progress" lamp: a small steady dot. */
 .pulse {
   position: relative;
   flex: none;
@@ -480,26 +446,6 @@ kbd {
   background: var(--ink-inverse);
 }
 
-.pulse::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: inherit;
-  animation: pulse 2.2s var(--ease-out) infinite;
-}
-
-@keyframes pulse {
-  from {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-  to {
-    transform: scale(3.2);
-    opacity: 0;
-  }
-}
-
 /* ------------------------------------------------------------------
  * Cards
  * ---------------------------------------------------------------- */
@@ -511,32 +457,22 @@ kbd {
   box-shadow: var(--shadow-sm);
 }
 
-/* A card that is itself a destination lifts toward the pointer. */
+/* A card that is itself a destination: its border darkens under the
+   pointer. Nothing moves. */
 .card.lift {
-  transition:
-    transform var(--dur-slow) var(--ease-out),
-    box-shadow var(--dur-slow) var(--ease-out),
-    border-color var(--dur-slow) var(--ease);
+  transition: border-color var(--dur) var(--ease);
 }
 
 @media (hover: hover) {
   .card.lift:hover {
-    transform: translateY(-4px);
-    border-color: var(--blue-soft);
-    box-shadow: var(--shadow-md);
+    border-color: var(--rule-strong);
   }
 }
 
 /* Keyboard focus only: a card whose button opened a dialog gets focus back
    when it closes, and should not stay lit for a mouse user. */
 .card.lift:has(:focus-visible) {
-  border-color: var(--blue-soft);
-  box-shadow: var(--shadow-md);
-}
-
-.card.lift:active {
-  transform: translateY(-1px) scale(0.995);
-  transition-duration: 0.08s;
+  border-color: var(--rule-strong);
 }
 
 /* Stretch one link or button over the whole card, so the card is a
@@ -563,10 +499,8 @@ kbd {
  * Modal dialogs
  *
  * Native <dialog>, opened with showModal(), so focus is trapped, Esc
- * closes, and focus returns to the control that opened it. The entrance
- * and exit are CSS only: @starting-style for the way in, and discrete
- * transitions on `display` and `overlay` for the way out. A browser
- * without those simply shows and hides the dialog.
+ * closes, and focus returns to the control that opened it. It appears
+ * and disappears at once, with no entrance animation.
  * ---------------------------------------------------------------- */
 dialog.modal {
   width: min(46rem, calc(100vw - 2rem));
@@ -580,55 +514,10 @@ dialog.modal {
   color: var(--ink-body);
   box-shadow: var(--shadow-lg);
   overflow: hidden;
-  opacity: 0;
-  scale: 0.96;
-  translate: 0 1rem;
-  transition:
-    opacity var(--dur-slow) var(--ease-out),
-    scale var(--dur-slow) var(--ease-spring),
-    translate var(--dur-slow) var(--ease-out),
-    overlay var(--dur-slow) allow-discrete,
-    display var(--dur-slow) allow-discrete;
-}
-
-dialog.modal[open] {
-  opacity: 1;
-  scale: 1;
-  translate: 0 0;
-}
-
-@starting-style {
-  dialog.modal[open] {
-    opacity: 0;
-    scale: 0.96;
-    translate: 0 1rem;
-  }
 }
 
 dialog.modal::backdrop {
-  background: rgba(15, 29, 53, 0);
-  backdrop-filter: blur(0);
-  -webkit-backdrop-filter: blur(0);
-  transition:
-    background-color var(--dur-slow) var(--ease),
-    backdrop-filter var(--dur-slow) var(--ease),
-    -webkit-backdrop-filter var(--dur-slow) var(--ease),
-    overlay var(--dur-slow) allow-discrete,
-    display var(--dur-slow) allow-discrete;
-}
-
-dialog.modal[open]::backdrop {
-  background: rgba(15, 29, 53, 0.48);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-
-@starting-style {
-  dialog.modal[open]::backdrop {
-    background: rgba(15, 29, 53, 0);
-    backdrop-filter: blur(0);
-    -webkit-backdrop-filter: blur(0);
-  }
+  background: var(--scrim);
 }
 
 /* The scrolling body of a dialog. */
@@ -653,18 +542,12 @@ dialog.modal[open]::backdrop {
   color: var(--ink-strong);
   transition:
     background-color var(--dur) var(--ease),
-    color var(--dur) var(--ease),
-    transform var(--dur) var(--ease-spring);
+    color var(--dur) var(--ease);
 }
 
 .modal-close:hover {
   background: var(--blue);
   color: var(--ink-inverse);
-  transform: rotate(90deg);
-}
-
-.modal-close:active {
-  transform: rotate(90deg) scale(0.9);
 }
 
 .modal-close:focus-visible {
@@ -674,95 +557,6 @@ dialog.modal[open]::backdrop {
 .modal-close svg {
   width: 1.125rem;
   height: 1.125rem;
-}
-
-/* ------------------------------------------------------------------
- * Arrivals
- *
- * One opt-in attribute. BaseLayout adds .revealed to each block the
- * first time it scrolls into view; until JS runs (html.js) nothing is
- * hidden, and if the observer fails everything is shown.
- *
- *   data-reveal            the block rises into place, staggered by --i
- *   data-reveal="fade"     it only fades
- *   data-reveal="scale"    it eases up from slightly small (images)
- *
- * Arrivals are animations, not transitions, so they never take over a
- * component's own hover transitions, and a stagger delay does not linger
- * once the block has arrived. Screen and motion only: print and reduced
- * motion get the finished page.
- * ---------------------------------------------------------------- */
-@media screen and (prefers-reduced-motion: no-preference) {
-  .js [data-reveal]:not(.revealed) {
-    opacity: 0;
-  }
-
-  .js [data-reveal].revealed {
-    animation: rise var(--dur-reveal) var(--ease-out) backwards;
-    animation-delay: calc(var(--i, 0) * var(--stagger));
-  }
-
-  .js [data-reveal='fade'].revealed {
-    animation-name: fade;
-  }
-
-  .js [data-reveal='scale'].revealed {
-    animation-name: grow;
-  }
-}
-
-@keyframes rise {
-  from {
-    opacity: 0;
-    translate: 0 1.25rem;
-  }
-}
-
-@keyframes fade {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes grow {
-  from {
-    opacity: 0;
-    scale: 0.96;
-  }
-}
-
-/* ------------------------------------------------------------------
- * Page-to-page transitions
- *
- * Same-origin navigations cross-fade where the browser supports
- * cross-document view transitions; elsewhere pages load as usual. The
- * header is named so it holds still while the page changes under it.
- * ---------------------------------------------------------------- */
-@media screen and (prefers-reduced-motion: no-preference) {
-  @view-transition {
-    navigation: auto;
-  }
-
-  ::view-transition-old(root) {
-    animation: vt-out 0.16s var(--ease) both;
-  }
-
-  ::view-transition-new(root) {
-    animation: vt-in 0.34s var(--ease-out) both;
-  }
-}
-
-@keyframes vt-out {
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes vt-in {
-  from {
-    opacity: 0;
-    translate: 0 0.5rem;
-  }
 }
 
 @media print {

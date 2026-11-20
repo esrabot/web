@@ -244,17 +244,17 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
     <div class="container hero-grid">
       <div class="hero-copy">
-        <p class="eyebrow" data-reveal>{SITE.fullName}</p>
+        <p class="eyebrow">{SITE.fullName}</p>
 
-        <h1 data-reveal style="--i: 1">One robot.<br /><em>Many campuses.</em></h1>
+        <h1>One robot.<br /><em>Many campuses.</em></h1>
 
-        <p class="lede" data-reveal style="--i: 2">
+        <p class="lede">
           ESRA is a national nonprofit that connects university robotics teams, so they can share
           what they learn, split the engineering, and build robots no single campus could build
           alone.
         </p>
 
-        <div class="hero-actions" data-reveal style="--i: 3">
+        <div class="hero-actions">
           <a class="btn lg" href="#join">
             Get involved <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
           </a>
@@ -267,7 +267,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
           }
         </div>
 
-        <dl class="hero-facts" data-reveal style="--i: 4">
+        <dl class="hero-facts">
           <div>
             <dt>Partners</dt>
             <dd>{partners.length}</dd>
@@ -293,25 +293,21 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     </div>
 
     <div class="container">
-      <div class="trust" data-reveal>
+      <div class="trust">
         <p class="trust-label">Built with teams at</p>
-        <div class="marquee" data-marquee>
-          <div class="marquee-track" data-marquee-track>
-            <ul class="trust-list" data-marquee-set>
-              {
-                partners.map((p) => (
-                  <li>
-                    <a href={p.data.url} rel="noopener" target="_blank">
-                      <PartnerMark partner={p} height={34} maxWidth={84} decorative />
-                      <span class="trust-name">{p.data.name}</span>
-                      <span class="sr-only"> (opens in a new tab)</span>
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-        </div>
+        <ul class="trust-list">
+          {
+            partners.map((p) => (
+              <li>
+                <a href={p.data.url} rel="noopener" target="_blank">
+                  <PartnerMark partner={p} height={34} maxWidth={84} decorative />
+                  <span class="trust-name">{p.data.name}</span>
+                  <span class="sr-only"> (opens in a new tab)</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
         <a class="link-arrow trust-all" href="#partners">
           All {partners.length} partners <Icon name="lucide:arrow-down" aria-hidden="true" />
         </a>
@@ -335,7 +331,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
           </Fragment>
         </SectionHead>
 
-        <div class="why-body" data-reveal>
+        <div class="why-body">
           <p>
             Today, one team spends a semester working out joint control while another works through
             the same problem, with little chance to compare notes.
@@ -348,7 +344,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
           </p>
         </div>
 
-        <aside class="example" data-reveal>
+        <aside class="example">
           <p class="example-label">For example</p>
           <p>
             On H1, the leg team needs its actuators’ dimensions and torque. The controller team
@@ -370,7 +366,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
       <ul class="reasons">
         {
           reasons.map((r, i) => (
-            <li class="reason" data-reveal style={`--i: ${i}`}>
+            <li class="reason">
               <h4>{r.title}</h4>
               <p>{r.body}</p>
             </li>
@@ -381,7 +377,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
     <div class="roles">
       <SectionHead as="h3" size="sm" align="center" eyebrow="The network" title="Who does what" />
-      <figure class="roles-figure" data-reveal>
+      <figure class="roles-figure">
         <ul class="supports" aria-label="Supporting the teams">
           {
             supportRoles.map((r) => (
@@ -414,7 +410,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
       <ol class="steps">
         {
           steps.map((s, i) => (
-            <li class="step card" data-reveal style={`--i: ${i}`}>
+            <li class="step card">
               <span class="step-no" aria-hidden="true">
                 {String(i + 1).padStart(2, '0')}
               </span>
@@ -449,7 +445,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
               </Fragment>
             </SectionHead>
 
-            <div data-reveal>
+            <div>
               {flagship.data.description && (
                 <p class="flagship-body">{flagship.data.description}</p>
               )}
@@ -463,7 +459,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
             </div>
           </div>
 
-          <dl class="spec card" data-reveal style="--i: 1">
+          <dl class="spec card">
             <div>
               <dt>Status</dt>
               <dd>
@@ -505,11 +501,11 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
         {milestones.length > 0 && (
           <div class="schedule">
             <SectionHead as="h3" size="sm" eyebrow="2026–27 roadmap" title="The schedule" />
-            <ol class="timeline" data-reveal style={`--stops: ${milestones.length}`}>
+            <ol class="timeline" style={`--stops: ${milestones.length}`}>
               {milestones.map((m, i) => (
                 <li
                   class:list={['stop', { done: i < current, current: i === current }]}
-                  style={`--i: ${i}; --fill: ${fills[i]!.toFixed(3)}`}
+                  style={`--fill: ${fills[i]!.toFixed(3)}`}
                 >
                   <span class="stop-line" aria-hidden="true">
                     <span class="stop-fill" />
@@ -537,7 +533,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
             </SectionHead>
             <div class="also-grid">
               {otherPrograms.map((p, i) => (
-                <article class="track card lift" data-reveal style={`--i: ${i}`}>
+                <article class="track card lift">
                   <p class="track-kind">
                     {p.data.kind}
                     {p.data.level && <> · {p.data.level}</>}
@@ -575,7 +571,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     <div class="ways">
       {
         ways.map((w, i) => (
-          <article class="way card lift" data-reveal style={`--i: ${i}`}>
+          <article class="way card lift">
             <span class="way-icon" aria-hidden="true">
               <Icon name={w.iconName} />
             </span>
@@ -606,7 +602,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
       }
     </div>
 
-    <p class="ways-note" data-reveal>
+    <p class="ways-note">
       Not sure which fits? <a href={mailto(general, 'Getting involved')}>Email {general}</a> and we will
       point you the right way.
     </p>
@@ -712,7 +708,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     activity.length > 0 && (
       <Section id="latest" tone="white">
         <SectionHead eyebrow="Elsewhere" title="Recent activity" />
-        <ul class="activity-list" data-reveal>
+        <ul class="activity-list">
           {activity.map((item) => (
             <li>
               <a href={item.href} rel="noopener" target="_blank">
@@ -744,14 +740,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     <div class="roster">
       {
         partners.map((p, i) => (
-          <a
-            class="tile card lift"
-            href={p.data.url}
-            rel="noopener"
-            target="_blank"
-            data-reveal
-            style={`--i: ${i}`}
-          >
+          <a class="tile card lift" href={p.data.url} rel="noopener" target="_blank">
             <span class="tile-top">
               <span class="chip sand">{KIND_LABEL[p.data.kind]}</span>
               <Icon name="lucide:arrow-up-right" class="tile-go" aria-hidden="true" />
@@ -769,7 +758,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
           </a>
         ))
       }
-      <a class="tile open" href="#join" data-reveal style={`--i: ${partners.length}`}>
+      <a class="tile open" href="#join">
         <span class="open-plus" aria-hidden="true">
           <Icon name="lucide:plus" />
         </span>
@@ -784,134 +773,6 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     </div>
   </Section>
 </BaseLayout>
-
-<script>
-  // The partner carousel. It scrolls at a steady speed and, each time the
-  // first partner comes back round to the start, glides to a stop there,
-  // rests, and sets off again. Pointing at it (or tabbing into it) eases
-  // the speed down to a stop in a fraction of a second, and leaving lets
-  // it pick back up. Speed is eased rather than switched, which a CSS
-  // animation cannot do, hence the script.
-  const marquee = document.querySelector<HTMLElement>('[data-marquee]');
-  const track = marquee?.querySelector<HTMLElement>('[data-marquee-track]');
-  const set = track?.querySelector<HTMLElement>('[data-marquee-set]');
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-  if (marquee && track && set && !reduce.matches) {
-    const SPEED = 40; // px per second when cruising
-    const STOP_TAU = 0.09; // s; small = stops fast on hover (about 0.3s to rest)
-    const GO_TAU = 0.35; // s; picks up more gently than it stops
-    const PAUSE = 2500; // ms to rest at the start of each lap
-    const BRAKE = 60; // px over which it glides into that rest
-
-    marquee.classList.add('is-running');
-
-    const makeCopy = () => {
-      const copy = set.cloneNode(true) as HTMLElement;
-      copy.removeAttribute('data-marquee-set');
-      copy.setAttribute('aria-hidden', 'true');
-      copy.querySelectorAll('a').forEach((a) => a.setAttribute('tabindex', '-1'));
-      return copy;
-    };
-
-    // One copy goes before the real row, so the real row (the one screen
-    // readers and the keyboard use) is the one resting at the start, and
-    // there is always something to the left of it. The rest go after, as
-    // many as it takes to fill the strip with a copy of slack. Copies are
-    // for looks only.
-    track.prepend(makeCopy());
-    let setWidth = 0;
-    const fill = () => {
-      setWidth = set.offsetWidth;
-      if (!setWidth) return;
-      const needed = Math.ceil(marquee.clientWidth / setWidth) + 2;
-      while (track.children.length < needed) track.append(makeCopy());
-      draw();
-    };
-
-    let held = false; // pointer over it, or keyboard focus inside it
-    let hovered = false;
-    let focused = false;
-    const update = () => {
-      held = hovered || focused;
-      wake();
-    };
-    marquee.addEventListener('pointerenter', () => ((hovered = true), update()));
-    marquee.addEventListener('pointerleave', () => ((hovered = false), update()));
-    marquee.addEventListener('focusin', () => ((focused = true), update()));
-    marquee.addEventListener('focusout', (e) => {
-      focused = marquee.contains(e.relatedTarget as Node | null);
-      update();
-    });
-
-    let visible = true;
-    new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      wake();
-    }).observe(marquee);
-
-    // offset: how far the real row has travelled from its rest place, in
-    // [0, setWidth). It starts at rest, paused, like every later lap.
-    let offset = 0;
-    let velocity = 0;
-    let pauseUntil = performance.now() + PAUSE;
-    let last = 0;
-    let frame = 0;
-
-    // The leading copy sits one row-width to the left of the real row.
-    const draw = () => {
-      track.style.transform = `translate3d(${-(setWidth + offset)}px, 0, 0)`;
-    };
-
-    const tick = (now: number) => {
-      // Cap the step so a background tab does not jump the strip on return.
-      const dt = last ? Math.min((now - last) / 1000, 0.05) : 0;
-      last = now;
-
-      const pausing = now < pauseUntil;
-      const target = held || pausing ? 0 : SPEED;
-      const tau = held ? STOP_TAU : GO_TAU;
-      velocity += (target - velocity) * (1 - Math.exp(-dt / tau));
-
-      // Glide into the rest place: never go faster than a steady braking
-      // from here would allow, so it lands on the spot at zero speed.
-      const remaining = setWidth - offset;
-      velocity = Math.min(velocity, SPEED * Math.sqrt(remaining / BRAKE));
-      if (velocity < 0.5 && (held || pausing)) velocity = 0;
-
-      if (setWidth) {
-        const step = velocity * dt;
-        if (step >= remaining - 0.25) {
-          // Back at the start: the next copy is now exactly where the
-          // real row began, so swap them without a visible jump, and rest.
-          offset = 0;
-          velocity = 0;
-          pauseUntil = now + PAUSE;
-        } else {
-          offset += step;
-        }
-        draw();
-      }
-
-      // Sleep when stopped or off screen; wake() restarts the loop.
-      if (!visible || (velocity === 0 && (held || now < pauseUntil))) {
-        frame = 0;
-        last = 0;
-        if (!held && now < pauseUntil) setTimeout(wake, pauseUntil - now);
-        return;
-      }
-      frame = requestAnimationFrame(tick);
-    };
-
-    function wake() {
-      if (!frame && visible) frame = requestAnimationFrame(tick);
-    }
-
-    fill();
-    new ResizeObserver(fill).observe(marquee);
-    wake();
-  }
-</script>
 
 <style>
   /* ================================================================
@@ -1063,57 +924,9 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     color: var(--blue);
   }
 
-  /* The carousel. Without JS, or with reduced motion, it is just the
-     wrapping row above. Once the script runs it adds .is-running: the row
-     stops wrapping, gets copied end to end, and scrolls under faded edges. */
-  .marquee {
-    --fade: 2.5rem;
-    flex: 1 1 16rem;
-    min-width: 0;
-  }
-
-  .marquee.is-running {
-    overflow: hidden;
-    -webkit-mask-image: linear-gradient(
-      90deg,
-      transparent,
-      #000 var(--fade),
-      #000 calc(100% - var(--fade)),
-      transparent
-    );
-    mask-image: linear-gradient(
-      90deg,
-      transparent,
-      #000 var(--fade),
-      #000 calc(100% - var(--fade)),
-      transparent
-    );
-  }
-
-  /* The left padding sets where the first partner rests: just clear of
-     the faded edge. The script keeps the padding itself out of view. */
-  .is-running .marquee-track {
-    display: flex;
-    width: max-content;
-    padding-left: var(--fade);
-    will-change: transform;
-  }
-
-  /* Each copy carries the gap at its end, so copy n+1 starts exactly one
-     copy-width after copy n and the loop has no seam. */
-  .is-running .trust-list {
-    flex: none;
-    flex-wrap: nowrap;
-    padding-right: var(--space-7);
-  }
-
   .trust-all {
     flex: none;
     font-size: var(--t-sm);
-  }
-
-  .trust-all:hover :global(svg) {
-    transform: translateY(3px);
   }
 
   /* ================================================================
@@ -1532,17 +1345,6 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     color: var(--ink-body);
   }
 
-  /* On arrival the elapsed part runs out along the track, stop by stop. */
-  @media screen and (prefers-reduced-motion: no-preference) {
-    :global(.js) .timeline:not(.revealed) .stop-fill {
-      scale: 0 1;
-    }
-
-    .timeline.revealed .stop-fill {
-      transition: scale 0.8s var(--ease-out) calc(0.35s + var(--i) * 0.3s);
-    }
-  }
-
   /* --- also on the roadmap ----------------------------------------- */
   .also-grid {
     display: grid;
@@ -1627,8 +1429,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     color: var(--blue);
     transition:
       background-color var(--dur-slow) var(--ease),
-      color var(--dur-slow) var(--ease),
-      transform var(--dur-slow) var(--ease-spring);
+      color var(--dur-slow) var(--ease);
   }
 
   .way-icon :global(svg) {
@@ -1638,13 +1439,12 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
   /* :focus-visible, not :focus-within: closing the pop-up hands focus back
      to the button that opened it, and a mouse user would otherwise be left
-     with a lit, tilted icon long after the pointer has gone. Keyboard focus
+     with a lit icon long after the pointer has gone. Keyboard focus
      still lights it. */
   .way:hover .way-icon,
   .way:has(:focus-visible) .way-icon {
     background: var(--blue);
     color: var(--ink-inverse);
-    transform: rotate(-6deg) scale(1.06);
   }
 
   .way-who {
@@ -1730,7 +1530,6 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     flex: none;
     width: 1.125rem;
     height: 1.125rem;
-    transition: transform var(--dur-slow) var(--ease-out);
   }
 
   .way:hover .way-open,
@@ -1738,10 +1537,6 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     border-color: var(--blue);
     background: var(--blue);
     color: var(--ink-inverse);
-  }
-
-  .way:hover .way-open :global(svg) {
-    transform: translate(2px, -2px);
   }
 
   .ways-note {
@@ -1917,13 +1712,10 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     border-bottom: 1px solid var(--rule-soft);
     color: var(--ink-strong);
     text-decoration: none;
-    transition:
-      background-color var(--dur) var(--ease),
-      padding var(--dur-slow) var(--ease-out);
+    transition: background-color var(--dur) var(--ease);
   }
 
   .activity-list a:hover {
-    padding-inline: var(--space-4) var(--space-2);
     background: var(--blue-wash);
   }
 
@@ -1955,14 +1747,11 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     width: 1.125rem;
     height: 1.125rem;
     color: var(--ink-faint);
-    transition:
-      color var(--dur) var(--ease),
-      transform var(--dur) var(--ease-out);
+    transition: color var(--dur) var(--ease);
   }
 
   .activity-list a:hover .a-go {
     color: var(--blue);
-    transform: translate(2px, -2px);
   }
 
   /* ================================================================
@@ -1997,14 +1786,11 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     width: 1.125rem;
     height: 1.125rem;
     color: var(--ink-faint);
-    transition:
-      color var(--dur) var(--ease),
-      transform var(--dur) var(--ease-out);
+    transition: color var(--dur) var(--ease);
   }
 
   .tile:hover .tile-go {
     color: var(--blue);
-    transform: translate(2px, -2px);
   }
 
   /* The mark prints in navy and turns blue with the tile. */
@@ -2071,8 +1857,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     color: var(--sand-ink);
     transition:
       background-color var(--dur-slow) var(--ease),
-      color var(--dur-slow) var(--ease),
-      transform var(--dur-slow) var(--ease-spring);
+      color var(--dur-slow) var(--ease);
   }
 
   .open-plus :global(svg) {
@@ -2083,7 +1868,6 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   .tile.open:hover .open-plus {
     background: var(--blue);
     color: var(--ink-inverse);
-    transform: rotate(90deg);
   }
 
   .open-text {
@@ -2093,10 +1877,6 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
   .tile.open .link-arrow {
     font-size: var(--t-sm);
-  }
-
-  .tile.open:hover .link-arrow :global(svg) {
-    transform: translateX(3px);
   }
 
   /* ================================================================
@@ -2185,10 +1965,6 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
     .stop-node {
       top: 0.2rem;
-    }
-
-    :global(.js) .timeline:not(.revealed) .stop-fill {
-      scale: 1 0;
     }
 
     .activity-list a {

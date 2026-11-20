@@ -180,7 +180,7 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     <ul class="areas">
       {
         AREAS.map((a, i) => (
-          <li class="area card" data-reveal style={`--i: ${i}`}>
+          <li class="area card">
             <h3>{a.title}</h3>
             <p>{a.body}</p>
           </li>
@@ -201,7 +201,7 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
 
     {
       flagship && (
-        <article id={flagship.id} class="flag card" data-reveal>
+        <article id={flagship.id} class="flag card">
           <div class="flag-main">
             <div class="flag-chips">
               <span class="chip solid">
@@ -283,7 +283,7 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
       otherPrograms.length > 0 && (
         <div class="program-grid">
           {otherPrograms.map((p, i) => (
-            <article id={p.id} class="program card" data-reveal style={`--i: ${i}`}>
+            <article id={p.id} class="program card">
               <div class="program-top">
                 <p class="program-kind">
                   {p.data.kind}
@@ -303,7 +303,7 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
       )
     }
 
-    <p class="roadmap-note" data-reveal>
+    <p class="roadmap-note">
       Want to work on one of these?{' '}
       <a class="link-arrow" href={JOIN_HREF}>
         See the ways in <Icon name="lucide:arrow-right" aria-hidden="true" />
@@ -319,7 +319,7 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     <ol class="built">
       {
         BUILT.map((b, i) => (
-          <li class="built-step" data-reveal style={`--i: ${i}`}>
+          <li class="built-step">
             <span class="built-no" aria-hidden="true">
               {String(i + 1).padStart(2, '0')}
             </span>
@@ -336,7 +336,7 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
         eyebrow="Two weeks in person"
         title="Inside an integration session"
       />
-      <div data-reveal>
+      <div>
         <DataTable
           columns={['Days', 'What happens', 'What it produces']}
           rows={SESSION}
@@ -361,7 +361,7 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
 
         <div class="build-grid">
           {builds.map((b, i) => (
-            <article class="build card lift" data-reveal style={`--i: ${i}`}>
+            <article class="build card lift">
               <div class="build-top">
                 <span class="chip">{BUILD_STATUS[b.data.status]}</span>
                 {b.data.revision && <span class="chip outline">{b.data.revision}</span>}
@@ -404,7 +404,7 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     </SectionHead>
 
     <div class="docs-grid">
-      <section class="docs-card card" data-reveal aria-labelledby="release-title">
+      <section class="docs-card card" aria-labelledby="release-title">
         <span class="docs-icon" aria-hidden="true">
           <Icon name="lucide:layers" />
         </span>
@@ -413,7 +413,7 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
           {RELEASE.map((r) => <li class="chip outline">{r}</li>)}
         </ul>
       </section>
-      <section class="docs-card card" data-reveal style="--i: 1" aria-labelledby="reports-title">
+      <section class="docs-card card" aria-labelledby="reports-title">
         <span class="docs-icon" aria-hidden="true">
           <Icon name="lucide:book-open" />
         </span>
@@ -422,7 +422,7 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
       </section>
     </div>
 
-    <aside class="ira" data-reveal aria-labelledby="ira-title">
+    <aside class="ira" aria-labelledby="ira-title">
       <p class="ira-label">Coming soon</p>
       <h3 id="ira-title">Industry Research Alliance</h3>
       <p>
@@ -460,11 +460,7 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
         <>
           <ul id="repo-list" class="repo-grid" data-repo-list>
             {repositories.map((r, i) => (
-              <li
-                class:list={['repo', 'card', 'lift', { extra: i >= REPO_PAGE }]}
-                data-reveal
-                style={`--i: ${i % 4}`}
-              >
+              <li class:list={['repo', 'card', 'lift', { extra: i >= REPO_PAGE }]}>
                 <div class="repo-top">
                   <Icon name="simple-icons:github" class="repo-gh" aria-hidden="true" />
                   <h3>
@@ -762,11 +758,6 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     gap: var(--space-2);
   }
 
-  /* This one points down the page, so its arrow leans down. */
-  .flag-links .down:hover :global(svg) {
-    transform: translateY(3px);
-  }
-
   /* ================================================================
    * Roadmap: the other programmes
    * ============================================================== */
@@ -1022,10 +1013,6 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     font-size: var(--t-sm);
   }
 
-  .build:hover .link-arrow :global(svg) {
-    transform: translateX(3px);
-  }
-
   /* Small plain-text tags: disciplines on a build, topics on a repo. */
   .topics {
     display: flex;
@@ -1107,14 +1094,11 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     width: 1.125rem;
     height: 1.125rem;
     color: var(--ink-faint);
-    transition:
-      color var(--dur) var(--ease),
-      transform var(--dur) var(--ease-out);
+    transition: color var(--dur) var(--ease);
   }
 
   .repo:hover .repo-go {
     color: var(--blue);
-    transform: translate(2px, -2px);
   }
 
   .repo-desc {
@@ -1166,10 +1150,6 @@ const hiddenCount = Math.max(0, repositories.length - REPO_PAGE);
     margin: 0;
     font-size: var(--t-sm);
     color: var(--ink-muted);
-  }
-
-  .repo-more .chev {
-    transition: transform var(--dur-slow) var(--ease-spring);
   }
 
   .repo-more [aria-expanded='true'] .chev {

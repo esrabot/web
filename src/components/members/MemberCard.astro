@@ -12,11 +12,9 @@ import { getOrg } from '../../data/orgs';
 
 interface Props {
   member: CollectionEntry<'members'>;
-  /** Stagger position for the arrival animation. */
-  index?: number;
 }
 
-const { member, index = 0 } = Astro.props;
+const { member } = Astro.props;
 const { name, avatar, discipline, affiliation, roles } = member.data;
 
 // A held title ("Co-director, ESRA") is worth a line; bare membership is not.
@@ -26,7 +24,7 @@ const titled = roles
   .join(' · ');
 ---
 
-<article class="member card lift" data-reveal style={`--i: ${index % 4}`}>
+<article class="member card lift">
   <div class="portrait">
     {
       avatar ? (
@@ -69,9 +67,7 @@ const titled = roles
     font-size: 1.625rem;
     font-weight: 500;
     color: var(--sand-ink);
-    transition:
-      box-shadow var(--dur-slow) var(--ease),
-      transform var(--dur-slow) var(--ease-spring);
+    transition: box-shadow var(--dur-slow) var(--ease);
   }
 
   .portrait :global(img) {
@@ -85,7 +81,6 @@ const titled = roles
     box-shadow:
       0 0 0 3px var(--surface),
       0 0 0 5px var(--blue);
-    transform: scale(1.05);
   }
 
   h3 {

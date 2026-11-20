@@ -29,7 +29,7 @@ import { NAV } from '../data/site';
     <ul class="links">
       {
         NAV.map(({ label, href }, i) => (
-          <li data-reveal style={`--i: ${i}`}>
+          <li>
             <a class="card lift" href={href}>
               {label}
               <Icon name="lucide:arrow-right" aria-hidden="true" />
@@ -72,10 +72,5 @@ import { NAV } from '../data/site';
     width: 1.125rem;
     height: 1.125rem;
     color: var(--blue);
-    transition: transform var(--dur) var(--ease-out);
-  }
-
-  .links a:hover :global(svg) {
-    transform: translateX(3px);
   }
 </style>

@@ -144,13 +144,13 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
 
     {
       featured.length === 0 ? (
-        <p class="empty card" data-reveal>
+        <p class="empty card">
           Nothing is featured right now. The <a href="#calendar">calendar</a> below has every date.
         </p>
       ) : (
         <div class="features">
           {featured.map((e, i) => (
-            <article id={e.id} class="feature card" data-reveal style={`--i: ${i}`}>
+            <article id={e.id} class="feature card">
               <div class:list={['feature-date', { 'has-photo': e.photo }]}>
                 {e.photo && (
                   <Image src={e.photo} alt={e.imageAlt ?? ''} width={720} class="feature-photo" />
@@ -244,7 +244,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
           <SectionHead as="h3" size="sm" eyebrow="Also" title="More events" />
           <ul class="more-list">
             {others.map((e, i) => (
-              <li id={e.id} class="more-item card" data-reveal style={`--i: ${i % 3}`}>
+              <li id={e.id} class="more-item card">
                 <p class:list={['more-date', { tbc: e.tentative }]} aria-hidden="true">
                   <span>{e.dateTop}</span>
                   <span>{e.dateBottom}</span>
@@ -317,8 +317,6 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
                 'card',
                 { done: i < currentMilestone, current: i === currentMilestone },
               ]}
-              data-reveal
-              style={`--i: ${i}`}
             >
               <p class="stage-top">
                 <span class="stage-no" aria-hidden="true">
@@ -355,7 +353,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     <dl class="publish">
       {
         PUBLISH.map((p, i) => (
-          <div class="pub card" data-reveal style={`--i: ${i}`}>
+          <div class="pub card">
             <dt>{p.output}</dt>
             <dd>{p.often}</dd>
           </div>
@@ -377,7 +375,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     </SectionHead>
 
     <div class="cal">
-      <div class="cal-frame card" data-reveal>
+      <div class="cal-frame card">
         <iframe
           id="esra-calendar"
           src={CALENDAR.embedUrl('MONTH')}
@@ -396,7 +394,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
         </script>
       </div>
 
-      <aside class="cal-side card" data-reveal style="--i: 1" aria-labelledby="subscribe-title">
+      <aside class="cal-side card" aria-labelledby="subscribe-title">
         <h3 id="subscribe-title">Subscribe</h3>
         <p>Add the ESRA calendar to the one you already use. New dates appear on their own.</p>
 
@@ -441,7 +439,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
       </aside>
     </div>
 
-    <p class="host" data-reveal>
+    <p class="host">
       Hosting something the network should know about?{' '}
       <a href={hostMail}>Email {general}</a>.
     </p>
@@ -562,7 +560,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     background: linear-gradient(160deg, rgba(27, 62, 159, 0.72), rgba(19, 41, 95, 0.9));
   }
 
-  /* Rings going out from the lower corner, turning slowly. */
+  /* Rings going out from the lower corner. */
   .rings {
     position: absolute;
     right: -7rem;
@@ -578,11 +576,6 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     );
     -webkit-mask-image: radial-gradient(circle, #000 20%, transparent 70%);
     mask-image: radial-gradient(circle, #000 20%, transparent 70%);
-    transition: transform 1.2s var(--ease-out);
-  }
-
-  .feature:hover .rings {
-    transform: scale(1.12);
   }
 
   .phase {
@@ -1066,9 +1059,7 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
     justify-content: center;
     gap: 0.375rem;
     grid-area: 1 / 1;
-    transition:
-      opacity var(--dur) var(--ease),
-      translate var(--dur-slow) var(--ease-spring);
+    transition: opacity var(--dur) var(--ease);
   }
 
   .copy :global(svg) {
@@ -1078,7 +1069,6 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
 
   .copy-done {
     opacity: 0;
-    translate: 0 0.5rem;
   }
 
   .copy[data-copied] {
@@ -1088,12 +1078,10 @@ const isInternal = (url: string) => url.startsWith('/') || url.startsWith('#');
 
   .copy[data-copied] .copy-idle {
     opacity: 0;
-    translate: 0 -0.5rem;
   }
 
   .copy[data-copied] .copy-done {
     opacity: 1;
-    translate: 0 0;
   }
 
   .cal-side .cal-note {

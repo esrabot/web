@@ -62,21 +62,12 @@ const accessibleName = meta && label ? `${meta.label}: ${label}` : undefined;
     transition:
       border-color var(--dur) var(--ease),
       background-color var(--dur) var(--ease),
-      color var(--dur) var(--ease),
-      transform var(--dur) var(--ease-out),
-      box-shadow var(--dur) var(--ease-out);
+      color var(--dur) var(--ease);
   }
 
   .link-chip:hover {
     border-color: var(--blue);
     color: var(--blue);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .link-chip:active {
-    transform: translateY(0) scale(0.98);
-    box-shadow: none;
   }
 
   .link-chip:focus-visible {
@@ -116,13 +107,10 @@ const accessibleName = meta && label ? `${meta.label}: ${label}` : undefined;
 
   .out {
     opacity: 0.55;
-    transition:
-      transform var(--dur) var(--ease-out),
-      opacity var(--dur) var(--ease);
+    transition: opacity var(--dur) var(--ease);
   }
 
   .link-chip:hover .out {
     opacity: 1;
-    transform: translate(2px, -2px);
   }
 </style>

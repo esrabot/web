@@ -39,7 +39,7 @@ const isActive = (href: string) =>
       <ul>
         {
           NAV.map(({ label, href, accent }, i) => (
-            <li style={`--i: ${i}`}>
+            <li>
               <a
                 href={href}
                 class:list={['nav-link', { active: isActive(href), accent }]}
@@ -50,7 +50,7 @@ const isActive = (href: string) =>
             </li>
           ))
         }
-        <li class="nav-cta" style={`--i: ${NAV.length}`}>
+        <li class="nav-cta">
           <a class="btn" href={JOIN_HREF}>
             Get involved <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
           </a>
@@ -100,7 +100,6 @@ const isActive = (href: string) =>
       background-color var(--dur-slow) var(--ease),
       border-color var(--dur-slow) var(--ease),
       box-shadow var(--dur-slow) var(--ease);
-    view-transition-name: site-header;
   }
 
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -138,17 +137,11 @@ const isActive = (href: string) =>
     padding: var(--space-2) 0;
     color: var(--ink-strong);
     text-decoration: none;
-    transition:
-      color var(--dur) var(--ease),
-      transform var(--dur) var(--ease-out);
+    transition: color var(--dur) var(--ease);
   }
 
   .brand:hover {
     color: var(--blue);
-  }
-
-  .brand:active {
-    transform: scale(0.96);
   }
 
   /* --- nav ------------------------------------------------------- */
@@ -228,18 +221,13 @@ const isActive = (href: string) =>
     transition:
       border-color var(--dur) var(--ease),
       color var(--dur) var(--ease),
-      box-shadow var(--dur) var(--ease),
-      transform var(--dur) var(--ease-out);
+      box-shadow var(--dur) var(--ease);
   }
 
   .search-trigger:hover {
     border-color: var(--blue);
     color: var(--blue);
     box-shadow: 0 0 0 4px var(--blue-wash);
-  }
-
-  .search-trigger:active {
-    transform: scale(0.97);
   }
 
   .search-trigger :global(svg) {
@@ -270,16 +258,11 @@ const isActive = (href: string) =>
     color: var(--ink-strong);
     transition:
       border-color var(--dur) var(--ease),
-      background-color var(--dur) var(--ease),
-      transform var(--dur) var(--ease-out);
+      background-color var(--dur) var(--ease);
   }
 
   .menu-toggle:hover {
     border-color: var(--blue);
-  }
-
-  .menu-toggle:active {
-    transform: scale(0.92);
   }
 
   .menu-toggle:focus-visible {
@@ -300,9 +283,6 @@ const isActive = (href: string) =>
     height: 2px;
     border-radius: 2px;
     background: currentColor;
-    transition:
-      transform var(--dur-slow) var(--ease-out),
-      top var(--dur-slow) var(--ease-out);
   }
 
   .bars span:first-child {
@@ -373,39 +353,16 @@ const isActive = (href: string) =>
       background: var(--bg);
       box-shadow: 0 24px 48px rgba(15, 29, 53, 0.12);
       visibility: hidden;
-      opacity: 0;
-      translate: 0 -0.5rem;
-      transition:
-        opacity var(--dur-slow) var(--ease-out),
-        translate var(--dur-slow) var(--ease-out),
-        visibility 0s linear var(--dur-slow);
     }
 
     :global(.js) .site-header:global([data-open]) .nav {
       visibility: visible;
-      opacity: 1;
-      translate: 0 0;
-      transition-delay: 0s;
     }
 
     :global(.js) .nav ul {
       flex-direction: column;
       align-items: stretch;
       gap: 0;
-    }
-
-    :global(.js) .nav li {
-      opacity: 0;
-      translate: 0 0.5rem;
-      transition:
-        opacity var(--dur-slow) var(--ease-out),
-        translate var(--dur-slow) var(--ease-out);
-    }
-
-    :global(.js) .site-header:global([data-open]) .nav li {
-      opacity: 1;
-      translate: 0 0;
-      transition-delay: calc(60ms + var(--i) * 35ms);
     }
 
     :global(.js) .nav-link {

@@ -105,27 +105,10 @@ const structuredData = [
 
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
-    <!-- Arms everything that depends on script: the scroll arrivals, the
-         folded menu. Set before first paint so nothing flashes; without JS
-         every [data-reveal] block is simply visible. -->
+    <!-- Arms what depends on script: the folded menu. Set before first
+         paint so nothing flashes. Content never waits on script to show. -->
     <script is:inline>
       document.documentElement.classList.add('js');
-
-      // Page-to-page transitions (see global.css) are skipped by the browser
-      // when something interrupts one — a second click, or the search
-      // shortcut pressed while the page is still fading in — and it reports
-      // each skip as an unhandled rejection. A skipped cross-fade is not an
-      // error, so that one rejection, and only that one, is acknowledged.
-      window.addEventListener('unhandledrejection', function (event) {
-        var reason = event.reason;
-        if (
-          reason &&
-          reason.name === 'InvalidStateError' &&
-          /^Transition was (aborted|skipped)/.test(String(reason.message))
-        ) {
-          event.preventDefault();
-        }
-      });
     </script>
   </head>
 
@@ -142,38 +125,11 @@ const structuredData = [
 
     <SearchDialog />
 
-    <!-- The behaviour every page shares. Inline and dependency-free, so it
-         cannot fail to load: arrivals, the header, and modal dialogs. -->
+    <!-- The behavior every page shares. Inline and dependency-free, so it
+         cannot fail to load: the header menu and modal dialogs. -->
     <script is:inline>
       (function () {
         var doc = document;
-
-        /* --- Arrivals (see global.css) ---------------------------------
-           If anything here fails, the catch reveals everything rather
-           than leaving content hidden. */
-        var blocks = doc.querySelectorAll('[data-reveal]');
-        var show = function (el) {
-          el.classList.add('revealed');
-        };
-        try {
-          if (!('IntersectionObserver' in window)) throw 0;
-          var io = new IntersectionObserver(
-            function (entries) {
-              entries.forEach(function (entry) {
-                if (entry.isIntersecting) {
-                  show(entry.target);
-                  io.unobserve(entry.target);
-                }
-              });
-            },
-            { rootMargin: '0px 0px -8% 0px' }
-          );
-          blocks.forEach(function (el) {
-            io.observe(el);
-          });
-        } catch (_) {
-          blocks.forEach(show);
-        }
 
         /* --- Header: a hairline once the page scrolls under it -------- */
         var header = doc.querySelector('[data-header]');
