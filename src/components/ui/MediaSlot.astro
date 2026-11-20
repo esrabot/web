@@ -1,0 +1,137 @@
+---
+/**
+ * A place for a real photo or video of the robots and the teams.
+ *
+ * Each slot is one entry in src/content/media.yaml, by id:
+ *
+ *   <MediaSlot id="hero" ratio="4/3" />
+ *
+ * With a photo, it is a figure (through astro:assets, so the source is
+ * served at sensible sizes). With a video, it is a click-to-load YouTube
+ * or Vimeo player, or a plain video file. With neither yet, it is a
+ * labeled placeholder that says which shot belongs there. The
+ * placeholder is deliberate, and shows on the live site too, so the gaps
+ * stay visible until the team fills them.
+ */
+import { getEntry } from 'astro:content';
+
+import Figure from './Figure.astro';
+import Embed from '../blog/Embed.astro';
+import Video from '../blog/Video.astro';
+import { requireAsset } from '../../lib/assets';
+
+interface Props {
+  /** The entry's id in src/content/media.yaml. */
+  id: string;
+  /** Width / height of the frame, e.g. "4/3" or "16/9". */
+  ratio?: string;
+  /** Eager for a slot above the fold. */
+  loading?: 'lazy' | 'eager';
+  /** Rendered width hint for the image optimizer. */
+  width?: number;
+  class?: string;
+}
+
+const { id, ratio = '3/2', loading = 'lazy', width = 1200, class: className } = Astro.props;
+
+const entry = await getEntry('media', id);
+if (!entry) {
+  throw new Error(`MediaSlot: there is no entry "${id}" in src/content/media.yaml.`);
+}
+const media = entry.data;
+
+const photo = media.image ? requireAsset(media.image, `media.yaml: ${id}`) : null;
+
+// A YouTube or Vimeo link plays through the click-to-load embed; anything
+// else is taken to be a video file.
+const youtube = media.video?.match(
+  /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/))([\w-]{11})/
+)?.[1];
+const vimeo = media.video?.match(/vimeo\.com\/(?:video\/)?(\d+)/)?.[1];
+
+const [rw, rh] = ratio.split('/').map(Number);
+const aspect = rw > 0 && rh > 0 ? `${rw} / ${rh}` : '3 / 2';
+const label = media.kind === 'video' ? 'Video needed' : 'Photo needed';
+---
+
+{
+  photo ? (
+    <Figure
+      src={photo}
+      alt={media.alt}
+      caption={media.caption}
+      ref={media.credit}
+      ratio={ratio}
+      width={width}
+      loading={loading}
+      class={className}
+    />
+  ) : youtube ? (
+    <div class={className}>
+      <Embed
+        youtube={youtube}
+        title={media.alt ?? media.caption ?? 'Video'}
+        caption={media.caption}
+      />
+    </div>
+  ) : vimeo ? (
+    <div class={className}>
+      <Embed
+        url={`https://player.vimeo.com/video/${vimeo}?autoplay=1&dnt=1`}
+        title={media.alt ?? media.caption ?? 'Video'}
+        caption={media.caption}
+      />
+    </div>
+  ) : media.video ? (
+    <div class={className}>
+      <Video src={media.video} poster={media.poster} caption={media.caption} ratio={ratio} />
+    </div>
+  ) : (
+    <div
+      class:list={['slot', className]}
+      style={`aspect-ratio: ${aspect};`}
+      data-media-slot={id}
+      aria-hidden="true"
+    >
+      <p class="slot-label">{label}</p>
+      <p class="slot-need">{media.need}</p>
+    </div>
+  )
+}
+
+<style>
+  /* The placeholder: a dashed gray frame, plainly a gap to be filled. */
+  .slot {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    border: 1px dashed var(--rule-strong);
+    border-radius: var(--r-lg);
+    background: var(--band);
+  }
+
+  /* On a gray band, a white frame stands out where a gray one would not. */
+  :global(.tone-band) .slot {
+    background: var(--surface);
+  }
+
+  .slot-label {
+    margin: 0;
+    font-family: var(--font-label);
+    font-size: var(--t-xs);
+    font-weight: var(--w-semibold);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .slot-need {
+    max-width: 34rem;
+    margin: 0;
+    font-size: var(--t-sm);
+    line-height: 1.5;
+    color: var(--ink-body);
+  }
+</style>

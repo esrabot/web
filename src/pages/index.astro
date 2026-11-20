@@ -21,6 +21,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Section from '../components/ui/Section.astro';
 import SectionHead from '../components/ui/SectionHead.astro';
 import PartnerMark from '../components/ui/PartnerMark.astro';
+import MediaSlot from '../components/ui/MediaSlot.astro';
 import PathwayBody from '../components/pathways/PathwayBody.astro';
 import { CONTACTS, PARTNER_HREF, SITE } from '../data/site';
 import { getPublicRepos } from '../lib/github';
@@ -263,23 +264,27 @@ const partnerMeta = (p: (typeof partners)[number]) =>
        ============================================================ -->
   <section class="hero">
     <div class="container">
-      <div class="hero-copy">
-        <p class="eyebrow">{SITE.fullName}</p>
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">{SITE.fullName}</p>
 
-        <h1>One robot.<br />Many campuses.</h1>
+          <h1>One robot.<br />Many campuses.</h1>
 
-        <p class="lede">
-          ESRA is a national nonprofit that connects university robotics teams, so they can share
-          what they learn, split the engineering, and build robots no single campus could build
-          alone.
-        </p>
+          <p class="lede">
+            ESRA is a national nonprofit that connects university robotics teams, so they can share
+            what they learn, split the engineering, and build robots no single campus could build
+            alone.
+          </p>
 
-        <div class="hero-actions">
-          <a class="btn lg" href={PARTNER_HREF}>
-            Partner with us <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
-          </a>
-          <a class="btn lg secondary" href="#join">Get involved</a>
+          <div class="hero-actions">
+            <a class="btn lg" href={PARTNER_HREF}>
+              Partner with us <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
+            </a>
+            <a class="btn lg secondary" href="#join">Get involved</a>
+          </div>
         </div>
+
+        <MediaSlot id="hero" ratio="4/3" loading="eager" width={960} class="hero-media" />
       </div>
 
       <dl class="hero-facts">
@@ -483,6 +488,11 @@ const partnerMeta = (p: (typeof partners)[number]) =>
               <dd>{SITE.license}</dd>
             </div>
           </dl>
+        </div>
+
+        <div class="flagship-media">
+          <MediaSlot id="h1-photo" ratio="16/9" />
+          <MediaSlot id="h1-video" ratio="16/9" />
         </div>
 
         {milestones.length > 0 && (
@@ -777,6 +787,14 @@ const partnerMeta = (p: (typeof partners)[number]) =>
    * ============================================================== */
   .hero {
     padding-block: clamp(3rem, 6vw, 5rem) var(--space-7);
+  }
+
+  /* The headline and its photo side by side; stacked on a narrow screen. */
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: center;
+    gap: var(--space-6) var(--space-8);
   }
 
   .hero-copy {
@@ -1117,6 +1135,14 @@ const partnerMeta = (p: (typeof partners)[number]) =>
 
   .flagship-copy :global(.title) {
     max-width: 20ch;
+  }
+
+  /* A photo and a video of the hardware, side by side. */
+  .flagship-media {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin-top: var(--space-8);
   }
 
   /* "H1": the program's name, set as the first line of its heading. */
@@ -1726,6 +1752,7 @@ const partnerMeta = (p: (typeof partners)[number]) =>
   }
 
   @media (max-width: 1000px) {
+    .hero-grid,
     .why,
     .support,
     .flagship {
@@ -1793,6 +1820,10 @@ const partnerMeta = (p: (typeof partners)[number]) =>
   /* Who does what: the three roles stack, and one line runs from the
      stack down to the university teams. */
   @media (max-width: 760px) {
+    .flagship-media {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
     .supports {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-3);

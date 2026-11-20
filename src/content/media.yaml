@@ -1,0 +1,47 @@
+# Photos and video of the robots and the teams.
+#
+# Each entry is one place on the site that should show a real photo or
+# video. Until an entry has a file, the site shows a labeled placeholder
+# there ("Photo needed: …"), on purpose, so the gaps stay visible.
+#
+# Only real photos and video of ESRA's own work. No stock images, no
+# AI-generated images.
+#
+# To fill a slot with a photo:
+#   1. Put the file in src/assets/media/ (JPG, at least 2400px on the long
+#      side; the site makes the smaller sizes itself).
+#   2. Set `image: media/<file name>` below.
+#   3. Write `alt`: what the photo shows, for people who cannot see it.
+#      The build fails without it.
+#   4. Optionally add `caption` and `credit` (who took it). Get the
+#      permission of anyone recognizable in the photo.
+#
+# To fill a slot with a video, set `video:` to a YouTube or Vimeo link
+# (an unlisted upload is fine), or to a short MP4 under public/video/
+# (e.g. /video/h1-leg-test.mp4, ideally under 10 MB). A YouTube video only
+# loads when the visitor presses play.
+#
+#   kind    photo | video (the label on the placeholder)
+#   where   where the slot is on the site
+#   need    the shot it needs, shown in the placeholder
+
+- id: hero
+  kind: photo
+  where: Home page, beside the headline
+  need: >-
+    Students working on H1 hardware, or the team together at a build
+    session. Landscape, at least 2400px wide.
+
+- id: h1-photo
+  kind: photo
+  where: Home page, H1 section
+  need: >-
+    H1 hardware in progress, such as a subsystem on the bench. Landscape,
+    at least 2400px wide.
+
+- id: h1-video
+  kind: video
+  where: Home page, H1 section, beside the photo
+  need: >-
+    A 15 to 60 second clip of hardware moving, such as a leg or actuator
+    test. A YouTube or Vimeo link, or a short MP4.

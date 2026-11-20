@@ -179,6 +179,51 @@ collections:
                   - { name: url, label: URL, widget: string, hint: 'A full URL, or a site path such as /#join' }
               - { name: draft, label: Draft (hidden), widget: boolean, default: false }
 
+  - name: media
+    label: Photos and video
+    files:
+      - name: media
+        label: Photo and video slots
+        file: src/content/media.yaml
+        description: 'Real photos and video of the robots and the teams. A slot with no file shows a "Photo needed" placeholder on the site. No stock or AI-generated images.'
+        fields:
+          - name: media
+            label: Slots
+            label_singular: slot
+            widget: list
+            root: true
+            allow_add: false
+            allow_remove: false
+            summary: '{{fields.where}}'
+            fields:
+              - { name: id, label: ID, widget: string, hint: 'Do not change: the page uses it to find this slot.' }
+              - { name: kind, label: Kind, widget: select, options: [photo, video] }
+              - { name: where, label: Where it appears, widget: string }
+              - { name: need, label: The shot it needs, widget: text }
+              - {
+                  name: image,
+                  label: Photo path,
+                  widget: string,
+                  required: false,
+                  hint: 'A path under src/assets, e.g. media/h1-bench.jpg. At least 2400px on the long side.',
+                }
+              - {
+                  name: alt,
+                  label: Description (alt text),
+                  widget: string,
+                  required: false,
+                  hint: 'What the photo or video shows, for people who cannot see it. Required with a photo.',
+                }
+              - { name: caption, label: Caption, widget: string, required: false }
+              - { name: credit, label: Credit (who took it), widget: string, required: false }
+              - {
+                  name: video,
+                  label: Video,
+                  widget: string,
+                  required: false,
+                  hint: 'A YouTube or Vimeo link, or a file under public/video/, e.g. /video/h1-leg-test.mp4',
+                }
+              - { name: poster, label: Video still (for a video file), widget: string, required: false }
   - name: roadmap
     label: Roadmap
     files:

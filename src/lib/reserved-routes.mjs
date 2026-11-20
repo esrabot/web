@@ -33,6 +33,7 @@ export const RESERVED_ROUTES = new Set([
   // static files in public/
   'admin',
   'media',
+  'video',
   'favicon.svg',
   'favicon.ico',
   'robots.txt',

@@ -379,6 +379,41 @@ const pathways = defineCollection({
   }),
 });
 
+/**
+ * Photos and video of the robots and the teams, one entry per place on
+ * the site that should show one (src/components/ui/MediaSlot.astro).
+ *
+ * Until an entry has a file, its slot shows a labeled placeholder saying
+ * what picture belongs there. Only real photos and video of ESRA's own
+ * work: no stock images, no generated ones.
+ */
+const media = defineCollection({
+  loader: file('./src/content/media.yaml'),
+  schema: z
+    .object({
+      kind: z.enum(['photo', 'video']),
+      /** Where the slot is on the site, for whoever edits the file. */
+      where: z.string(),
+      /** The shot the slot needs. Shown in the placeholder. */
+      need: z.string(),
+      /** A photo: a path under src/assets, e.g. media/h1-bench.jpg. */
+      image: blank(z.string()),
+      /** What the photo or video shows, for people who cannot see it. */
+      alt: blank(z.string()),
+      caption: blank(z.string()),
+      /** Who took it. */
+      credit: blank(z.string()),
+      /** A video: a YouTube or Vimeo link, or a file under public/video/. */
+      video: blank(z.string()),
+      /** Still frame for a video file, under public/video/. */
+      poster: blank(z.string()),
+    })
+    .refine((m) => !m.image || Boolean(m.alt), {
+      message: 'a photo needs alt text: say what it shows',
+      path: ['alt'],
+    }),
+});
+
 const docs = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/docs' }),
   schema: z.object({
@@ -401,4 +436,5 @@ export const collections = {
   programs,
   events,
   pathways,
+  media,
 };

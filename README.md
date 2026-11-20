@@ -64,6 +64,7 @@ src/
     programs.yaml     the roadmap: H1, Q1 and the manipulator projects
     events.yaml       featured events on /events
     pathways.yaml     the "Get involved" cards, pop-ups and /partner
+    media.yaml        photo and video slots, with what each one needs
     featured.yaml     hand-picked links for the home page
   data/
     orgs.ts           every social/org URL, defined once
@@ -125,10 +126,11 @@ pieces (buttons, cards, tags, pop-up dialogs) are defined once in [global.css](.
 | Featured events                                               | `src/content/events.yaml`                     |
 | Everyday dates                                                | the public Google Calendar — no deploy needed |
 | The "Get involved" cards, their pop-ups, and the partner page | `src/content/pathways.yaml`                   |
+| Photos and video of the robots and teams                      | `src/content/media.yaml`                      |
 | The navigation, or which calendar is embedded                 | `src/data/site.ts`                            |
 | How many repositories show before "Show all"                  | `REPO_PAGE` in `src/pages/projects.astro`     |
 
-The four YAML files can also be edited in the content editor at `/admin`.
+The YAML files above can also be edited in the content editor at `/admin`.
 
 ---
 
