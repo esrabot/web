@@ -15,6 +15,7 @@ export const RESERVED_ROUTES = new Set([
   'contact',
   'colophon',
   '404',
+  'partner',
   // removed sections, redirected home in vercel.json — a redirect wins
   // over a page, so a member slug here would never be reachable
   'blog',
@@ -43,6 +44,8 @@ export const RESERVED_ROUTES = new Set([
   'about',
   'join',
   'sponsors',
+  'sponsor',
+  'partners',
   'calendar',
   'tags',
   'feed',

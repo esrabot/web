@@ -2,8 +2,9 @@
 /**
  * Site header.
  *
- * Wordmark, the primary nav, search, and the one call to action. Sticky,
- * solid white, with a hairline underneath.
+ * Wordmark, the primary nav, search, and the one call to action: the
+ * partner page, so companies and labs have a way in from every page.
+ * Sticky, solid white, with a hairline underneath.
  *
  * Below the breakpoint the nav folds into a panel behind a menu button.
  * That needs JS, so without it the nav stays a horizontally scrollable
@@ -15,7 +16,7 @@
 import { Icon } from 'astro-icon/components';
 
 import Logo from '../ui/Logo.astro';
-import { JOIN_HREF, NAV, SITE } from '../../data/site';
+import { NAV, PARTNER_HREF, SITE } from '../../data/site';
 
 interface Props {
   /** Path of the current page, used to mark the active nav item. */
@@ -50,9 +51,7 @@ const isActive = (href: string) =>
           ))
         }
         <li class="nav-cta">
-          <a class="btn" href={JOIN_HREF}>
-            Get involved <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
-          </a>
+          <a class="btn" href={PARTNER_HREF}>Partner with us</a>
         </li>
       </ul>
     </nav>
@@ -70,7 +69,7 @@ const isActive = (href: string) =>
         <kbd data-search-kbd aria-hidden="true">Ctrl K</kbd>
       </a>
 
-      <a class="btn sm cta" href={JOIN_HREF}>Get involved</a>
+      <a class="btn sm cta" href={PARTNER_HREF}>Partner with us</a>
 
       <button
         class="menu-toggle"

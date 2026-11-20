@@ -63,7 +63,7 @@ src/
     partners.yaml     partner clubs and schools
     programs.yaml     the roadmap: H1, Q1 and the manipulator projects
     events.yaml       featured events on /events
-    pathways.yaml     the "Get involved" cards and their pop-ups
+    pathways.yaml     the "Get involved" cards, pop-ups and /partner
     featured.yaml     hand-picked links for the home page
   data/
     orgs.ts           every social/org URL, defined once
@@ -119,14 +119,14 @@ pieces (buttons, cards, tags, pop-up dialogs) are defined once in [global.css](.
 
 ### Where to change what
 
-| To change…                                    | Edit                                          |
-| --------------------------------------------- | --------------------------------------------- |
-| The robots on the roadmap, and H1's dates     | `src/content/programs.yaml`                   |
-| Featured events                               | `src/content/events.yaml`                     |
-| Everyday dates                                | the public Google Calendar — no deploy needed |
-| The "Get involved" cards and their pop-ups    | `src/content/pathways.yaml`                   |
-| The navigation, or which calendar is embedded | `src/data/site.ts`                            |
-| How many repositories show before "Show all"  | `REPO_PAGE` in `src/pages/projects.astro`     |
+| To change…                                                    | Edit                                          |
+| ------------------------------------------------------------- | --------------------------------------------- |
+| The robots on the roadmap, and H1's dates                     | `src/content/programs.yaml`                   |
+| Featured events                                               | `src/content/events.yaml`                     |
+| Everyday dates                                                | the public Google Calendar — no deploy needed |
+| The "Get involved" cards, their pop-ups, and the partner page | `src/content/pathways.yaml`                   |
+| The navigation, or which calendar is embedded                 | `src/data/site.ts`                            |
+| How many repositories show before "Show all"                  | `REPO_PAGE` in `src/pages/projects.astro`     |
 
 The four YAML files can also be edited in the content editor at `/admin`.
 

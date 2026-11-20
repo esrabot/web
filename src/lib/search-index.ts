@@ -13,7 +13,7 @@
  */
 import { getCollection } from 'astro:content';
 
-import { CONTACTS, JOIN_HREF, SITE } from '../data/site';
+import { CONTACTS, JOIN_HREF, PARTNER_HREF, SITE } from '../data/site';
 import { getOrg } from '../data/orgs';
 import { getPublicRepos } from './github';
 import { memberPath } from './routes';
@@ -105,6 +105,13 @@ function staticEntries(): SearchEntry[] {
       k: 'Page',
       d: 'Four ways in: students, partner clubs, labs and companies.',
       w: 'join sign up apply volunteer students engineering computer science business marketing partner club lab research mentor company sponsor sponsorship levels bronze silver gold platinum industry research alliance',
+    },
+    {
+      t: 'Partner with ESRA',
+      u: PARTNER_HREF,
+      k: 'Page',
+      d: 'For companies and research labs: what partners give and get, the partnership levels, and how to start.',
+      w: 'partner partnership sponsor sponsorship donate donation donor tax deductible 501c3 501(c)(3) nonprofit company industry corporate funding hardware in-kind lab research mentor faculty levels bronze silver gold platinum industry research alliance',
     },
     {
       t: 'Projects',

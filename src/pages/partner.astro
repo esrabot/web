@@ -1,0 +1,246 @@
+---
+/**
+ * Partner with ESRA: the page for companies and research labs.
+ *
+ * The header's one button points here, so a sponsor has a way in from
+ * every page, and this is the link to send a sponsorship manager or a
+ * lab.
+ *
+ * Everything specific is read from src/content/pathways.yaml (the
+ * Companies and Research labs entries), the same copy the home page's
+ * cards use, so the partnership levels and what partners are asked to do
+ * are written down once and never retyped.
+ */
+import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/ui/PageHero.astro';
+import Section from '../components/ui/Section.astro';
+import SectionHead from '../components/ui/SectionHead.astro';
+import PathwayBody from '../components/pathways/PathwayBody.astro';
+import { CONTACTS, SITE } from '../data/site';
+
+const pathways = await getCollection('pathways');
+const byId = (id: string) => pathways.find((p) => p.id === id)?.data;
+
+const general = CONTACTS[0]!;
+const mailto = (address: string, subject: string) =>
+  `mailto:${address}?subject=${encodeURIComponent(subject)}`;
+
+/** The two audiences, in the order the page reads. */
+const audiences = [
+  { id: 'companies', way: byId('industry-partner'), tone: 'white' as const },
+  { id: 'labs', way: byId('partner-lab'), tone: 'band' as const },
+].flatMap(({ id, way, tone }) =>
+  way ? [{ id, tone, way, email: way.email ?? general.address }] : []
+);
+
+const company = audiences.find((a) => a.id === 'companies');
+const levelsId = 'companies-partnership-levels';
+const hasLevels = Boolean(company?.way.sections.some((s) => s.table?.columns[0] === 'Level'));
+
+/** Who to write to: the partnerships inbox first, then the general one. */
+const contacts = [CONTACTS.find((c) => c.label === 'Partnerships'), general].filter(
+  (c): c is (typeof CONTACTS)[number] => Boolean(c)
+);
+---
+
+<BaseLayout
+  title="Partner with ESRA"
+  description="How companies and research labs work with ESRA: what partners give and get, the partnership levels, and how to start. ESRA is a 501(c)(3) nonprofit."
+  cta={false}
+>
+  <PageHero
+    eyebrow="For companies and research labs"
+    title="Partner with ESRA"
+    lede="ESRA is a national nonprofit that connects university robotics teams. Companies supply funding, hardware, software, machining and technical support. Research labs mentor teams, review designs and advise on hard problems."
+  >
+    {
+      company && (
+        <a class="btn lg" href={mailto(company.email, company.way.subject)}>
+          {company.way.cta} <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
+        </a>
+      )
+    }
+    {
+      hasLevels && (
+        <a class="btn lg secondary" href={`#${levelsId}`}>
+          See partnership levels
+        </a>
+      )
+    }
+  </PageHero>
+
+  <Section pad="flush-top">
+    <dl class="glance">
+      <div>
+        <dt>Tax status</dt>
+        <dd>{SITE.taxNote}</dd>
+      </div>
+      {
+        audiences.map((a) => (
+          <div>
+            <dt>{a.way.audience}</dt>
+            <dd>
+              <a href={`#${a.id}`}>{a.way.title}</a>: {a.way.lede}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </Section>
+
+  {
+    audiences.map((a) => (
+      <Section id={a.id} tone={a.tone}>
+        <SectionHead eyebrow={a.way.audience} title={a.way.title} lede={a.way.lede} />
+        <PathwayBody way={a.way} idPrefix={a.id} />
+        <div class="actions">
+          <a class="btn" href={mailto(a.email, a.way.subject)}>
+            {a.way.cta} <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
+          </a>
+          <p class="via">
+            or write to <a href={mailto(a.email, a.way.subject)}>{a.email}</a>
+          </p>
+        </div>
+      </Section>
+    ))
+  }
+
+  <Section id="contact">
+    <SectionHead eyebrow="Contact" title="Talk to us" />
+    <ul class="contacts">
+      {
+        contacts.map((c) => (
+          <li>
+            <p class="c-label">{c.label}</p>
+            <a class="c-addr" href={`mailto:${c.address}`}>
+              {c.address}
+            </a>
+            <p class="c-note">{c.note}</p>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="tax">{SITE.taxNote}</p>
+  </Section>
+</BaseLayout>
+
+<style>
+  /* The key facts, right under the title: the tax status first. */
+  .glance {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding-block: var(--space-5);
+    border-block: 1px solid var(--rule);
+  }
+
+  .glance dt {
+    font-family: var(--font-label);
+    font-size: var(--t-xs);
+    font-weight: var(--w-semibold);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .glance dd {
+    margin: var(--space-1) 0 0;
+    font-size: var(--t-base);
+    color: var(--ink-body);
+  }
+
+  /* The tax line is the one sponsors look for: set it in the heading ink. */
+  .glance div:first-child dd {
+    font-weight: var(--w-semibold);
+    color: var(--ink-strong);
+  }
+
+  .glance a {
+    font-weight: var(--w-semibold);
+    color: var(--blue);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-5);
+    margin-top: var(--space-7);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--rule);
+  }
+
+  .via {
+    margin: 0;
+    font-size: var(--t-sm);
+    color: var(--ink-muted);
+  }
+
+  .via a {
+    font-weight: var(--w-semibold);
+    color: var(--blue);
+  }
+
+  .contacts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .contacts li {
+    padding: var(--space-5);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+  }
+
+  .c-label {
+    margin: 0;
+    font-family: var(--font-label);
+    font-size: var(--t-xs);
+    font-weight: var(--w-semibold);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .c-addr {
+    display: inline-block;
+    margin-top: var(--space-1);
+    font-size: var(--t-lg);
+    font-weight: var(--w-semibold);
+    color: var(--ink-strong);
+    overflow-wrap: anywhere;
+  }
+
+  .c-addr:hover {
+    color: var(--blue);
+  }
+
+  .c-note {
+    margin: var(--space-2) 0 0;
+    font-size: var(--t-sm);
+    color: var(--ink-muted);
+  }
+
+  .tax {
+    max-width: var(--measure);
+    margin: var(--space-6) 0 0;
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--rule-strong);
+    font-weight: var(--w-semibold);
+    color: var(--ink-strong);
+  }
+
+  @media (max-width: 900px) {
+    .glance {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

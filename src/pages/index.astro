@@ -21,8 +21,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Section from '../components/ui/Section.astro';
 import SectionHead from '../components/ui/SectionHead.astro';
 import PartnerMark from '../components/ui/PartnerMark.astro';
-import DataTable from '../components/ui/DataTable.astro';
-import { CONTACTS, SITE } from '../data/site';
+import PathwayBody from '../components/pathways/PathwayBody.astro';
+import { CONTACTS, PARTNER_HREF, SITE } from '../data/site';
 import { getPublicRepos } from '../lib/github';
 
 const [repos, partners, allFeatured, allPrograms, allPathways] = await Promise.all([
@@ -159,17 +159,34 @@ const general = CONTACTS[0].address;
 const mailto = (address: string, subject: string) =>
   `mailto:${address}?subject=${encodeURIComponent(subject)}`;
 
+/** Ways in with a page of their own: the card goes there, not to a pop-up. */
+const WAY_PAGE: Record<string, string> = {
+  'industry-partner': `${PARTNER_HREF}#companies`,
+  'partner-lab': `${PARTNER_HREF}#labs`,
+};
+
 const ways = [...allPathways]
   .sort((a, b) => a.data.order - b.data.order)
   .map((w) => ({
     ...w.data,
     id: w.id,
+    page: WAY_PAGE[w.id],
     dialogId: `way-${w.id}`,
     href: mailto(w.data.email ?? general, w.data.subject),
     secondaryHref: w.data.secondary && mailto(w.data.secondary.email, w.data.secondary.subject),
     // A four-column table needs more room than the standard pop-up gives.
     wide: w.data.sections.some((s) => (s.table?.columns.length ?? 0) >= 4),
   }));
+
+/* ------------------------------------------------------------------
+ * For companies and labs: the partnership levels, read from the
+ * Companies card so the amounts are only ever written in one place.
+ * ---------------------------------------------------------------- */
+const industry = allPathways.find((w) => w.id === 'industry-partner')?.data;
+const partnerEmail = industry?.email ?? general;
+const levels = (
+  industry?.sections.find((s) => s.table?.columns[0] === 'Level')?.table?.rows ?? []
+).map((r) => ({ level: r.cells[0], value: r.cells[1] }));
 
 /* ------------------------------------------------------------------
  * Recent activity: featured links and repo pushes as a short list.
@@ -242,16 +259,10 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
         </p>
 
         <div class="hero-actions">
-          <a class="btn lg" href="#join">
-            Get involved <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
+          <a class="btn lg" href={PARTNER_HREF}>
+            Partner with us <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
           </a>
-          {
-            flagship && (
-              <a class="btn lg secondary" href="#h1">
-                Meet {flagship.data.designation ?? flagship.data.title}
-              </a>
-            )
-          }
+          <a class="btn lg secondary" href="#join">Get involved</a>
         </div>
       </div>
 
@@ -525,7 +536,52 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   <!-- ============================================================
-       Get involved: four cards, each opening a pop-up
+       For companies and research labs
+       ============================================================ -->
+  <Section id="support" tone="white">
+    <div class="support">
+      <div class="support-copy">
+        <SectionHead eyebrow="For companies and research labs" title="Partner with ESRA" />
+        <p class="support-body">
+          Companies supply funding, hardware, software, machining and technical support. Research
+          labs mentor teams, review designs and advise on hard problems. One contribution reaches
+          teams at many universities.
+        </p>
+        <p class="support-tax">{SITE.taxNote}</p>
+        <div class="support-actions">
+          <a class="btn" href={PARTNER_HREF}>
+            Partner with us <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
+          </a>
+          <a class="btn secondary" href={mailto(partnerEmail, 'Industry partnership')}>
+            Email {partnerEmail}
+          </a>
+        </div>
+      </div>
+
+      {
+        levels.length > 0 && (
+          <div class="levels">
+            <h3 class="levels-head">Partnership levels</h3>
+            <dl>
+              {levels.map((l) => (
+                <div>
+                  <dt>{l.level}</dt>
+                  <dd>{l.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <a class="link-arrow" href={`${PARTNER_HREF}#companies-partnership-levels`}>
+              What each level includes <Icon name="lucide:arrow-right" aria-hidden="true" />
+            </a>
+          </div>
+        )
+      }
+    </div>
+  </Section>
+
+  <!-- ============================================================
+       Get involved: four cards. Students and clubs open a pop-up;
+       companies and labs go to the partner page.
        ============================================================ -->
   <Section id="join">
     <SectionHead
@@ -546,14 +602,20 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
                 <li>{p}</li>
               ))}
             </ul>
-            <button
-              type="button"
-              class="way-open stretch"
-              data-modal-open={w.dialogId}
-              aria-haspopup="dialog"
-            >
-              See what’s involved<span class="sr-only">: {w.title}</span>
-            </button>
+            {w.page ? (
+              <a class="way-open stretch" href={w.page}>
+                See what’s involved<span class="sr-only">: {w.title}</span>
+              </a>
+            ) : (
+              <button
+                type="button"
+                class="way-open stretch"
+                data-modal-open={w.dialogId}
+                aria-haspopup="dialog"
+              >
+                See what’s involved<span class="sr-only">: {w.title}</span>
+              </button>
+            )}
           </article>
         ))
       }
@@ -566,88 +628,46 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   </Section>
 
   {
-    ways.map((w) => (
-      <dialog
-        class:list={['modal', 'way-modal', { wide: w.wide }]}
-        id={w.dialogId}
-        aria-labelledby={`${w.dialogId}-title`}
-      >
-        <button type="button" class="modal-close" data-modal-close aria-label="Close">
-          <Icon name="lucide:x" aria-hidden="true" />
-        </button>
+    ways
+      .filter((w) => !w.page)
+      .map((w) => (
+        <dialog
+          class:list={['modal', 'way-modal', { wide: w.wide }]}
+          id={w.dialogId}
+          aria-labelledby={`${w.dialogId}-title`}
+        >
+          <button type="button" class="modal-close" data-modal-close aria-label="Close">
+            <Icon name="lucide:x" aria-hidden="true" />
+          </button>
 
-        <div class="modal-scroll">
-          <header class="wm-head">
-            <p class="eyebrow">{w.audience}</p>
-            <h2 id={`${w.dialogId}-title`}>{w.title}</h2>
-            <p class="wm-lede">{w.lede}</p>
-          </header>
+          <div class="modal-scroll">
+            <header class="wm-head">
+              <p class="eyebrow">{w.audience}</p>
+              <h2 id={`${w.dialogId}-title`}>{w.title}</h2>
+              <p class="wm-lede">{w.lede}</p>
+            </header>
 
-          <div class="wm-body">
-            <p class="wm-intro">{w.intro}</p>
-
-            {/* Lists sit side by side where there is room; a table or a
-                paragraph takes the full width. */}
-            <div class="wm-sections">
-              {w.sections.map((s) => (
-                <section class:list={{ full: !s.items }}>
-                  <h3>{s.heading}</h3>
-                  {s.items && (
-                    <ul>
-                      {s.items.map((item) => (
-                        <li>{item}</li>
-                      ))}
-                    </ul>
-                  )}
-                  {s.table && (
-                    <DataTable
-                      columns={s.table.columns}
-                      rows={s.table.rows.map((r) => r.cells)}
-                      note={s.table.note}
-                      label={s.heading}
-                    />
-                  )}
-                  {s.text && <p class="wm-text">{s.text}</p>}
-                </section>
-              ))}
+            <div class="wm-body">
+              <PathwayBody way={w} />
             </div>
 
-            {w.notes.length > 0 && (
-              <div class="wm-notes">
-                {w.notes.map((n) => (
-                  <aside class="wm-note">
-                    <p class="wm-note-label">{n.label}</p>
-                    <p>{n.body}</p>
-                  </aside>
-                ))}
-              </div>
-            )}
-
-            {w.start && (
-              <section class="wm-start">
-                <h3>How to start</h3>
-                <p>{w.start}</p>
-              </section>
-            )}
+            <footer class="wm-foot">
+              <a class="btn" href={w.href}>
+                {w.cta} <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
+              </a>
+              {w.secondary ? (
+                <a class="btn secondary" href={w.secondaryHref}>
+                  {w.secondary.label}
+                </a>
+              ) : (
+                <a class="btn quiet" href="/contact">
+                  Other ways to reach us
+                </a>
+              )}
+            </footer>
           </div>
-
-          <footer class="wm-foot">
-            <a class="btn" href={w.href}>
-              {w.cta} <Icon name="lucide:arrow-right" class="arrow" aria-hidden="true" />
-            </a>
-            {w.secondary ? (
-              <a class="btn secondary" href={w.secondaryHref}>
-                {w.secondary.label}
-              </a>
-            ) : (
-              <a class="btn quiet" href="/contact">
-                Other ways to reach us
-              </a>
-            )}
-          </footer>
-        </div>
-      </dialog>
-    ))
+        </dialog>
+      ))
   }
 
   <!-- ============================================================
@@ -1266,6 +1286,82 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
   }
 
   /* ================================================================
+   * For companies and research labs
+   * ============================================================== */
+  .support {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: start;
+    gap: var(--space-6) var(--space-8);
+  }
+
+  .support-copy :global(.section-head) {
+    margin-bottom: var(--space-5);
+  }
+
+  .support-body {
+    max-width: var(--measure);
+    margin: 0;
+    font-size: var(--t-md);
+  }
+
+  .support-tax {
+    max-width: var(--measure);
+    margin: var(--space-5) 0 0;
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--rule-strong);
+    font-weight: var(--w-semibold);
+    color: var(--ink-strong);
+  }
+
+  .support-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+
+  /* The four levels and what each is worth, read from the Companies card. */
+  .levels {
+    padding: var(--space-5) var(--space-6);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    background: var(--band);
+  }
+
+  .levels-head {
+    margin-bottom: var(--space-2);
+    font-size: var(--t-base);
+  }
+
+  .levels dl {
+    margin: 0 0 var(--space-4);
+  }
+
+  .levels dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .levels dt {
+    font-weight: var(--w-semibold);
+    color: var(--ink-strong);
+  }
+
+  .levels dd {
+    margin: 0;
+    color: var(--ink-body);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .levels .link-arrow {
+    font-size: var(--t-sm);
+  }
+
+  /* ================================================================
    * Ways in
    * ============================================================== */
   .ways {
@@ -1313,9 +1409,8 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     color: var(--ink-body);
   }
 
-  /* Plain bulleted lists, on the cards and in their pop-ups. */
-  .way-points,
-  .wm-sections ul {
+  /* Plain bulleted lists on the cards. */
+  .way-points {
     display: grid;
     align-content: start;
     gap: var(--space-2);
@@ -1330,22 +1425,22 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     border-top: 1px solid var(--rule-soft);
   }
 
-  .way-points li,
-  .wm-sections li {
+  .way-points li {
     padding-left: 0.125rem;
     font-size: var(--t-sm);
     line-height: 1.55;
     color: var(--ink-body);
   }
 
-  .way-points li::marker,
-  .wm-sections li::marker {
+  .way-points li::marker {
     color: var(--ink-faint);
   }
 
-  /* The button that opens the pop-up. It is stretched over the whole
-     card (.stretch), so anywhere on the card opens it. */
+  /* The button that opens the pop-up, or the link to the partner page.
+     It is stretched over the whole card (.stretch), so anywhere on the
+     card works. */
   .way-open {
+    display: inline-block;
     justify-self: start;
     align-self: end;
     margin-top: var(--space-5);
@@ -1358,6 +1453,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
     line-height: 1.3;
     color: var(--ink-strong);
     text-align: left;
+    text-decoration: none;
     transition:
       border-color var(--dur) var(--ease),
       color var(--dur) var(--ease);
@@ -1412,88 +1508,6 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
   .wm-body {
     padding: var(--space-5) var(--space-6) var(--space-6);
-  }
-
-  .wm-intro {
-    margin: 0;
-    font-size: var(--t-md);
-    color: var(--ink-body);
-  }
-
-  .wm-notes {
-    display: grid;
-    gap: var(--space-3);
-    margin-top: var(--space-6);
-  }
-
-  .wm-note {
-    padding: var(--space-4) var(--space-5);
-    border: 1px solid var(--band-edge);
-    border-radius: var(--r-md);
-    background: var(--band);
-  }
-
-  .wm-note p {
-    margin: 0;
-    font-size: var(--t-base);
-    color: var(--ink-body);
-  }
-
-  .wm-note .wm-note-label {
-    margin-bottom: var(--space-1);
-    font-family: var(--font-label);
-    font-size: var(--t-xs);
-    font-weight: var(--w-semibold);
-    letter-spacing: var(--track-label);
-    text-transform: uppercase;
-    color: var(--ink-muted);
-  }
-
-  /* Lists share a row where there is room, each growing to fill it; a
-     table or a paragraph always takes a row of its own. Flex rather than
-     grid, so a list left alone on a row grows to the full width instead
-     of leaving an empty track beside it. */
-  .wm-sections {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-6);
-    margin-top: var(--space-6);
-  }
-
-  .wm-sections > section {
-    flex: 1 1 13rem;
-    /* Lets a wide table scroll inside its own box instead of stretching
-       the pop-up. */
-    min-width: 0;
-  }
-
-  .wm-sections > section.full {
-    flex-basis: 100%;
-  }
-
-  .wm-text {
-    margin: 0;
-    font-size: var(--t-base);
-    color: var(--ink-body);
-  }
-
-  .wm-body h3 {
-    margin-bottom: var(--space-3);
-    font-size: var(--t-base);
-    letter-spacing: 0;
-    color: var(--ink-strong);
-  }
-
-  .wm-start {
-    margin-top: var(--space-6);
-    padding-top: var(--space-5);
-    border-top: 1px solid var(--rule-soft);
-  }
-
-  .wm-start p {
-    margin: 0;
-    font-size: var(--t-base);
-    color: var(--ink-body);
   }
 
   /* The actions stay in view while the card's body scrolls. */
@@ -1710,6 +1724,7 @@ const STATUS_LABEL = { active: 'In progress', planned: 'Planned', complete: 'Com
 
   @media (max-width: 1000px) {
     .why,
+    .support,
     .flagship {
       grid-template-columns: minmax(0, 1fr);
     }

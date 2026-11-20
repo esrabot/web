@@ -26,6 +26,14 @@ export const SITE = {
   incorporated: 'New Jersey nonprofit, 2026',
   /** Federal tax status. Shown in the footer and the home page's facts. */
   taxStatus: '501(c)(3)',
+  /**
+   * The one sentence sponsors look for, shown on the home page, on
+   * /partner and in the footer's closing row. Worded as in the Companies
+   * card in src/content/pathways.yaml.
+   * TODO(confirm): the IRS determination letter is in hand. Consider
+   * adding "to the extent allowed by law", the usual qualifier.
+   */
+  taxNote: 'ESRA is a 501(c)(3) nonprofit, so donations are tax-deductible.',
   license: 'MIT + CERN-OHL-S',
   repo: 'esrabot/web',
   repoUrl: 'https://github.com/esrabot/web',
@@ -74,21 +82,27 @@ export const CONTACTS: { address: string; label: string; note: string }[] = [
   },
 ];
 
+/** Where every "Get involved" link points: the ways-in section on Home. */
+export const JOIN_HREF = '/#join';
+
+/**
+ * The page for companies and research labs. The header's one button
+ * points here, so sponsors have a way in from every page.
+ */
+export const PARTNER_HREF = '/partner';
+
 /**
  * Primary navigation, in the order it reads across the header. Search and
- * the "Get involved" button sit after it and are not part of this list.
+ * the "Partner with us" button sit after it and are not part of this list.
  */
-/** `accent` keeps a link's text blue at all times, not just on hover. */
-export const NAV: { label: string; href: string; accent?: boolean }[] = [
+export const NAV: { label: string; href: string }[] = [
   { label: 'Projects', href: '/projects' },
   { label: 'Events', href: '/events' },
   { label: 'Guides', href: '/docs' },
   { label: 'Members', href: '/members' },
-  { label: 'Contact', href: '/contact', accent: true },
+  { label: 'Get involved', href: JOIN_HREF },
+  { label: 'Contact', href: '/contact' },
 ];
-
-/** Where every "Get involved" button points: the ways-in section on Home. */
-export const JOIN_HREF = '/#join';
 
 /**
  * The public ESRA events calendar (Google Calendar).
